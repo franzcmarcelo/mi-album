@@ -123,8 +123,7 @@ export function useInventory(instanceId: string, userId: string | null) {
       if (context?.previous !== undefined) {
         qc.setQueryData(['inventory', instanceId, userId], context.previous);
       }
-    },
-    onSettled: () => {
+      // Sync with server after a failed write
       qc.invalidateQueries({ queryKey: ['inventory', instanceId] });
     },
     mutationFn: async ({
