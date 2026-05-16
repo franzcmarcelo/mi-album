@@ -1,63 +1,58 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
-import { LogoutButton } from './LogoutButton';
+import { NavMenu } from './NavMenu';
+import { BottomNav } from './BottomNav';
 
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const displayName = user?.user_metadata?.full_name ?? user?.email?.split('@')[0] ?? null;
-  const avatarUrl = user?.user_metadata?.avatar_url ?? null;
-
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+    <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
+      {/* Top navbar */}
+      <nav
+        className="sticky top-0 z-40"
+        style={{
+          background: 'rgba(7,9,15,0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid var(--bg-border)',
+        }}
+      >
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2 font-bold text-gray-900">
-            <span className="text-xl">📚</span>
-            <span>Album Digital</span>
+          {/* Brand */}
+          <Link href="/" className="flex items-center gap-2.5" style={{ textDecoration: 'none' }}>
+            <div
+              style={{
+                width: '34px', height: '34px',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                borderRadius: '10px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '18px',
+                boxShadow: '0 2px 12px rgba(245,158,11,0.3)',
+                flexShrink: 0,
+              }}
+            >
+              ⚽
+            </div>
+            <div style={{ lineHeight: 1 }}>
+              <span style={{ display: 'block', color: 'var(--text-1)', fontWeight: 800, fontSize: '15px', letterSpacing: '-0.01em' }}>
+                Mi Álbum
+              </span>
+              <span style={{
+                display: 'block', fontSize: '9px', fontWeight: 700,
+                letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: '2px',
+                background: 'linear-gradient(90deg, #6366f1, #06b6d4)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              }}>
+                Mundial 2026
+              </span>
+            </div>
           </Link>
 
-          <div className="flex items-center gap-3">
-            <Link href="/cargar" className="text-sm text-gray-500 hover:text-gray-700">Cargar</Link>
-            <Link href="/repetidas" className="text-sm text-gray-500 hover:text-gray-700">Repetidas</Link>
-
-            {user ? (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-2 py-1">
-                  {avatarUrl ? (
-                    <Image
-                      src={avatarUrl}
-                      alt={displayName ?? ''}
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
-                      {displayName?.[0]?.toUpperCase() ?? '?'}
-                    </div>
-                  )}
-                  <span className="max-w-[120px] truncate text-sm font-medium text-gray-700">
-                    {displayName}
-                  </span>
-                </div>
-                <LogoutButton />
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                Ingresar
-              </Link>
-            )}
-          </div>
+          <NavMenu />
         </div>
       </nav>
 
-      <main className="mx-auto max-w-2xl px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-2xl px-4 py-4 pb-24 sm:pb-8">{children}</main>
+
+      <BottomNav />
     </div>
   );
 }
