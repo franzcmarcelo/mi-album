@@ -172,12 +172,15 @@ export function useInventory(instanceId: string, userId: string | null) {
           .eq('sticker_catalog_id', stickerCatalogId)
           .eq('user_album_id', instanceId);
       } else {
-        await supabase.from('user_stickers').upsert({
-          user_album_id: instanceId,
-          sticker_catalog_id: stickerCatalogId,
-          state: next,
-          quantity: 1,
-        });
+        await supabase.from('user_stickers').upsert(
+          {
+            user_album_id: instanceId,
+            sticker_catalog_id: stickerCatalogId,
+            state: next,
+            quantity: 1,
+          },
+          { onConflict: 'user_album_id,sticker_catalog_id' }
+        );
       }
     },
   });
