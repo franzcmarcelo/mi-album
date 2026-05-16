@@ -94,6 +94,39 @@ export function useInventory(instanceId: string, userId: string | null) {
   });
 
   const toggle = useMutation({
+    onMutate: async ({ stickerId, currentState }) => {
+      const queryKey = ['inventory', instanceId, userId];
+      await qc.cancelQueries({ queryKey });
+      const previous = qc.getQueryData<InventoryMap>(queryKey);
+
+      const next: StickerState | null =
+        currentState === undefined ? 'owned' : currentState === 'owned' ? 'repeated' : null;
+
+      qc.setQueryData<InventoryMap>(queryKey, (old = {}) => {
+        const updated = { ...old };
+        if (next === null) {
+          delete updated[stickerId];
+        } else {
+          updated[stickerId] = {
+            stickerId,
+            state: next,
+            quantity: 1,
+            markedAt: new Date().toISOString(),
+          };
+        }
+        return updated;
+      });
+
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous !== undefined) {
+        qc.setQueryData(['inventory', instanceId, userId], context.previous);
+      }
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['inventory', instanceId] });
+    },
     mutationFn: async ({
       stickerId,
       currentState,
@@ -120,7 +153,6 @@ export function useInventory(instanceId: string, userId: string | null) {
         return;
       }
 
-      // Get UUID map — fetch on demand if cache was evicted (very rare)
       let uuidMap = qc.getQueryData<Record<string, string>>(['catalog-uuids', instanceId]);
       if (!uuidMap) {
         uuidMap = await fetchCatalogUUIDs(instanceId);
@@ -148,9 +180,6 @@ export function useInventory(instanceId: string, userId: string | null) {
           quantity: 1,
         });
       }
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['inventory', instanceId] });
     },
   });
 
