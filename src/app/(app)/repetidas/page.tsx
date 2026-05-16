@@ -1,5 +1,6 @@
 'use client';
 
+import { useSession } from '@/hooks/useSession';
 import { useUserAlbums } from '@/hooks/useUserAlbums';
 import { useAlbumData } from '@/hooks/useAlbumData';
 import { useInventory } from '@/hooks/useInventory';
@@ -8,9 +9,9 @@ import { Badge } from '@/components/ui/Badge';
 import { UserAlbumInstance } from '@/types';
 import Link from 'next/link';
 
-function InstanceRepetidas({ instance }: { instance: UserAlbumInstance }) {
+function InstanceRepetidas({ instance, userId }: { instance: UserAlbumInstance; userId: string | null }) {
   const { data: catalog = [] } = useAlbumData(instance.slug);
-  const { data: inventory = {} } = useInventory(instance.id, null);
+  const { data: inventory = {} } = useInventory(instance.id, userId);
 
   const stickers = mergeWithInventory(catalog, inventory);
   const repetidas = stickers.filter((s) => s.userState === 'repeated');
@@ -36,9 +37,8 @@ function InstanceRepetidas({ instance }: { instance: UserAlbumInstance }) {
 }
 
 export default function RepetidasPage() {
-  const { instances } = useUserAlbums();
-
-  const hasAnyRepeated = instances.length > 0;
+  const { user } = useSession();
+  const { instances } = useUserAlbums(user);
 
   return (
     <div className="space-y-6">
@@ -56,13 +56,11 @@ export default function RepetidasPage() {
       ) : (
         <>
           {instances.map((inst) => (
-            <InstanceRepetidas key={inst.id} instance={inst} />
+            <InstanceRepetidas key={inst.id} instance={inst} userId={user?.id ?? null} />
           ))}
-          {hasAnyRepeated && instances.every(() => true) && (
-            <p className="text-center text-sm text-gray-400">
-              Las figuritas marcadas como repetidas aparecen aqui
-            </p>
-          )}
+          <p className="text-center text-sm text-gray-400">
+            Las figuritas marcadas como repetidas aparecen aqui
+          </p>
         </>
       )}
     </div>

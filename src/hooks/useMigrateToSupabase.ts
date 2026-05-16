@@ -126,7 +126,7 @@ async function migrate(user: User) {
           marked_at: s.markedAt,
         };
       })
-      .filter(Boolean);
+      .filter((r): r is NonNullable<typeof r> => r !== null);
 
     if (rows.length > 0) {
       await supabase.from('user_stickers').upsert(rows);
