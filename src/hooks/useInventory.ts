@@ -27,6 +27,7 @@ export function useInventory(instanceId: string, userId: string | null) {
 
   const query = useQuery({
     queryKey: ['inventory', instanceId, userId],
+    enabled: !!instanceId,
     queryFn: async () => {
       if (!userId) return getLocalInventory(instanceId);
 

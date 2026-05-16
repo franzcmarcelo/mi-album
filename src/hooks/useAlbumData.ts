@@ -12,6 +12,7 @@ async function fetchCatalog(slug: string): Promise<Sticker[]> {
 export function useAlbumData(albumSlug: string) {
   return useQuery({
     queryKey: ['catalog', albumSlug],
+    enabled: !!albumSlug,
     queryFn: () => fetchCatalog(albumSlug),
     staleTime: Infinity,
   });
