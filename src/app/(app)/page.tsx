@@ -37,12 +37,13 @@ function AlbumCard({ instance, userId, onRemove, onRename }: {
 }
 
 export default function DashboardPage() {
-  const { user } = useSession();
-  const { instances, addAlbum, removeAlbum, renameAlbum } = useUserAlbums(user);
+  const { user, loading: sessionLoading } = useSession();
+  const { instances, isLoading: albumsLoading, addAlbum, removeAlbum, renameAlbum } = useUserAlbums(user);
   const [showModal, setShowModal] = useState(false);
 
   useMigrateToSupabase(user);
 
+  const isLoading = sessionLoading || albumsLoading;
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] ?? null;
 
   return (
@@ -127,7 +128,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Albums grid */}
-      {instances.length === 0 ? (
+      {isLoading ? (
+        <DashboardSkeleton />
+      ) : instances.length === 0 ? (
         <EmptyState onAdd={() => setShowModal(true)} />
       ) : (
         <div className="grid grid-cols-2 gap-4">
@@ -146,6 +149,43 @@ export default function DashboardPage() {
       {showModal && (
         <CreateAlbumModal onAdd={addAlbum} onClose={() => setShowModal(false)} />
       )}
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {[1, 2].map((i) => (
+        <div
+          key={i}
+          style={{
+            borderRadius: '18px',
+            aspectRatio: '3/4',
+            overflow: 'hidden',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--bg-border)',
+            padding: '14px 12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="skeleton" style={{ height: '10px', width: '60px', borderRadius: '5px' }} />
+            <div className="skeleton" style={{ height: '30px', width: '30px', borderRadius: '8px' }} />
+            <div className="skeleton" style={{ height: '16px', width: '100px', borderRadius: '6px' }} />
+            <div className="skeleton" style={{ height: '10px', width: '70px', borderRadius: '5px' }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '5px' }}>
+              <div className="skeleton" style={{ height: '40px', width: '52px', borderRadius: '8px' }} />
+              <div className="skeleton" style={{ height: '40px', width: '52px', borderRadius: '8px' }} />
+            </div>
+            <div className="skeleton" style={{ height: '3px', borderRadius: '99px' }} />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -178,10 +218,10 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
         ⚽
       </div>
       <h2 style={{ fontWeight: 700, fontSize: '17px', color: 'var(--text-1)', margin: '0 0 8px' }}>
-        Todavía no tenés álbumes
+        Todavía no tienes álbumes
       </h2>
       <p style={{ fontSize: '14px', color: 'var(--text-2)', margin: '0 0 24px', maxWidth: '260px', lineHeight: 1.5 }}>
-        Agregá tu primer álbum para empezar a registrar tus figuritas
+        Agrega tu primer álbum para empezar a registrar tus figuritas
       </p>
       <button
         onClick={onAdd}

@@ -15,7 +15,17 @@ export function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+      style={{
+        background: 'rgba(255,255,255,0.08)',
+        border: 'none',
+        borderRadius: '10px',
+        padding: '6px 12px',
+        fontSize: '13px',
+        fontWeight: 500,
+        color: 'rgba(255,255,255,0.5)',
+        cursor: 'pointer',
+        transition: 'background 0.15s',
+      }}
     >
       Salir
     </button>

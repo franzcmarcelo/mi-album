@@ -9,8 +9,8 @@ import { AlbumCatalog, UserAlbumInstance } from '@/types';
 const LOCAL_STORAGE_KEY = 'user_album_instances';
 
 export const AVAILABLE_ALBUMS: AlbumCatalog[] = [
-  { id: 'panini-2024', slug: 'panini-2024', name: 'Mundial 2024', year: 2024, publisher: 'Panini', totalStickers: 145 },
-  { id: '3reyes-2024', slug: '3reyes-2024', name: 'Liga Argentina', year: 2024, publisher: '3 Reyes', totalStickers: 150 },
+  { id: 'panini-2024', slug: 'panini-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: 'Panini', totalStickers: 145 },
+  { id: '3reyes-2024', slug: '3reyes-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: '3 Reyes', totalStickers: 150 },
 ];
 
 // ─── LocalStorage (no autenticado) ───────────────────────────────────────────
@@ -81,6 +81,15 @@ async function archiveSupabaseInstance(instanceId: string): Promise<void> {
   if (error) throw error;
 }
 
+async function renameSupabaseInstance(instanceId: string, name: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('user_albums')
+    .update({ name })
+    .eq('id', instanceId);
+  if (error) throw error;
+}
+
 // ─── Hook principal ───────────────────────────────────────────────────────────
 
 export function useUserAlbums(user: User | null) {
@@ -105,6 +114,12 @@ export function useUserAlbums(user: User | null) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['user-albums', user?.id] }),
   });
 
+  const renameMutation = useMutation({
+    mutationFn: ({ instanceId, name }: { instanceId: string; name: string }) =>
+      renameSupabaseInstance(instanceId, name),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['user-albums', user?.id] }),
+  });
+
   // --- Modo localStorage ---
   const [localInstances, setLocalInstances] = useState<UserAlbumInstance[]>([]);
 
@@ -116,7 +131,7 @@ export function useUserAlbums(user: User | null) {
     const next: UserAlbumInstance = {
       id: generateId(),
       slug,
-      name: name.trim() || 'Mi Album',
+      name: name.trim() || 'Mi Álbum',
       createdAt: new Date().toISOString(),
     };
     setLocalInstances((prev) => {
@@ -134,6 +149,14 @@ export function useUserAlbums(user: User | null) {
     });
   }, []);
 
+  const renameLocalAlbum = useCallback((instanceId: string, name: string) => {
+    setLocalInstances((prev) => {
+      const updated = prev.map((i) => (i.id === instanceId ? { ...i, name } : i));
+      saveLocalInstances(updated);
+      return updated;
+    });
+  }, []);
+
   // --- API unificada ---
   const instances = isAuth ? (supabaseQuery.data ?? []) : localInstances;
   const isLoading = isAuth ? supabaseQuery.isLoading : false;
@@ -146,10 +169,14 @@ export function useUserAlbums(user: User | null) {
     ? (instanceId: string) => archiveMutation.mutate(instanceId)
     : removeLocalAlbum;
 
+  const renameAlbum = isAuth
+    ? (instanceId: string, name: string) => renameMutation.mutate({ instanceId, name })
+    : renameLocalAlbum;
+
   const getInstanceById = useCallback(
     (instanceId: string) => instances.find((i) => i.id === instanceId) ?? null,
     [instances]
   );
 
-  return { instances, isLoading, addAlbum, removeAlbum, getInstanceById };
+  return { instances, isLoading, addAlbum, removeAlbum, renameAlbum, getInstanceById };
 }

@@ -29,10 +29,22 @@
 | Estilos | Tailwind CSS | Utilidades inline, sin CSS extra |
 | Hosting | Vercel (previsto) | Next.js first-class, preview deployments automáticos |
 
+### Rutas actuales
+
+| Ruta | Descripción |
+|------|-------------|
+| `/` | Dashboard — lista de álbumes del usuario |
+| `/album/[albumId]` | Detalle de álbum — grid de figuritas, filtros, share |
+| `/login` | Login con Google |
+| `/share/[token]` | Vista pública de inventario (sin auth) |
+
+Las rutas `/cargar` y `/repetidas` fueron eliminadas: la carga se hace directamente desde el grid del álbum y la info de repetidas/faltantes vive en el modal de compartir. El `BottomNav` fue eliminado junto con `/repetidas` (con una sola ruta principal no aportaba valor).
+
 ### Fases completadas
 
 - **Fase 1** ✅ — Frontend solo, localStorage, flip-card 3D, URL compartible por WhatsApp
 - **Fase 2** ✅ — Google OAuth, Supabase DB, migración automática, múltiples álbumes por usuario
+- **Fase 2.5** ✅ — UI overhaul: NavMenu hamburger, AlbumToolbar unificada, ShareModal con 3 secciones, skeleton loaders, limpieza de rutas
 - **Fase 3** ⏳ — Intercambios entre usuarios (ver sección 13)
 
 ---
@@ -228,9 +240,11 @@ onError   → setQueryData (snapshot anterior) + invalidateQueries (sync con ser
 
 ---
 
-## 10. URL compartible
+## 10. URL compartible y modal de compartir
 
-La URL `/share/[token]` codifica el inventario completo en base64url:
+### URL `/share/[token]`
+
+Codifica el inventario completo en base64url:
 
 ```json
 { "albumSlug": "panini-2024", "owned": [1,3,5], "repeated": [12,45] }
@@ -241,6 +255,18 @@ La URL `/share/[token]` codifica el inventario completo en base64url:
 - Funciona como link de WhatsApp con inventario embebido en la URL
 
 **Limitación**: el token no está firmado — cualquiera puede construir un token falso. Para esta app (compartir colección personal) es aceptable. Si se usara para validar intercambios, habría que firmar el payload.
+
+### ShareModal — 3 modos de compartir
+
+El modal de compartir del detalle de álbum expone 3 secciones independientes, cada una con botón Copiar y botón WhatsApp:
+
+| Sección | Contenido | WhatsApp |
+|---------|-----------|----------|
+| 🔗 Enlace del álbum | URL `/share/[token]` con inventario completo | Abre wa.me con la URL |
+| ❌ Mis faltantes | Texto con números por sección + firma "Álbum: Panini" | Abre wa.me con el texto |
+| 🔄 Mis repetidas | Texto con números por sección + firma "Álbum: Panini" | Abre wa.me con el texto |
+
+Las secciones de faltantes/repetidas solo se muestran si hay figuritas en ese estado. El texto está en español LATAM estándar (sin voseo argentino).
 
 ---
 
@@ -275,10 +301,10 @@ La URL `/share/[token]` codifica el inventario completo en base64url:
 
 | Item | Descripción |
 |------|-------------|
-| **Batch add sin atomicidad** | `handleBatchAdd` en `/cargar` dispara N mutaciones individuales en un loop. Para 145 stickers serían 145 requests. Debería ser un único UPSERT. Impacto: lento al cargar secciones completas. |
 | **Sin paginación/virtualización en catálogo** | `FiguriteGrid` renderiza todos los stickers del álbum (145–150 items). Funciona hoy, pero si los álbumes crecen a 600+ items se degradará. Implementar `@tanstack/react-virtual`. |
 | **Tipos de Supabase no generados** | Los tipos de las tablas están escritos a mano (`as unknown as { slug: string }`). Usar `supabase gen types typescript` para tipos seguros end-to-end. |
 | **Sin manejo de error en UI** | Si `useInventory` o `useUserAlbums` fallan, no hay feedback al usuario (toast, banner). Solo se loggea en consola. |
+| **`FilterBar.tsx` huérfano** | El componente original `FilterBar` quedó en el repo pero ya no se usa (reemplazado por `AlbumToolbar`). Eliminar para evitar confusión. |
 
 ### Media prioridad
 

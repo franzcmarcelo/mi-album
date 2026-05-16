@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { NavMenu } from './NavMenu';
-import { BottomNav } from './BottomNav';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -50,9 +49,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-2xl px-4 py-4 pb-24 sm:pb-8">{children}</main>
-
-      <BottomNav />
+      <main className="mx-auto max-w-2xl px-4 py-4">{children}</main>
     </div>
   );
 }

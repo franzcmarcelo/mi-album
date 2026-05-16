@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { AlbumCatalog } from '@/types';
-import { Button } from '@/components/ui/Button';
 
 interface CreateAlbumModalProps {
   onAdd: (slug: string, name: string) => void;
@@ -10,85 +9,126 @@ interface CreateAlbumModalProps {
 }
 
 const AVAILABLE_ALBUMS: AlbumCatalog[] = [
-  { id: 'panini-2024', slug: 'panini-2024', name: 'Mundial 2024', year: 2024, publisher: 'Panini', totalStickers: 145 },
-  { id: '3reyes-2024', slug: '3reyes-2024', name: 'Liga Argentina', year: 2024, publisher: '3 Reyes', totalStickers: 150 },
+  { id: 'panini-2024', slug: 'panini-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: 'Panini', totalStickers: 145 },
+  { id: '3reyes-2024', slug: '3reyes-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: '3 Reyes', totalStickers: 150 },
 ];
 
-const coverColors: Record<string, string> = {
-  'panini-2024': 'from-blue-600 to-indigo-700',
-  '3reyes-2024': 'from-emerald-600 to-teal-700',
-};
-
-const publisherIcons: Record<string, string> = {
-  Panini: '⚽',
-  '3 Reyes': '🏆',
+const ALBUM_STYLES: Record<string, { grad: string; glow: string; icon: string }> = {
+  'panini-2024': { grad: 'linear-gradient(155deg, #1d4ed8, #1e1b4b)', glow: 'rgba(99,102,241,0.35)', icon: '⚽' },
+  '3reyes-2024': { grad: 'linear-gradient(155deg, #065f46, #064e3b)', glow: 'rgba(16,185,129,0.35)', icon: '🏆' },
 };
 
 export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
   const [selected, setSelected] = useState<string | null>(null);
-  const [albumName, setAlbumName] = useState('Mi Album');
+  const [albumName, setAlbumName] = useState('Mi Álbum');
 
   function handleConfirm() {
     if (!selected) return;
-    onAdd(selected, albumName);
+    onAdd(selected, albumName.trim() || 'Mi Álbum');
     onClose();
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl space-y-5">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        className="modal-content w-full max-w-sm space-y-5 rounded-2xl p-6"
+        style={{
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--bg-border-hi)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+        }}
+      >
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Nuevo album</h2>
-          <button onClick={onClose} className="rounded-full p-1 hover:bg-gray-100">
-            <svg className="h-5 w-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <h2 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>
+            Nuevo álbum
+          </h2>
+          <button
+            onClick={onClose}
+            className="pressable flex items-center justify-center rounded-full p-1.5"
+            style={{ background: 'var(--bg-raised)', border: '1px solid var(--bg-border)' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" strokeWidth={2.5} strokeLinecap="round">
+              <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Nombre del album */}
+        {/* Name input */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-2)', marginBottom: '6px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
             Nombre
           </label>
           <input
             type="text"
             value={albumName}
             onChange={(e) => setAlbumName(e.target.value)}
-            placeholder="Mi Album"
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            placeholder="Mi Álbum"
+            style={{
+              width: '100%',
+              background: 'var(--bg-raised)',
+              border: '1px solid var(--bg-border-hi)',
+              borderRadius: '10px',
+              padding: '10px 14px',
+              fontSize: '14px',
+              fontWeight: 500,
+              color: 'var(--text-1)',
+              outline: 'none',
+              boxSizing: 'border-box',
+              transition: 'border-color 150ms',
+            }}
+            onFocus={(e) => { e.target.style.borderColor = '#6366f1'; }}
+            onBlur={(e) => { e.target.style.borderColor = 'var(--bg-border-hi)'; }}
           />
-          <p className="mt-1 text-xs text-gray-400">Por ejemplo: &ldquo;Mi Album&rdquo;, &ldquo;Album de Mateo&rdquo;</p>
         </div>
 
-        {/* Tipo de album */}
+        {/* Album type selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tipo de album
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-2)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            Tipo de álbum
           </label>
           <div className="grid grid-cols-2 gap-3">
             {AVAILABLE_ALBUMS.map((album) => {
               const isSelected = selected === album.slug;
-              const gradient = coverColors[album.slug] ?? 'from-gray-600 to-gray-800';
+              const s = ALBUM_STYLES[album.slug];
               return (
                 <button
                   key={album.slug}
                   onClick={() => setSelected(album.slug)}
-                  className={`relative overflow-hidden rounded-xl p-4 text-left transition-all ${
-                    isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : 'hover:scale-[1.02]'
-                  }`}
+                  className="pressable relative overflow-hidden rounded-xl p-4 text-left"
+                  style={{
+                    background: s.grad,
+                    border: isSelected ? '2px solid #6366f1' : '2px solid transparent',
+                    boxShadow: isSelected ? `0 0 0 2px rgba(99,102,241,0.4), 0 8px 24px ${s.glow}` : `0 4px 16px ${s.glow}`,
+                    cursor: 'pointer',
+                    transition: 'box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out)',
+                  }}
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
-                  <div className="relative z-10 space-y-1 text-white">
-                    <span className="text-2xl">{publisherIcons[album.publisher] ?? '📚'}</span>
-                    <p className="text-xs font-medium text-white/60 uppercase tracking-wide">{album.publisher}</p>
-                    <p className="font-bold leading-tight">{album.name}</p>
-                    <p className="text-xs text-white/70">{album.totalStickers} figuritas</p>
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <span style={{ fontSize: '24px', display: 'block', lineHeight: 1, marginBottom: '6px' }}>{s.icon}</span>
+                    <p style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 2px' }}>
+                      {album.publisher}
+                    </p>
+                    <p style={{ fontSize: '13px', fontWeight: 800, color: 'white', margin: '0 0 2px', lineHeight: 1.2 }}>
+                      {album.name}
+                    </p>
+                    <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+                      {album.totalStickers} figuritas
+                    </p>
                   </div>
                   {isSelected && (
-                    <div className="absolute top-2 right-2 rounded-full bg-white p-0.5">
-                      <svg className="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                        <path fillRule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <div style={{
+                      position: 'absolute', top: '8px', right: '8px',
+                      width: '20px', height: '20px', borderRadius: '50%',
+                      background: '#6366f1',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
                       </svg>
                     </div>
                   )}
@@ -98,9 +138,22 @@ export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
           </div>
         </div>
 
-        <Button onClick={handleConfirm} disabled={!selected} className="w-full">
-          Crear album
-        </Button>
+        {/* Confirm button */}
+        <button
+          onClick={handleConfirm}
+          disabled={!selected}
+          className="pressable w-full rounded-xl py-3 font-bold text-sm"
+          style={{
+            background: selected ? 'linear-gradient(135deg, #6366f1, #06b6d4)' : 'var(--bg-raised)',
+            color: selected ? 'white' : 'var(--text-3)',
+            border: 'none',
+            cursor: selected ? 'pointer' : 'not-allowed',
+            transition: 'background 200ms var(--ease-out)',
+            boxShadow: selected ? '0 4px 16px rgba(99,102,241,0.3)' : 'none',
+          }}
+        >
+          Crear álbum
+        </button>
       </div>
     </div>
   );
