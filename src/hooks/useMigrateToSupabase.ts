@@ -108,7 +108,7 @@ async function migrate(user: User) {
 
     // El stickerId local es el id del catálogo local (ej. "panini-1")
     // Necesitamos mapear al número para cruzar con Supabase
-    const { data: localCatalog } = await import(`@/data/${inst.slug.startsWith('3reyes') ? 'treyes' : 'panini'}.json`);
+    const { default: localCatalog } = await import(`@/data/${inst.slug.startsWith('3reyes') ? 'treyes' : 'panini'}.json`);
     const localIdToNumber = Object.fromEntries(
       (localCatalog as { id: string; number: number }[]).map((s) => [s.id, s.number])
     );
