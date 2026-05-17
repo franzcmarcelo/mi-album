@@ -1,12 +1,12 @@
 'use client';
 
-import { StickerWithState } from '@/types';
+import { StickerWithState, StickerState } from '@/types';
 import { useUIStore } from '@/store/uiStore';
 import { FiguriteCard } from './FiguriteCard';
 
 interface FiguriteGridProps {
   stickers: StickerWithState[];
-  onToggle: (stickerId: string, currentState: StickerWithState['userState']) => void;
+  onUpdate: (stickerId: string, state: StickerState | null, quantity?: number) => void;
   isLoading?: boolean;
 }
 
@@ -16,7 +16,7 @@ const SIZE_CONFIG = {
   lg: { minWidth: '112px', gap: '10px' },
 };
 
-export function FiguriteGrid({ stickers, onToggle, isLoading }: FiguriteGridProps) {
+export function FiguriteGrid({ stickers, onUpdate, isLoading }: FiguriteGridProps) {
   const { cardSize } = useUIStore();
   const { minWidth, gap } = SIZE_CONFIG[cardSize];
 
@@ -70,7 +70,9 @@ export function FiguriteGrid({ stickers, onToggle, isLoading }: FiguriteGridProp
           key={sticker.id}
           sticker={sticker}
           size={cardSize}
-          onClick={() => onToggle(sticker.id, sticker.userState)}
+          onMarkOwned={() => onUpdate(sticker.id, 'owned')}
+          onMarkRepeated={(qty) => onUpdate(sticker.id, 'repeated', qty)}
+          onRemove={() => onUpdate(sticker.id, null)}
         />
       ))}
     </div>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useUIStore } from '@/store/uiStore';
 import { StickerWithState } from '@/types';
@@ -20,11 +20,11 @@ export function SectionNav({ sections, stickers }: SectionNavProps) {
         onClick={() => setActiveSection(null)}
         className="pressable shrink-0 rounded-xl px-3 py-2 text-xs font-semibold transition-colors"
         style={{
-          background: activeSection === null ? 'linear-gradient(135deg, #6366f1, #06b6d4)' : 'var(--bg-surface)',
+          background: activeSection === null ? 'var(--accent-grad)' : 'var(--bg-surface)',
           color: activeSection === null ? 'white' : 'var(--text-2)',
           border: `1px solid ${activeSection === null ? 'transparent' : 'var(--bg-border)'}`,
           cursor: 'pointer',
-          boxShadow: activeSection === null ? '0 4px 12px rgba(99,102,241,0.3)' : 'none',
+          boxShadow: activeSection === null ? '0 4px 12px var(--accent-glow)' : 'none',
         }}
       >
         Todas

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
@@ -10,41 +10,56 @@ interface AlbumCoverProps {
   customName: string;
   progress: number;
   owned: number;
+  repeated: number;
   total: number;
   onRename: (name: string) => void;
   onDelete: () => void;
 }
 
-const COVER_STYLES: Record<string, { grad: string; glow: string; icon: string }> = {
+const COVER_STYLES: Record<string, {
+  grad: string;
+  glow: string;
+  icon: string;
+  labelColor: string;
+}> = {
   'panini-2024': {
-    grad: 'linear-gradient(155deg, #1d4ed8 0%, #1e1b4b 100%)',
-    glow: 'rgba(99,102,241,0.4)',
+    grad: 'linear-gradient(160deg, #04102e 0%, #0d2a7a 38%, #1a44c8 65%, #081840 100%)',
+    glow: 'rgba(29,78,216,0.55)',
     icon: '⚽',
+    labelColor: '#93c5fd',
   },
   '3reyes-2024': {
-    grad: 'linear-gradient(155deg, #065f46 0%, #064e3b 100%)',
-    glow: 'rgba(16,185,129,0.4)',
+    grad: 'linear-gradient(160deg, #011a0c 0%, #065236 38%, #059669 65%, #022b1a 100%)',
+    glow: 'rgba(5,150,105,0.55)',
     icon: '🏆',
+    labelColor: '#6ee7b7',
   },
 };
 
-export function AlbumCover({ album, instanceId, customName, progress, owned, total, onRename, onDelete }: AlbumCoverProps) {
-  const style = COVER_STYLES[album.slug] ?? {
-    grad: 'linear-gradient(155deg, #1f2937 0%, #111827 100%)',
-    glow: 'rgba(107,114,128,0.3)',
-    icon: '📚',
-  };
-  const missing = total - owned;
+const FALLBACK_STYLE = {
+  grad: 'linear-gradient(160deg, #111827 0%, #1f2937 100%)',
+  glow: 'rgba(107,114,128,0.3)',
+  icon: '📚',
+  labelColor: 'rgba(255,255,255,0.5)',
+};
+
+export function AlbumCover({
+  album, instanceId, customName, progress, owned, repeated, total, onRename, onDelete,
+}: AlbumCoverProps) {
+  const style = COVER_STYLES[album.slug] ?? FALLBACK_STYLE;
+  const missing = total - owned - repeated;
   const isComplete = progress >= 100;
   const progressWidth = `${Math.min(progress, 100)}%`;
 
+  const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(customName);
   const menuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const tiltRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  // Close menu on outside click
   useEffect(() => {
     if (!menuOpen) return;
     function onClickOutside(e: MouseEvent) {
@@ -56,7 +71,6 @@ export function AlbumCover({ album, instanceId, customName, progress, owned, tot
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, [menuOpen]);
 
-  // Focus input when editing starts
   useEffect(() => {
     if (editing) {
       setEditName(customName);
@@ -93,105 +107,239 @@ export function AlbumCover({ album, instanceId, customName, progress, owned, tot
     onDelete();
   }
 
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (menuOpen || editing || !tiltRef.current || !cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    tiltRef.current.style.transform = `rotateY(${x * 12}deg) rotateX(${-y * 8}deg) scale(1.02)`;
+  }
+
+  function handleMouseLeave() {
+    setHovered(false);
+    if (tiltRef.current) {
+      tiltRef.current.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+    }
+  }
+
+  const isHovering = hovered && !menuOpen && !editing;
+
   return (
-    <div className="relative stagger-item">
-      {/* Card link */}
-      <Link href={`/album/${instanceId}`} className="block pressable" style={{ textDecoration: 'none' }}>
-        <div
-          style={{
+    <div
+      ref={cardRef}
+      className="relative stagger-item"
+      style={{ perspective: '900px' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      onMouseMove={handleMouseMove}
+    >
+      {/* ── Pages stack (same gradient as cover so no ugly color bleed) ── */}
+      <div aria-hidden="true" style={{
+        position: 'absolute', inset: 0, borderRadius: '18px',
+        background: style.grad,
+        transform: 'translateX(5px) translateY(7px)',
+        opacity: 0.4,
+      }} />
+      <div aria-hidden="true" style={{
+        position: 'absolute', inset: 0, borderRadius: '18px',
+        background: style.grad,
+        transform: 'translateX(3px) translateY(4px)',
+        opacity: 0.6,
+      }} />
+
+      {/* ── Rotating book cover ── */}
+      <div ref={tiltRef} style={{
+        position: 'relative', zIndex: 1,
+        transformStyle: 'preserve-3d',
+        transition: 'transform 320ms cubic-bezier(0.23, 1, 0.32, 1)',
+      }}>
+        <Link href={`/album/${instanceId}`} style={{ display: 'block', textDecoration: 'none' }}>
+          <div style={{
             position: 'relative',
             overflow: 'hidden',
             borderRadius: '18px',
             aspectRatio: '3/4',
             background: style.grad,
-            boxShadow: `0 8px 32px ${style.glow}, 0 2px 8px rgba(0,0,0,0.4)`,
+            boxShadow: isHovering
+              ? `0 40px 80px ${style.glow}, 0 20px 48px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.12)`
+              : `0 18px 48px ${style.glow}, 0 4px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)`,
+            transition: 'box-shadow 420ms cubic-bezier(0.23, 1, 0.32, 1)',
             border: '1px solid rgba(255,255,255,0.08)',
-            transition: 'box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out)',
-          }}
-        >
-          {/* Diagonal pattern */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 14px, rgba(255,255,255,0.03) 14px, rgba(255,255,255,0.03) 28px)',
-            pointerEvents: 'none',
-          }} />
-          {/* Top glow orb */}
-          <div style={{
-            position: 'absolute', top: '-20px', right: '-20px',
-            width: '120px', height: '120px', borderRadius: '50%',
-            background: `radial-gradient(circle, ${style.glow} 0%, transparent 70%)`,
-            pointerEvents: 'none',
-          }} />
-          {/* Content */}
-          <div style={{
-            position: 'relative', zIndex: 1, height: '100%',
-            display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-            padding: '14px 12px 12px',
           }}>
-            {/* Top */}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+            {/* ── Spine ── */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px',
+              background: 'rgba(255,255,255,0.08)',
+              zIndex: 3,
+            }} />
+
+            {/* Hex pattern overlay */}
+            <div className="wc-hex" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
+
+            {/* Top ambient glow */}
+            <div style={{
+              position: 'absolute', top: '-30px', right: '-30px',
+              width: '130px', height: '130px', borderRadius: '50%',
+              background: `radial-gradient(circle, ${style.glow} 0%, transparent 70%)`,
+              pointerEvents: 'none',
+            }} />
+
+            {/* Specular highlight on hover */}
+            {isHovering && (
+              <div style={{
+                position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4,
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 55%)',
+              }} />
+            )}
+
+            {/* Foil sweep — completed albums */}
+            {isComplete && (
+              <div className="foil-sweep" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4 }} />
+            )}
+
+            {/* ── Visual area (top ~55%) ── */}
+            <div style={{
+              position: 'relative', zIndex: 2,
+              height: '55%',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              paddingLeft: '10px',
+            }}>
+              {/* Publisher + badge row */}
+              <div style={{
+                position: 'absolute', top: '10px', left: '18px', right: '10px',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              }}>
+                <span style={{
+                  fontSize: '8px', fontWeight: 900, letterSpacing: '0.18em',
+                  textTransform: 'uppercase', color: style.labelColor,
+                }}>
                   {album.publisher}
                 </span>
-                {isComplete && (
+                {isComplete ? (
                   <span style={{
-                    background: 'var(--gold)', color: '#07090f',
-                    fontSize: '7.5px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase',
-                    borderRadius: '5px', padding: '2px 6px',
-                  }}>✓ COMPLETO</span>
+                    background: 'var(--accent-grad)', color: '#07090f',
+                    fontSize: '7px', fontWeight: 900, letterSpacing: '0.06em',
+                    textTransform: 'uppercase', borderRadius: '4px', padding: '2px 5px',
+                  }}>
+                    ✓ COMPLETO
+                  </span>
+                ) : (
+                  <span style={{ fontSize: '8px', fontWeight: 600, color: 'rgba(255,255,255,0.25)' }}>
+                    {album.year}
+                  </span>
                 )}
               </div>
-              <div style={{ fontSize: '30px', lineHeight: 1 }}>{style.icon}</div>
+
+              {/* Main icon */}
+              <div style={{
+                fontSize: '52px', lineHeight: 1,
+                filter: isHovering
+                  ? 'drop-shadow(0 10px 24px rgba(0,0,0,0.7))'
+                  : 'drop-shadow(0 6px 16px rgba(0,0,0,0.5))',
+                transform: isHovering ? 'translateY(-2px)' : 'translateY(0)',
+                transition: 'filter 420ms ease, transform 420ms ease',
+              }}>
+                {style.icon}
+              </div>
+
+              <p style={{
+                fontSize: '7px', fontWeight: 800, letterSpacing: '0.22em',
+                textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)',
+                margin: '8px 0 0', textAlign: 'center',
+              }}>
+                FIFA World Cup
+              </p>
+            </div>
+
+            {/* Gold divider */}
+            <div style={{
+              height: '1px', marginLeft: '14px', marginRight: '10px',
+              background: 'linear-gradient(90deg, rgba(99,102,241,0.18), rgba(99,102,241,0.18))',
+              position: 'relative', zIndex: 2,
+            }} />
+
+            {/* ── Info area (bottom ~45%) ── */}
+            <div style={{
+              position: 'relative', zIndex: 2,
+              padding: '10px 10px 12px 14px',
+              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+              height: 'calc(45% - 1px)',
+            }}>
               <h2 style={{
-                color: 'white', fontWeight: 800, fontSize: '15px',
-                margin: '6px 0 2px', lineHeight: 1.2, letterSpacing: '-0.01em',
+                color: 'white', fontWeight: 800, fontSize: '13px',
+                margin: 0, lineHeight: 1.2, letterSpacing: '-0.01em',
               }}>
                 {customName}
               </h2>
-              <p style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', margin: 0 }}>
-                {album.name} · {album.year}
-              </p>
-            </div>
-            {/* Bottom */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', gap: '5px' }}>
-                <div style={{
-                  background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.25)',
-                  borderRadius: '8px', padding: '4px 8px',
-                }}>
-                  <span style={{ fontSize: '14px', fontWeight: 800, color: '#34d399', display: 'block', lineHeight: 1 }}>{owned}</span>
-                  <span style={{ fontSize: '8px', color: 'rgba(52,211,153,0.6)', fontWeight: 600 }}>tengo</span>
-                </div>
-                <div style={{
-                  background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px', padding: '4px 8px',
-                }}>
-                  <span style={{ fontSize: '14px', fontWeight: 800, color: 'rgba(255,255,255,0.5)', display: 'block', lineHeight: 1 }}>{missing}</span>
-                  <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>faltan</span>
-                </div>
-              </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', fontWeight: 500 }}>{owned}/{total}</span>
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: 'white' }}>{progress}%</span>
-                </div>
-                <div style={{ height: '3px', borderRadius: '99px', background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                {/* Stat chips */}
+                <div style={{ display: 'flex', gap: '4px' }}>
                   <div style={{
-                    height: '100%', borderRadius: '99px', width: progressWidth,
-                    background: isComplete
-                      ? 'linear-gradient(90deg, #f59e0b, #fcd34d)'
-                      : 'linear-gradient(90deg, #6366f1, #06b6d4)',
-                    transition: 'width 0.5s var(--ease-out)',
-                  }} />
+                    background: 'rgba(16,185,129,0.18)', border: '1px solid rgba(16,185,129,0.22)',
+                    borderRadius: '7px', padding: '3px 6px', flex: 1,
+                  }}>
+                    <span style={{ fontSize: '13px', fontWeight: 900, color: '#34d399', display: 'block', lineHeight: 1 }}>
+                      {owned}
+                    </span>
+                    <span style={{ fontSize: '6.5px', color: 'rgba(52,211,153,0.5)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                      tengo
+                    </span>
+                  </div>
+                  {repeated > 0 && (
+                    <div style={{
+                      background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.2)',
+                      borderRadius: '7px', padding: '3px 6px', flex: 1,
+                    }}>
+                      <span style={{ fontSize: '13px', fontWeight: 900, color: '#fbbf24', display: 'block', lineHeight: 1 }}>
+                        {repeated}
+                      </span>
+                      <span style={{ fontSize: '6.5px', color: 'rgba(251,191,36,0.5)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                        repet.
+                      </span>
+                    </div>
+                  )}
+                  <div style={{
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '7px', padding: '3px 6px', flex: 1,
+                  }}>
+                    <span style={{ fontSize: '13px', fontWeight: 900, color: 'rgba(255,255,255,0.4)', display: 'block', lineHeight: 1 }}>
+                      {missing}
+                    </span>
+                    <span style={{ fontSize: '6.5px', color: 'rgba(255,255,255,0.22)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                      faltan
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '8.5px', color: 'rgba(255,255,255,0.28)', fontWeight: 500 }}>
+                      {owned + repeated} / {total}
+                    </span>
+                    <span style={{ fontSize: '11px', fontWeight: 900, color: 'white' }}>
+                      {progress}%
+                    </span>
+                  </div>
+                  <div style={{ height: '3px', borderRadius: '99px', background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: '99px', width: progressWidth,
+                      background: isComplete
+                        ? 'linear-gradient(90deg, #a5b4fc, #a5b4fc)'
+                        : 'linear-gradient(90deg, #1d4ed8, #d97706)',
+                      transition: 'width 0.5s var(--ease-out)',
+                    }} />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </Link>
+        </Link>
+      </div>
 
-      {/* Actions button — sibling of Link so it sits on top via z-index */}
+      {/* ⋮ Actions button — sibling of tiltRef so it's unaffected by 3D transform and independent of Link */}
       <div ref={menuRef} style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 10 }}>
         <button
           onClick={openMenu}
@@ -199,15 +347,13 @@ export function AlbumCover({ album, instanceId, customName, progress, owned, tot
           style={{
             background: 'rgba(0,0,0,0.55)',
             backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.12)',
+            border: '1px solid rgba(255,255,255,0.1)',
             borderRadius: '8px',
             padding: '5px 7px',
             cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            color: 'rgba(255,255,255,0.75)',
+            display: 'flex', alignItems: 'center',
+            color: 'rgba(255,255,255,0.7)',
           }}
-          title="Acciones"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" />
@@ -216,16 +362,11 @@ export function AlbumCover({ album, instanceId, customName, progress, owned, tot
 
         {menuOpen && (
           <div style={{
-            position: 'absolute',
-            top: '100%',
-            right: 0,
-            marginTop: '4px',
-            background: 'white',
-            borderRadius: '10px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-            border: '1px solid rgba(0,0,0,0.08)',
-            overflow: 'hidden',
-            minWidth: '148px',
+            position: 'absolute', top: '100%', right: 0, marginTop: '4px',
+            background: 'var(--bg-raised)', borderRadius: '12px',
+            boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+            border: '1px solid var(--bg-border-hi)',
+            overflow: 'hidden', minWidth: '160px',
           }}>
             <button
               onClick={startEdit}
@@ -233,10 +374,9 @@ export function AlbumCover({ album, instanceId, customName, progress, owned, tot
                 display: 'flex', alignItems: 'center', gap: '8px',
                 width: '100%', padding: '10px 14px',
                 background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: '13px', fontWeight: 500, color: '#111827',
-                textAlign: 'left',
+                fontSize: '13px', fontWeight: 500, color: 'var(--text-1)', textAlign: 'left',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#f9fafb')}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -245,17 +385,16 @@ export function AlbumCover({ album, instanceId, customName, progress, owned, tot
               </svg>
               Editar nombre
             </button>
-            <div style={{ height: '1px', background: '#f3f4f6', margin: '0 10px' }} />
+            <div style={{ height: '1px', background: 'var(--bg-border)', margin: '0 10px' }} />
             <button
               onClick={handleDelete}
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
                 width: '100%', padding: '10px 14px',
                 background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: '13px', fontWeight: 500, color: '#ef4444',
-                textAlign: 'left',
+                fontSize: '13px', fontWeight: 500, color: '#ef4444', textAlign: 'left',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#fef2f2')}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239,68,68,0.08)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -272,18 +411,18 @@ export function AlbumCover({ album, instanceId, customName, progress, owned, tot
 
       {/* Rename overlay */}
       {editing && (
-        <div
-          className="modal-content"
-          style={{
-            position: 'absolute', inset: 0, zIndex: 20,
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            gap: '12px', borderRadius: '18px',
-            background: 'rgba(7,9,15,0.88)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
-          <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <div className="modal-content" style={{
+          position: 'absolute', inset: 0, zIndex: 20,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          gap: '12px', borderRadius: '18px',
+          background: 'rgba(4,16,46,0.92)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(29,78,216,0.25)',
+        }}>
+          <span style={{
+            fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em',
+            textTransform: 'uppercase', color: '#a5b4fc',
+          }}>
             Editar nombre
           </span>
           <input
@@ -292,15 +431,11 @@ export function AlbumCover({ album, instanceId, customName, progress, owned, tot
             onChange={(e) => setEditName(e.target.value)}
             onKeyDown={handleKeyDown}
             style={{
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: '10px',
-              padding: '8px 12px',
-              fontSize: '14px', fontWeight: 600,
-              color: 'white',
-              width: 'calc(100% - 32px)',
-              outline: 'none',
-              textAlign: 'center',
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.14)',
+              borderRadius: '10px', padding: '8px 12px',
+              fontSize: '13px', fontWeight: 600, color: 'white',
+              width: 'calc(100% - 32px)', outline: 'none', textAlign: 'center',
             }}
           />
           <div style={{ display: 'flex', gap: '8px', width: 'calc(100% - 32px)' }}>
@@ -308,22 +443,24 @@ export function AlbumCover({ album, instanceId, customName, progress, owned, tot
               onClick={() => setEditing(false)}
               className="pressable flex-1"
               style={{
-                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
+                background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '9px', padding: '8px',
-                fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.6)',
-                cursor: 'pointer',
+                fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.55)', cursor: 'pointer',
               }}
-            >Cancelar</button>
+            >
+              Cancelar
+            </button>
             <button
               onClick={submitRename}
               className="pressable flex-1"
               style={{
-                background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
+                background: 'linear-gradient(135deg, #1d4ed8, #d97706)',
                 border: 'none', borderRadius: '9px', padding: '8px',
-                fontSize: '12px', fontWeight: 700, color: 'white',
-                cursor: 'pointer',
+                fontSize: '12px', fontWeight: 700, color: 'white', cursor: 'pointer',
               }}
-            >Guardar</button>
+            >
+              Guardar
+            </button>
           </div>
         </div>
       )}

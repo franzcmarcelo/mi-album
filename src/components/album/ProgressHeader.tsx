@@ -1,4 +1,4 @@
-interface ProgressHeaderProps {
+﻿interface ProgressHeaderProps {
   albumName: string;
   albumType?: string;
   owned: number;
@@ -25,19 +25,27 @@ export function ProgressHeader({
         background: 'var(--bg-surface)',
         border: '1px solid var(--bg-border)',
         borderRadius: '16px',
-        padding: '16px',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* Subtle gradient accent */}
+      {/* Gold top bar */}
+      <div style={{
+        height: '3px',
+        background: 'var(--accent-grad-h)',
+      }} />
+
+      {/* WC diagonal stripes */}
+      <div className="wc-stripes" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.35 }} />
+
+      {/* Blue gradient accent */}
       <div style={{
         position: 'absolute', top: 0, right: 0, bottom: 0, width: '180px',
-        background: 'radial-gradient(circle at top right, rgba(99,102,241,0.12) 0%, transparent 70%)',
+        background: 'radial-gradient(circle at top right, rgba(29,78,216,0.12) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
 
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      <div style={{ padding: '16px', position: 'relative', zIndex: 1 }}>
         {/* Name + % */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
           <div>
@@ -67,7 +75,7 @@ export function ProgressHeader({
               {progress}%
             </span>
             {isComplete && (
-              <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: '9px', fontWeight: 700, color: '#a5b4fc', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 COMPLETO
               </span>
             )}
@@ -85,7 +93,7 @@ export function ProgressHeader({
             width: `${progress}%`,
             background: isComplete
               ? 'linear-gradient(90deg, #f59e0b, #fcd34d)'
-              : 'linear-gradient(90deg, #6366f1, #06b6d4)',
+              : 'var(--accent-grad-h)',
             transition: 'width 0.5s var(--ease-out)',
           }} />
         </div>

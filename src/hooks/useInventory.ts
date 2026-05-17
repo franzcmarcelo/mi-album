@@ -19,8 +19,6 @@ function setLocalInventory(instanceId: string, map: InventoryMap) {
   localStorage.setItem(LOCAL_KEY(instanceId), JSON.stringify(map));
 }
 
-// Fetches localId → sticker_catalog_id UUID for every sticker in the album.
-// Cached indefinitely — catalog never changes at runtime.
 async function fetchCatalogUUIDs(instanceId: string): Promise<Record<string, string>> {
   const supabase = createClient();
   const { data: userAlbum } = await supabase
@@ -49,7 +47,6 @@ async function fetchCatalogUUIDs(instanceId: string): Promise<Record<string, str
 export function useInventory(instanceId: string, userId: string | null) {
   const qc = useQueryClient();
 
-  // UUID map is cached indefinitely — only refetches if evicted from cache.
   useQuery({
     queryKey: ['catalog-uuids', instanceId],
     enabled: !!instanceId && !!userId,
@@ -71,8 +68,6 @@ export function useInventory(instanceId: string, userId: string | null) {
 
       if (error) throw error;
 
-      // Build inventory map keyed by local sticker id (e.g. "panini-1")
-      // so mergeWithInventory works unchanged.
       const map: InventoryMap = {};
       for (const row of data ?? []) {
         const sc = row.stickers_catalog as unknown as {
@@ -93,24 +88,22 @@ export function useInventory(instanceId: string, userId: string | null) {
     },
   });
 
-  const toggle = useMutation({
-    onMutate: async ({ stickerId, currentState }) => {
+  // update: set an explicit state (and optional quantity) or remove (state = null)
+  const update = useMutation({
+    onMutate: async ({ stickerId, state, quantity = 1 }) => {
       const queryKey = ['inventory', instanceId, userId];
       await qc.cancelQueries({ queryKey });
       const previous = qc.getQueryData<InventoryMap>(queryKey);
 
-      const next: StickerState | null =
-        currentState === undefined ? 'owned' : currentState === 'owned' ? 'repeated' : null;
-
       qc.setQueryData<InventoryMap>(queryKey, (old = {}) => {
         const updated = { ...old };
-        if (next === null) {
+        if (state === null) {
           delete updated[stickerId];
         } else {
           updated[stickerId] = {
             stickerId,
-            state: next,
-            quantity: 1,
+            state,
+            quantity,
             markedAt: new Date().toISOString(),
           };
         }
@@ -123,30 +116,23 @@ export function useInventory(instanceId: string, userId: string | null) {
       if (context?.previous !== undefined) {
         qc.setQueryData(['inventory', instanceId, userId], context.previous);
       }
-      // Sync with server after a failed write
       qc.invalidateQueries({ queryKey: ['inventory', instanceId] });
     },
     mutationFn: async ({
       stickerId,
-      currentState,
+      state,
+      quantity = 1,
     }: {
       stickerId: string;
-      currentState: StickerState | undefined;
+      state: StickerState | null;
+      quantity?: number;
     }) => {
-      const next: StickerState | null =
-        currentState === undefined ? 'owned' : currentState === 'owned' ? 'repeated' : null;
-
       if (!userId) {
         const map = getLocalInventory(instanceId);
-        if (next === null) {
+        if (state === null) {
           delete map[stickerId];
         } else {
-          map[stickerId] = {
-            stickerId,
-            state: next,
-            quantity: 1,
-            markedAt: new Date().toISOString(),
-          };
+          map[stickerId] = { stickerId, state, quantity, markedAt: new Date().toISOString() };
         }
         setLocalInventory(instanceId, map);
         return;
@@ -160,12 +146,12 @@ export function useInventory(instanceId: string, userId: string | null) {
 
       const stickerCatalogId = uuidMap[stickerId];
       if (!stickerCatalogId) {
-        console.error('[toggle] UUID not found for', stickerId);
+        console.error('[update] UUID not found for', stickerId);
         return;
       }
 
       const supabase = createClient();
-      if (next === null) {
+      if (state === null) {
         await supabase
           .from('user_stickers')
           .delete()
@@ -173,17 +159,12 @@ export function useInventory(instanceId: string, userId: string | null) {
           .eq('user_album_id', instanceId);
       } else {
         await supabase.from('user_stickers').upsert(
-          {
-            user_album_id: instanceId,
-            sticker_catalog_id: stickerCatalogId,
-            state: next,
-            quantity: 1,
-          },
+          { user_album_id: instanceId, sticker_catalog_id: stickerCatalogId, state, quantity },
           { onConflict: 'user_album_id,sticker_catalog_id' }
         );
       }
     },
   });
 
-  return { ...query, toggle };
+  return { ...query, update };
 }

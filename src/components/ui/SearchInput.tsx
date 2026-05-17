@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useUIStore } from '@/store/uiStore';
 
@@ -31,7 +31,7 @@ export function SearchInput() {
           boxSizing: 'border-box',
           transition: 'border-color 150ms',
         }}
-        onFocus={(e) => { e.target.style.borderColor = '#6366f1'; }}
+        onFocus={(e) => { e.target.style.borderColor = '#1d4ed8'; }}
         onBlur={(e) => { e.target.style.borderColor = 'var(--bg-border)'; }}
       />
     </div>

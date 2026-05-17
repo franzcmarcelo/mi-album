@@ -4,10 +4,10 @@ import { useUIStore, CardSize } from '@/store/uiStore';
 import { FilterType } from '@/types';
 
 const FILTERS: { value: FilterType; label: string }[] = [
-  { value: 'all',      label: 'Todas'    },
-  { value: 'owned',    label: 'Tengo'    },
-  { value: 'missing',  label: 'Faltan'   },
-  { value: 'repeated', label: 'Repet.'   },
+  { value: 'all',      label: 'Todas'  },
+  { value: 'owned',    label: 'Tengo'  },
+  { value: 'missing',  label: 'Faltan' },
+  { value: 'repeated', label: 'Repet.' },
 ];
 
 const SIZES: { value: CardSize; label: string }[] = [
@@ -16,11 +16,7 @@ const SIZES: { value: CardSize; label: string }[] = [
   { value: 'lg', label: 'L' },
 ];
 
-interface AlbumToolbarProps {
-  onShare: () => void;
-}
-
-export function AlbumToolbar({ onShare }: AlbumToolbarProps) {
+export function AlbumToolbar() {
   const { filter, setFilter, cardSize, setCardSize } = useUIStore();
 
   return (
@@ -33,7 +29,7 @@ export function AlbumToolbar({ onShare }: AlbumToolbarProps) {
         padding: '5px',
       }}
     >
-      {/* Filter pills — flex-1 so they fill available space */}
+      {/* Filter pills */}
       <div className="flex flex-1 gap-0.5">
         {FILTERS.map((f) => {
           const active = filter === f.value;
@@ -80,35 +76,6 @@ export function AlbumToolbar({ onShare }: AlbumToolbarProps) {
           );
         })}
       </div>
-
-      {/* Divider */}
-      <div style={{ width: '1px', height: '20px', background: 'var(--bg-border-hi)', flexShrink: 0 }} />
-
-      {/* Share button */}
-      <button
-        onClick={onShare}
-        className="pressable shrink-0 flex items-center gap-1.5 rounded-[9px] px-2.5 py-1.5"
-        style={{
-          background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
-          border: 'none',
-          color: 'white',
-          cursor: 'pointer',
-          fontSize: '11px',
-          fontWeight: 700,
-          boxShadow: '0 2px 8px rgba(99,102,241,0.35)',
-          whiteSpace: 'nowrap',
-        }}
-        title="Compartir álbum"
-      >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="18" cy="5" r="3" />
-          <circle cx="6" cy="12" r="3" />
-          <circle cx="18" cy="19" r="3" />
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-        </svg>
-        Compartir
-      </button>
     </div>
   );
 }

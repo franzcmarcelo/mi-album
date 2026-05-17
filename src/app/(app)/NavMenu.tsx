@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 
 export function NavMenu() {
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const { user } = useSession();
   const { instances } = useUserAlbums(user);
   const router = useRouter();
@@ -20,28 +21,30 @@ export function NavMenu() {
   const paniniInstances = instances.filter((i) => i.slug.startsWith('panini'));
   const treyesInstances = instances.filter((i) => i.slug.startsWith('3reyes'));
 
+  // Detectar clicks fuera del dropdown
+  useEffect(() => {
+    if (!open) return;
+
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside, true);
+    return () => document.removeEventListener('click', handleClickOutside, true);
+  }, [open]);
+
   async function handleLogout() {
     const supabase = createClient();
     await supabase.auth.signOut();
     setOpen(false);
-    router.refresh();
+    router.push('/');
   }
 
-  function close() { setOpen(false); }
-
   return (
-    <>
-      {/* Backdrop — cierra el menú al hacer click afuera */}
-      {open && (
-        <div
-          onClick={close}
-          style={{ position: 'fixed', inset: 0, zIndex: 98 }}
-        />
-      )}
-
-      {/* Wrapper relative para anclar el dropdown */}
-      <div style={{ position: 'relative', zIndex: 99 }}>
-        <button
+    <div ref={menuRef} style={{ position: 'relative', zIndex: 99 }}>
+      <button
           onClick={() => setOpen((v) => !v)}
           className="pressable"
           style={{
@@ -87,7 +90,7 @@ export function NavMenu() {
                 ) : (
                   <div style={{
                     width: 32, height: 32, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
+                    background: 'var(--accent-grad)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '13px', fontWeight: 700, color: 'white', flexShrink: 0,
                   }}>
@@ -105,7 +108,7 @@ export function NavMenu() {
 
             {/* Nav links */}
             <div style={{ padding: '6px' }}>
-              <NavLink href="/" onClick={close} icon={
+              <NavLink href="/" onClick={() => setOpen(false)} icon={
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
@@ -123,7 +126,7 @@ export function NavMenu() {
                       padding: '4px 10px 2px',
                     }}>⚽ Panini</p>
                     {paniniInstances.map((inst) => (
-                      <NavLink key={inst.id} href={`/album/${inst.id}`} onClick={close} indent>
+                      <NavLink key={inst.id} href={`/album/${inst.id}`} onClick={() => setOpen(false)} indent>
                         {inst.name}
                       </NavLink>
                     ))}
@@ -137,7 +140,7 @@ export function NavMenu() {
                       padding: '4px 10px 2px',
                     }}>🏆 3 Reyes</p>
                     {treyesInstances.map((inst) => (
-                      <NavLink key={inst.id} href={`/album/${inst.id}`} onClick={close} indent>
+                      <NavLink key={inst.id} href={`/album/${inst.id}`} onClick={() => setOpen(false)} indent>
                         {inst.name}
                       </NavLink>
                     ))}
@@ -171,11 +174,11 @@ export function NavMenu() {
               ) : (
                 <Link
                   href="/login"
-                  onClick={close}
+                  onClick={() => setOpen(false)}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     padding: '9px 10px', borderRadius: '9px',
-                    background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
+                    background: 'var(--accent-grad)',
                     fontSize: '13px', fontWeight: 700, color: 'white',
                     textDecoration: 'none',
                   }}
@@ -187,7 +190,6 @@ export function NavMenu() {
           </div>
         )}
       </div>
-    </>
   );
 }
 
@@ -198,23 +200,33 @@ function NavLink({ href, onClick, icon, children, indent }: {
   children: React.ReactNode;
   indent?: boolean;
 }) {
+  const router = useRouter();
+
+  function handleClick() {
+    onClick();
+    router.push(href);
+  }
+
   return (
-    <Link
-      href={href}
-      onClick={onClick}
+    <button
+      onClick={handleClick}
       style={{
         display: 'flex', alignItems: 'center', gap: '9px',
+        width: '100%',
         padding: `8px ${indent ? '18px' : '10px'}`,
         borderRadius: '9px',
         fontSize: '13px', fontWeight: 500,
         color: 'var(--text-2)',
-        textDecoration: 'none',
+        background: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        textAlign: 'left',
       }}
       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-raised)'; }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
     >
       {icon && <span style={{ color: 'var(--text-3)', flexShrink: 0 }}>{icon}</span>}
       <span>{children}</span>
-    </Link>
+    </button>
   );
 }

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { AlbumCatalog } from '@/types';
@@ -14,17 +14,33 @@ const AVAILABLE_ALBUMS: AlbumCatalog[] = [
 ];
 
 const ALBUM_STYLES: Record<string, { grad: string; glow: string; icon: string }> = {
-  'panini-2024': { grad: 'linear-gradient(155deg, #1d4ed8, #1e1b4b)', glow: 'rgba(99,102,241,0.35)', icon: '⚽' },
+  'panini-2024': { grad: 'linear-gradient(155deg, #1d4ed8, #1e1b4b)', glow: 'var(--accent-glow)', icon: '⚽' },
   '3reyes-2024': { grad: 'linear-gradient(155deg, #065f46, #064e3b)', glow: 'rgba(16,185,129,0.35)', icon: '🏆' },
 };
 
+const SUGGESTED_NAMES = new Set(
+  AVAILABLE_ALBUMS.map((a) => `Mi Álbum - ${a.publisher}`)
+);
+
 export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
   const [selected, setSelected] = useState<string | null>(null);
-  const [albumName, setAlbumName] = useState('Mi Álbum');
+  const [albumName, setAlbumName] = useState('');
+  const [nameTouched, setNameTouched] = useState(false);
+
+  function handleSelectAlbum(slug: string) {
+    setSelected(slug);
+    const publisher = AVAILABLE_ALBUMS.find((a) => a.slug === slug)!.publisher;
+    const suggestion = `Mi Álbum - ${publisher}`;
+    // Only auto-fill if the user hasn't typed a custom name
+    if (!nameTouched || SUGGESTED_NAMES.has(albumName)) {
+      setAlbumName(suggestion);
+    }
+  }
 
   function handleConfirm() {
     if (!selected) return;
-    onAdd(selected, albumName.trim() || 'Mi Álbum');
+    const publisher = AVAILABLE_ALBUMS.find((a) => a.slug === selected)!.publisher;
+    onAdd(selected, albumName.trim() || `Mi Álbum - ${publisher}`);
     onClose();
   }
 
@@ -66,8 +82,8 @@ export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
           <input
             type="text"
             value={albumName}
-            onChange={(e) => setAlbumName(e.target.value)}
-            placeholder="Mi Álbum"
+            onChange={(e) => { setAlbumName(e.target.value); setNameTouched(true); }}
+            placeholder="Mi Álbum - Panini"
             style={{
               width: '100%',
               background: 'var(--bg-raised)',
@@ -81,7 +97,7 @@ export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
               boxSizing: 'border-box',
               transition: 'border-color 150ms',
             }}
-            onFocus={(e) => { e.target.style.borderColor = '#6366f1'; }}
+            onFocus={(e) => { e.target.style.borderColor = '#1d4ed8'; }}
             onBlur={(e) => { e.target.style.borderColor = 'var(--bg-border-hi)'; }}
           />
         </div>
@@ -98,12 +114,12 @@ export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
               return (
                 <button
                   key={album.slug}
-                  onClick={() => setSelected(album.slug)}
+                  onClick={() => handleSelectAlbum(album.slug)}
                   className="pressable relative overflow-hidden rounded-xl p-4 text-left"
                   style={{
                     background: s.grad,
-                    border: isSelected ? '2px solid #6366f1' : '2px solid transparent',
-                    boxShadow: isSelected ? `0 0 0 2px rgba(99,102,241,0.4), 0 8px 24px ${s.glow}` : `0 4px 16px ${s.glow}`,
+                    border: isSelected ? '2px solid #1d4ed8' : '2px solid transparent',
+                    boxShadow: isSelected ? `0 0 0 2px var(--accent-glow), 0 8px 24px ${s.glow}` : `0 4px 16px ${s.glow}`,
                     cursor: 'pointer',
                     transition: 'box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out)',
                   }}
@@ -124,7 +140,7 @@ export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
                     <div style={{
                       position: 'absolute', top: '8px', right: '8px',
                       width: '20px', height: '20px', borderRadius: '50%',
-                      background: '#6366f1',
+                      background: '#1d4ed8',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
@@ -144,12 +160,12 @@ export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
           disabled={!selected}
           className="pressable w-full rounded-xl py-3 font-bold text-sm"
           style={{
-            background: selected ? 'linear-gradient(135deg, #6366f1, #06b6d4)' : 'var(--bg-raised)',
+            background: selected ? 'var(--accent-grad)' : 'var(--bg-raised)',
             color: selected ? 'white' : 'var(--text-3)',
             border: 'none',
             cursor: selected ? 'pointer' : 'not-allowed',
             transition: 'background 200ms var(--ease-out)',
-            boxShadow: selected ? '0 4px 16px rgba(99,102,241,0.3)' : 'none',
+            boxShadow: selected ? '0 4px 16px var(--accent-glow)' : 'none',
           }}
         >
           Crear álbum
