@@ -55,6 +55,9 @@ async function fetchSupabaseInstances(): Promise<UserAlbumInstance[]> {
 async function createSupabaseInstance(slug: string, name: string): Promise<void> {
   const supabase = createClient();
 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('No autenticado');
+
   const { data: catalog } = await supabase
     .from('albums_catalog')
     .select('id')
@@ -64,6 +67,7 @@ async function createSupabaseInstance(slug: string, name: string): Promise<void>
   if (!catalog) throw new Error(`Catálogo no encontrado: ${slug}`);
 
   const { error } = await supabase.from('user_albums').insert({
+    user_id: user.id,
     album_catalog_id: catalog.id,
     name,
     status: 'active',
@@ -107,6 +111,7 @@ export function useUserAlbums(user: User | null) {
     mutationFn: ({ slug, name }: { slug: string; name: string }) =>
       createSupabaseInstance(slug, name),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['user-albums', user?.id] }),
+    onError: (err) => console.error('[createAlbum]', err),
   });
 
   const archiveMutation = useMutation({
