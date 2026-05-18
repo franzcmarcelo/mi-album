@@ -34,13 +34,13 @@ export const FiguriteCard = React.memo(function FiguriteCard({
     if (!prevIsOwned.current && isOwned) {
       // Bounce the outer wrapper (no overflow:hidden there, so scale is unrestricted)
       if (wrapperRef.current) {
-        wrapperRef.current.style.animation = 'card-owned-pop 420ms var(--ease-out)';
+        wrapperRef.current.style.animation = 'card-owned-pop 750ms var(--ease-out)';
         const t = setTimeout(() => {
           if (wrapperRef.current) wrapperRef.current.style.animation = '';
-        }, 420);
+        }, 750);
         // Shine overlay
         setShowShine(true);
-        const t2 = setTimeout(() => setShowShine(false), 500);
+        const t2 = setTimeout(() => setShowShine(false), 900);
         return () => { clearTimeout(t); clearTimeout(t2); };
       }
     }
@@ -118,7 +118,7 @@ export const FiguriteCard = React.memo(function FiguriteCard({
               top: '-30%', bottom: '-30%',
               width: '50%',
               background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.55) 50%, transparent)',
-              animation: 'card-shine-sweep 460ms var(--ease-out) forwards',
+              animation: 'card-shine-sweep 820ms var(--ease-out) forwards',
             }} />
           </div>
         )}
