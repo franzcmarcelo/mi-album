@@ -4,7 +4,7 @@ import { use, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from '@/hooks/useSession';
 import { useUserAlbums, AVAILABLE_ALBUMS } from '@/hooks/useUserAlbums';
-import { usePublicAlbum } from '@/hooks/usePublicAlbum';
+import { usePublicAlbum, isShareableId } from '@/hooks/usePublicAlbum';
 import { useAlbumStats } from '@/hooks/useAlbumStats';
 import { getSectionColor } from '@/lib/sectionColors';
 import { StickerWithState } from '@/types';
@@ -278,6 +278,24 @@ function AlbumShareView({ instanceId }: { instanceId: string }) {
 
   const instance = getInstanceById(instanceId);
   const isOwner = !!user && !!instance;
+
+  if (!isShareableId(instanceId)) {
+    return (
+      <div style={{ textAlign: 'center', padding: '48px 16px' }}>
+        <p style={{ fontSize: '32px', marginBottom: '12px' }}>🔒</p>
+        <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: '16px', margin: '0 0 8px' }}>
+          Compartir requiere cuenta
+        </p>
+        <p style={{ color: 'var(--text-3)', fontSize: '13px', margin: '0 0 20px', lineHeight: 1.5 }}>
+          Para compartir tu álbum en tiempo real iniciá sesión.<br />
+          Tu progreso se sincroniza automáticamente.
+        </p>
+        <Link href="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'var(--accent-grad)', borderRadius: '12px', color: 'white', fontWeight: 700, fontSize: '13px', textDecoration: 'none' }}>
+          Iniciar sesión con Google
+        </Link>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

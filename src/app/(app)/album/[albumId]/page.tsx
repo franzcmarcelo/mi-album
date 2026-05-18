@@ -268,9 +268,7 @@ function ShareBanner({ onShare, faltantes, repetidas }: {
           Compartir mi álbum
         </p>
         <p style={{ margin: '3px 0 0', fontSize: '11px', color: 'rgba(165,180,252,0.75)', lineHeight: 1.4 }}>
-          {[faltantes > 0 && `${faltantes} faltantes`, repetidas > 0 && `${repetidas} para intercambiar`].filter(Boolean).join(' · ') || 'Comparte tu progreso'}
-          {' · '}
-          <span style={{ color: 'rgba(103,232,249,0.8)' }}>siempre actualizado</span>
+          {[faltantes > 0 && `${faltantes} faltantes`, repetidas > 0 && `${repetidas} para intercambiar`].filter(Boolean).join(' · ') || 'Comparte tu progreso en tiempo real'}
         </p>
       </div>
 

@@ -46,11 +46,19 @@ async function fetchPublicAlbum(instanceId: string) {
   return { slug, albumName, stickers };
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function usePublicAlbum(instanceId: string) {
+  const isUUID = UUID_RE.test(instanceId);
   return useQuery({
     queryKey: ['public-album', instanceId],
-    enabled: !!instanceId,
+    enabled: !!instanceId && isUUID,
     queryFn: () => fetchPublicAlbum(instanceId),
     staleTime: 60_000,
+    retry: false,
   });
+}
+
+export function isShareableId(instanceId: string) {
+  return UUID_RE.test(instanceId);
 }
