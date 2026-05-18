@@ -13,9 +13,10 @@ Aplicación web para gestionar el inventario digital de álbumes de figuritas Pa
 
 ## Estado actual del proyecto
 
-- **Fase 2 completa**: Google Auth + Supabase BD + migración automática desde localStorage
+- **Fase 2 completa**: Google Auth + Supabase BD — autenticación obligatoria, sin localStorage
 - Multi-álbum: el usuario puede tener varios álbumes activos (Panini y/o 3 Reyes)
-- Ruta `/share` funciona en modo propietario (`/share/<instanceId>`) y modo público (`/share/<token>`)
+- `/share/<instanceId>` — vista privada del propietario (requiere sesión); muestra enlace público a compartir
+- `/external-share/<albumId>` — vista pública de solo lectura (sin auth), protegida con security headers
 - UI con tema oscuro, World Cup identity (logos, colores, animaciones)
 
 ## Estructura de carpetas
@@ -37,7 +38,8 @@ src/
 │   │   ├── NavMenu.tsx                 # Menú hamburguesa (navegación lateral/dropdown)
 │   │   ├── LogoutButton.tsx            # Botón cerrar sesión
 │   │   └── album/[albumId]/page.tsx    # Vista de álbum: progreso, filtros, grid de figuritas
-│   ├── share/[token]/page.tsx          # Vista compartir (dual mode: propietario o público)
+│   ├── share/[token]/page.tsx          # Vista compartir del propietario (requiere sesión)
+│   ├── external-share/[albumId]/page.tsx # Vista pública de solo lectura (sin auth, security headers)
 │   └── api/
 │       └── auth/callback/route.ts      # Callback OAuth de Supabase
 ├── components/
@@ -65,12 +67,12 @@ src/
 │       └── SearchInput.tsx             # Buscador de figuritas por número o nombre
 ├── hooks/
 │   ├── useSession.ts                   # Sesión Supabase (user, loading)
-│   ├── useUserAlbums.ts                # CRUD de álbumes del usuario + AVAILABLE_ALBUMS
-│   ├── useInventory.ts                 # CRUD de figuritas del inventario contra Supabase
+│   ├── useUserAlbums.ts                # CRUD de álbumes del usuario + AVAILABLE_ALBUMS (solo Supabase)
+│   ├── useInventory.ts                 # CRUD de figuritas del inventario contra Supabase (solo Supabase)
+│   ├── useExternalAlbum.ts             # Fetch público de álbum para /external-share (anon client, UUID gate)
 │   ├── useAlbumData.ts                 # Carga catálogo JSON del álbum (panini/3reyes)
 │   ├── useAlbumStats.ts                # useMemo wrapper sobre getStats(stickers)
 │   ├── useFilters.ts                   # Aplica filtros + búsqueda al listado de stickers
-│   ├── useMigrateToSupabase.ts         # Migra inventario de localStorage → Supabase al primer login
 │   └── useShare.ts                     # Genera y decodifica URL de intercambio (legacy)
 ├── store/
 │   └── uiStore.ts                      # Zustand: filter, activeSection, cardSize, searchQuery
@@ -127,20 +129,36 @@ public/
 | `.wc-stripes` | Líneas diagonales sutiles (identidad WC) |
 | `.wc-hex` | Patrón hexagonal tipo balón de fútbol |
 
-## Ruta `/share/[token]`
+## Ruta `/share/[token]` (solo propietario)
 
-La página detecta el modo según el valor del parámetro `token`:
+Requiere sesión activa (redirect a `/login` si no hay usuario). Solo acepta UUIDs.
 
-```
-UUID (xxxxxxxx-xxxx-…)     → ownerMode = true  → OwnerView (requiere sesión)
-ID local (\d{10,}-[a-z0-9]+) → ownerMode = true  → OwnerView
-Cualquier otro valor        → ownerMode = false → TokenView (público, sin auth)
-```
+- Muestra breadcrumb: `Mi colección > Nombre álbum > Compartir`
+- Panel con `CopyCard` que apunta a `/external-share/<instanceId>` (enlace público)
+- Grid por secciones con ×N para repetidas (vista de propietario)
+- `CopyCard`: botón copiar con flash 2s + botón WhatsApp
 
-- **OwnerView**: muestra botón "← Mi álbum", panel con acciones de compartir (URL, faltantes texto, repetidas texto), y luego el contenido visual.
-- **TokenView**: decodifica el token base64url con `decodeInventory`, muestra solo el contenido visual.
-- `ShareContent`: componente compartido que renderiza stats card, repetidas por sección, y grid completo.
-- `CopyCard`: botón copiar con flash 2s + botón WhatsApp.
+## Ruta `/external-share/[albumId]` (pública)
+
+Accesible sin sesión. El `albumId` es el UUID de `user_albums` en Supabase.
+
+- Página standalone (fuera del layout `(app)`) — sin navbar ni info del usuario
+- Header mínimo: logo + "Mi Álbum · Copa del Mundo 2026" + badge "Solo lectura"
+- `useExternalAlbum`: fetch con cliente anon de Supabase (las políticas RLS permiten SELECT público por UUID)
+- UUID validation con regex antes de hacer la query (`enabled: isValidUUID`)
+- Grid de figuritas por sección, solo lectura: verde = tengo, verde brillante + ×N = repetida, gris = falta
+- `InvalidLink` component para UUIDs no encontrados o rutas inválidas
+- Sin mutaciones, sin `onClick` handlers en las figuritas, `userSelect: 'none'`
+
+### Security headers (middleware.ts)
+
+El middleware intercepta `/external-share/*`:
+- Non-UUID paths → 404 inmediato (sin consultar Supabase)
+- `X-Frame-Options: DENY` — anti-clickjacking
+- `Content-Security-Policy` — `form-action 'none'`, `frame-ancestors 'none'`
+- `X-Robots-Tag: noindex, nofollow` — no indexar en buscadores
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: no-referrer`
 
 ## Esquema de base de datos (Supabase / PostgreSQL)
 
@@ -248,11 +266,11 @@ Estructura de arriba hacia abajo:
 - Estado de figurita: `owned` | `repeated` | `undefined` (= faltante, no está en `user_stickers`)
 - Faltantes = catálogo total − (owned + repeated)
 - Badge en FiguriteCard: `+N` en vista "tengo" (copias extra), `×N` en vista "repetidas"
-- El token de compartir codifica toda la info en la URL — funciona sin login, sin servidor
 - `useUserAlbums` expone `AVAILABLE_ALBUMS` con los slugs disponibles y metadata de cada álbum
 - `mergeWithInventory(catalog, inventory)` produce `StickerWithState[]` con qty y userState
-- La migración localStorage→Supabase ocurre automáticamente en el primer login (hook `useMigrateToSupabase`)
 - `FiguriteCard` detecta transición missing→owned con `useRef(prevIsOwned)` para disparar animaciones
+- Autenticación obligatoria: `useEffect(() => { if (!sessionLoading && !user) router.replace('/login') }, [...])`
+- UUID del álbum actúa como token de acceso público en `/external-share/<albumId>`
 
 ## Variables de entorno necesarias
 
@@ -272,5 +290,5 @@ npx tsc --noEmit     # Verificar tipos sin compilar
 ## Fases del proyecto
 
 - **Fase 1** ✓: frontend solo, localStorage, URL compartible sin backend
-- **Fase 2** ✓: Google Auth + Supabase BD + multi-álbum + carga manual + ruta /share dual-mode
+- **Fase 2** ✓: Google Auth + Supabase BD + multi-álbum + autenticación obligatoria + share público `/external-share`
 - **Fase 3** (futura): intercambios entre usuarios, notificaciones, grupos

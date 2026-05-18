@@ -277,10 +277,12 @@ function AlbumShareView({ instanceId }: { instanceId: string }) {
   }
 
   const publisher = catalogMeta?.publisher ?? 'Panini';
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const externalUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/external-share/${instanceId}`
+    : '';
   const faltantesText = buildFaltantesText(publisher, instance.name, stickers);
   const repetidasText = buildRepetidasText(publisher, instance.name, stickers);
-  const waUrlText = `Mira mi álbum "${instance.name}" 🏆 ${shareUrl}`;
+  const waUrlText = `Mira mi álbum "${instance.name}" 🏆 ${externalUrl}`;
 
   return (
     <>
@@ -310,11 +312,11 @@ function AlbumShareView({ instanceId }: { instanceId: string }) {
 
         <CopyCard
           icon="🔗"
-          title="Enlace"
-          description="Comparte tu progreso con quien quieras"
-          content={shareUrl}
+          title="Enlace público"
+          description="Cualquiera con el link puede ver tu progreso actualizado (solo lectura)"
+          content={externalUrl}
           waContent={waUrlText}
-          preview={shareUrl}
+          preview={externalUrl}
         />
 
         {missing > 0 && faltantesText && (
