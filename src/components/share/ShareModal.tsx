@@ -24,13 +24,13 @@ function buildFaltantesText(publisher: string, stickers: StickerWithState[]): st
   const faltantes = stickers.filter((s) => !s.userState);
   if (faltantes.length === 0) return '';
   const bySection = groupBySection(faltantes);
-  const lines = ['Me faltan estas figuritas:\n'];
+  const lines = ['Me faltan estas figuras:\n'];
   lines.push(`📘 Álbum: ${publisher}\n`);
 
   for (const [section, items] of Object.entries(bySection)) {
     lines.push(`📌 ${section}: ${items.map((s) => `#${s.number}`).join(', ')}`);
   }
-  lines.push(`\n¡Si tienes alguna avísame! 🙌`);
+  lines.push(`\n¡Si tienes alguna, avísame! 🙌`);
   return lines.join('\n');
 }
 
@@ -210,10 +210,10 @@ export function ShareModal({ shareUrl, albumName, publisher, stickers }: ShareMo
           {faltantesCount > 0 && (
             <ShareSection
               icon="❌"
-              title={`Mis faltantes · ${faltantesCount} figuritas`}
-              description="Texto listo para pedir figuritas a tus contactos"
+              title={`Mis faltantes · ${faltantesCount} figuras`}
+              description="Texto listo para pedir figuras a tus contactos"
               content={faltantesText}
-              preview={`Me faltan ${faltantesCount} figuritas del álbum "${albumName}"...`}
+              preview={`Me faltan ${faltantesCount} figuras del álbum "${albumName}"...`}
             />
           )}
 
@@ -221,7 +221,7 @@ export function ShareModal({ shareUrl, albumName, publisher, stickers }: ShareMo
           {repetidasCount > 0 && (
             <ShareSection
               icon="🔄"
-              title={`Mis repetidas · ${repetidasCount} figuritas`}
+              title={`Mis repetidas · ${repetidasCount} figuras`}
               description="Texto para ofrecer tus repetidas e intercambiar"
               content={repetidasText}
               preview={`Tengo ${repetidasCount} repetidas del álbum "${albumName}"...`}

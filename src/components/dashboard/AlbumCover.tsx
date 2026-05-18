@@ -19,19 +19,28 @@ interface AlbumCoverProps {
 const COVER_STYLES: Record<string, {
   grad: string;
   glow: string;
-  icon: string;
+  /**
+   * 'multiply' → white bg × dark gradient = dark (transparent-looking). Good for
+   *              logos with white background on a dark cover gradient.
+   * 'screen'   → dark bg × bright gradient = shows logo colors. Good for logos
+   *              with dark/transparent background.
+   */
+  logoSrc: string;
+  logoBlend: 'multiply' | 'screen';
   labelColor: string;
 }> = {
   'panini-2024': {
     grad: 'linear-gradient(160deg, #04102e 0%, #0d2a7a 38%, #1a44c8 65%, #081840 100%)',
     glow: 'rgba(29,78,216,0.55)',
-    icon: '⚽',
+    logoSrc: '/images/world-cup-logo-2.png',
+    logoBlend: 'multiply',   // white bg disappears on the dark blue gradient
     labelColor: '#93c5fd',
   },
   '3reyes-2024': {
     grad: 'linear-gradient(160deg, #011a0c 0%, #065236 38%, #059669 65%, #022b1a 100%)',
     glow: 'rgba(5,150,105,0.55)',
-    icon: '🏆',
+    logoSrc: '/images/world-cup-logo-2.png',
+    logoBlend: 'screen',     // dark bg disappears on the green gradient
     labelColor: '#6ee7b7',
   },
 };
@@ -39,7 +48,8 @@ const COVER_STYLES: Record<string, {
 const FALLBACK_STYLE = {
   grad: 'linear-gradient(160deg, #111827 0%, #1f2937 100%)',
   glow: 'rgba(107,114,128,0.3)',
-  icon: '📚',
+  logoSrc: '',
+  logoBlend: 'screen' as const,
   labelColor: 'rgba(255,255,255,0.5)',
 };
 
@@ -47,7 +57,7 @@ export function AlbumCover({
   album, instanceId, customName, progress, owned, repeated, total, onRename, onDelete,
 }: AlbumCoverProps) {
   const style = COVER_STYLES[album.slug] ?? FALLBACK_STYLE;
-  const missing = total - owned - repeated;
+  const missing = total - owned;
   const isComplete = progress >= 100;
   const progressWidth = `${Math.min(progress, 100)}%`;
 
@@ -231,17 +241,34 @@ export function AlbumCover({
                 )}
               </div>
 
-              {/* Main icon */}
-              <div style={{
-                fontSize: '52px', lineHeight: 1,
-                filter: isHovering
-                  ? 'drop-shadow(0 10px 24px rgba(0,0,0,0.7))'
-                  : 'drop-shadow(0 6px 16px rgba(0,0,0,0.5))',
-                transform: isHovering ? 'translateY(-2px)' : 'translateY(0)',
-                transition: 'filter 420ms ease, transform 420ms ease',
-              }}>
-                {style.icon}
-              </div>
+              {/* Main logo — no container, blend mode handles background removal */}
+              {style.logoSrc ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={style.logoSrc}
+                  alt=""
+                  style={{
+                    width: '88px',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    mixBlendMode: style.logoBlend,
+                    filter: isHovering
+                      ? 'drop-shadow(0 10px 28px rgba(0,0,0,0.75)) brightness(1.08)'
+                      : 'drop-shadow(0 5px 16px rgba(0,0,0,0.55))',
+                    transform: isHovering ? 'translateY(-3px)' : 'translateY(0)',
+                    transition: 'filter 420ms ease, transform 420ms ease',
+                  }}
+                />
+              ) : (
+                /* Fallback emoji */
+                <div style={{
+                  fontSize: '52px', lineHeight: 1,
+                  transform: isHovering ? 'translateY(-2px)' : 'translateY(0)',
+                  transition: 'transform 420ms ease',
+                }}>
+                  📚
+                </div>
+              )}
 
               <p style={{
                 fontSize: '7px', fontWeight: 800, letterSpacing: '0.22em',
@@ -317,7 +344,7 @@ export function AlbumCover({
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
                     <span style={{ fontSize: '8.5px', color: 'rgba(255,255,255,0.28)', fontWeight: 500 }}>
-                      {owned + repeated} / {total}
+                      {owned} / {total}
                     </span>
                     <span style={{ fontSize: '11px', fontWeight: 900, color: 'white' }}>
                       {progress}%
@@ -328,7 +355,7 @@ export function AlbumCover({
                       height: '100%', borderRadius: '99px', width: progressWidth,
                       background: isComplete
                         ? 'linear-gradient(90deg, #a5b4fc, #a5b4fc)'
-                        : 'linear-gradient(90deg, #1d4ed8, #d97706)',
+                        : 'var(--accent-grad)',
                       transition: 'width 0.5s var(--ease-out)',
                     }} />
                   </div>

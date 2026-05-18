@@ -60,7 +60,7 @@ export function BatchInput({ totalStickers, onAdd }: BatchInputProps) {
 
       {preview.length > 0 && (
         <p className="text-sm text-gray-500">
-          {preview.length} figurita{preview.length !== 1 ? 's' : ''}: {preview.slice(0, 10).join(', ')}
+          {preview.length} figura{preview.length !== 1 ? 's' : ''}: {preview.slice(0, 10).join(', ')}
           {preview.length > 10 ? `... +${preview.length - 10} mas` : ''}
         </p>
       )}

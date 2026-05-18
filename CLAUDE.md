@@ -1,72 +1,138 @@
 # Álbum Digital Panini / 3 Reyes
 
-Aplicación web para gestionar el inventario digital de álbumes de figuritas Panini y 3 Reyes.
+Aplicación web para gestionar el inventario digital de álbumes de figuritas Panini y 3 Reyes del Mundial 2026.
 
 ## Stack
 
-- **Framework**: Next.js 14+ con App Router
+- **Framework**: Next.js 15 con App Router
 - **Hosting**: Vercel (free tier)
 - **BD + Auth**: Supabase (PostgreSQL + Google OAuth)
 - **Estado cliente**: Zustand (UI local) + TanStack Query (datos del servidor)
-- **Estilos**: Tailwind CSS
+- **Estilos**: Tailwind CSS + CSS custom properties (design tokens en `globals.css`)
 - **Lenguaje**: TypeScript
+
+## Estado actual del proyecto
+
+- **Fase 2 completa**: Google Auth + Supabase BD + migración automática desde localStorage
+- Multi-álbum: el usuario puede tener varios álbumes activos (Panini y/o 3 Reyes)
+- Ruta `/share` funciona en modo propietario (`/share/<instanceId>`) y modo público (`/share/<token>`)
+- UI con tema oscuro, World Cup identity (logos, colores, animaciones)
 
 ## Estructura de carpetas
 
 ```
 src/
 ├── app/
+│   ├── layout.tsx                      # Root layout: fuentes Geist, Providers, page-background div
+│   ├── providers.tsx                   # QueryClientProvider + SessionProvider
+│   ├── globals.css                     # Design tokens, animaciones CSS, clases utilitarias
 │   ├── (auth)/
-│   │   └── login/page.tsx          # Pantalla de login con Google
+│   │   └── login/
+│   │       ├── page.tsx                # Login page (logo WC, tarjeta centrada)
+│   │       └── LoginButton.tsx         # Botón Google OAuth via Supabase
 │   ├── (app)/
-│   │   ├── layout.tsx              # Layout con nav, requiere sesión
-│   │   ├── page.tsx                # Dashboard / home
-│   │   ├── album/[albumId]/page.tsx  # Vista álbum con grid 3D
-│   │   ├── repetidas/page.tsx      # Mis repetidas + intercambio
-│   │   └── cargar/page.tsx         # Carga manual de figuritas
-│   ├── share/[token]/page.tsx      # Vista pública (sin auth)
+│   │   ├── layout.tsx                  # Layout autenticado: navbar sticky, aurora blobs, logo ghost
+│   │   ├── page.tsx                    # Dashboard: WCHero banner + grid de álbumes
+│   │   ├── HeaderActions.tsx           # Avatar de usuario + indicador de sesión en navbar
+│   │   ├── NavMenu.tsx                 # Menú hamburguesa (navegación lateral/dropdown)
+│   │   ├── LogoutButton.tsx            # Botón cerrar sesión
+│   │   └── album/[albumId]/page.tsx    # Vista de álbum: progreso, filtros, grid de figuritas
+│   ├── share/[token]/page.tsx          # Vista compartir (dual mode: propietario o público)
 │   └── api/
-│       └── auth/callback/route.ts  # Callback OAuth de Supabase
+│       └── auth/callback/route.ts      # Callback OAuth de Supabase
 ├── components/
 │   ├── album/
-│   │   ├── FiguriteGrid.tsx        # Cuadrícula virtualizada de figuritas
-│   │   ├── FiguriteCard.tsx        # Flip-card 3D (CSS transform3d)
-│   │   ├── SectionNav.tsx          # Navegación por sección del álbum
-│   │   ├── FilterBar.tsx           # Filtros: tengo / me falta / repetidas
-│   │   └── ProgressHeader.tsx      # Barra de progreso + contadores
+│   │   ├── FiguriteCard.tsx            # Tarjeta de figurita con animaciones (bounce, shine, stamp)
+│   │   ├── FiguriteGrid.tsx            # Cuadrícula de figuritas (virtualizada para 600+ items)
+│   │   ├── SectionNav.tsx              # Nav horizontal de secciones con pills + barra de progreso
+│   │   ├── AlbumToolbar.tsx            # Filtros (Todas/Tengo/Faltan/Repetidas) + tamaño de carta
+│   │   ├── ProgressHeader.tsx          # Header con stats (tengo/repet./faltan/total) + barra
+│   │   ├── AddOwnedModal.tsx           # Modal para marcar figuritas como "tengo" en lote
+│   │   └── AddRepeatedModal.tsx        # Modal para marcar figuritas como "repetidas" con cantidad
 │   ├── dashboard/
-│   │   ├── AlbumCover.tsx          # Portada animada del álbum
-│   │   └── StatCard.tsx            # Tarjeta de métrica (pegadas, faltantes)
+│   │   ├── AlbumCover.tsx              # Portada de álbum con logo oficial, stats y hover lift
+│   │   ├── CreateAlbumModal.tsx        # Modal para crear un nuevo álbum de la colección
+│   │   └── StatCard.tsx               # Tarjeta de métrica genérica (no usada actualmente)
 │   ├── cargar/
-│   │   ├── BatchInput.tsx          # Ingreso de números por lote (ej: "12,45,78-90")
-│   │   ├── GridSelector.tsx        # Cuadrícula para marcar clic a clic
-│   │   └── SectionSelector.tsx     # Marcar sección completa de un tirón
+│   │   ├── BatchInput.tsx              # Ingreso de números por lote (ej: "12,45,78-90")
+│   │   ├── GridSelector.tsx            # Cuadrícula para marcar figuritas clic a clic
+│   │   └── SectionSelector.tsx        # Marcar sección completa de un tirón
 │   ├── share/
-│   │   ├── ShareModal.tsx          # Modal con enlace + botón WhatsApp
-│   │   └── WhatsAppButton.tsx      # Abre wa.me con mensaje pre-armado
+│   │   └── ShareModal.tsx             # Modal de compartir (legacy — la lógica principal está en /share)
 │   └── ui/
 │       ├── Button.tsx
 │       ├── Badge.tsx
-│       └── SearchInput.tsx
+│       └── SearchInput.tsx             # Buscador de figuritas por número o nombre
 ├── hooks/
-│   ├── useInventory.ts             # CRUD de figuritas contra Supabase
-│   ├── useAlbumData.ts             # Carga catálogo JSON del álbum activo
-│   ├── useFilters.ts               # Estado de filtros activos
-│   └── useShare.ts                 # Genera y decodifica URL de intercambio
+│   ├── useSession.ts                   # Sesión Supabase (user, loading)
+│   ├── useUserAlbums.ts                # CRUD de álbumes del usuario + AVAILABLE_ALBUMS
+│   ├── useInventory.ts                 # CRUD de figuritas del inventario contra Supabase
+│   ├── useAlbumData.ts                 # Carga catálogo JSON del álbum (panini/3reyes)
+│   ├── useFilters.ts                   # Aplica filtros + búsqueda al listado de stickers
+│   ├── useMigrateToSupabase.ts         # Migra inventario de localStorage → Supabase al primer login
+│   └── useShare.ts                     # Genera y decodifica URL de intercambio (legacy)
 ├── store/
-│   └── uiStore.ts                  # Zustand: filtros, modal abierto, álbum activo
+│   └── uiStore.ts                      # Zustand: filter, activeSection, cardSize, searchQuery
 ├── lib/
 │   ├── supabase/
-│   │   ├── client.ts               # createBrowserClient de @supabase/ssr
-│   │   └── server.ts               # createServerClient para Server Components
-│   ├── shareEncoder.ts             # Serializa inventario a base64url para URL pública
-│   └── catalogHelpers.ts           # Utilidades: diff catálogo vs inventario
+│   │   ├── client.ts                   # createBrowserClient de @supabase/ssr
+│   │   └── server.ts                   # createServerClient para Server Components
+│   ├── shareEncoder.ts                 # Serializa inventario a base64url para URL pública
+│   ├── sectionColors.ts                # Mapa sección → color (para pills y badges)
+│   └── catalogHelpers.ts               # mergeWithInventory, getStats, getSections, getSectionStats
 ├── data/
-│   ├── panini.json                 # Catálogo completo Panini (id, numero, nombre, seccion, imagen_url)
-│   └── treyes.json                 # Catálogo completo 3 Reyes
+│   ├── panini.json                     # Catálogo Panini (id, number, name, section)
+│   └── treyes.json                     # Catálogo 3 Reyes
 └── types/
-    └── index.ts                    # Tipos globales: Sticker, StickerState, UserAlbum, etc.
+    └── index.ts                        # Sticker, StickerWithState, UserAlbumInstance, etc.
+
+public/
+└── images/
+    ├── world-cup-logo.png              # Logo 1: trofeo FIFA, fondo BLANCO
+    └── world-cup-logo-2.png            # Logo 2: esfera "26", fondo OSCURO
 ```
+
+## Guía de uso de los logos
+
+| Contexto | Logo | Técnica |
+|---|---|---|
+| Navbar (fondo oscuro) | logo-2 | `mix-blend-mode: screen` + `objectFit: cover` cropeado a la esfera |
+| Dashboard WCHero | logo-2 | `mix-blend-mode: screen`, posicionado `bottom:-105px` para clipear texto |
+| Login card | logo-2 | `filter: drop-shadow(...)` sobre fondo oscuro |
+| Portada álbum Panini | logo-1 | `mix-blend-mode: multiply` (fondo blanco × azul oscuro = transparente) |
+| Portada álbum 3 Reyes | logo-2 | `mix-blend-mode: screen` |
+| Watermark página (ghost) | logo-1 | `filter: grayscale(1) invert(1) brightness(X) opacity(Y)` |
+
+## Animaciones CSS (globals.css)
+
+| Clase / keyframe | Uso |
+|---|---|
+| `badge-pop` | Badge de qty en FiguriteCard, se activa con `key={qty}` |
+| `card-owned-pop` | Bounce del card al marcar como "tengo" (via ref DOM) |
+| `card-shine-sweep` | Destello diagonal al marcar como "tengo" |
+| `check-stamp` | Sello ✓ que aparece al marcar como "tengo" |
+| `foil-sweep` | Brillo metálico en álbumes completos |
+| `aurora-drift-1/2` | Blobs de aurora en el layout |
+| `skeleton` | Shimmer para estados de carga |
+| `.pressable` | `scale(0.97)` en `:active` (feedback táctil) |
+| `.card-hover` | `translateY(-3px)` en hover (para portadas de álbum) |
+| `.wc-stripes` | Líneas diagonales sutiles (identidad WC) |
+| `.wc-hex` | Patrón hexagonal tipo balón de fútbol |
+
+## Ruta `/share/[token]`
+
+La página detecta el modo según el valor del parámetro `token`:
+
+```
+UUID (xxxxxxxx-xxxx-…)     → ownerMode = true  → OwnerView (requiere sesión)
+ID local (\d{10,}-[a-z0-9]+) → ownerMode = true  → OwnerView
+Cualquier otro valor        → ownerMode = false → TokenView (público, sin auth)
+```
+
+- **OwnerView**: muestra botón "← Mi álbum", panel con acciones de compartir (URL, faltantes texto, repetidas texto), y luego el contenido visual.
+- **TokenView**: decodifica el token base64url con `decodeInventory`, muestra solo el contenido visual.
+- `ShareContent`: componente compartido que renderiza stats card, repetidas por sección, y grid completo.
+- `CopyCard`: botón copiar con flash 2s + botón WhatsApp.
 
 ## Esquema de base de datos (Supabase / PostgreSQL)
 
@@ -81,38 +147,28 @@ create table albums_catalog (
   total_stickers int not null
 );
 
-create table stickers_catalog (
-  id uuid primary key default gen_random_uuid(),
-  album_id uuid references albums_catalog(id),
-  number int not null,
-  name text not null,
-  section text not null,
-  image_url text,
-  unique(album_id, number)
-);
-
 -- Datos de usuario (RLS activo)
 create table user_albums (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,
   album_catalog_id uuid references albums_catalog(id),
-  status text default 'active',        -- active | completed | archived
+  name text,                           -- nombre personalizado del álbum
+  status text default 'active',
   started_at timestamptz default now(),
-  updated_at timestamptz default now(),
-  unique(user_id, album_catalog_id)
+  updated_at timestamptz default now()
 );
 
 create table user_stickers (
   id uuid primary key default gen_random_uuid(),
   user_album_id uuid references user_albums(id) on delete cascade,
   sticker_catalog_id uuid references stickers_catalog(id),
-  state text not null,                 -- owned | repeated
+  state text not null,                 -- 'owned' | 'repeated'
   quantity int default 1,
   marked_at timestamptz default now(),
   unique(user_album_id, sticker_catalog_id)
 );
 
--- RLS: cada usuario solo ve y escribe sus propios datos
+-- RLS
 alter table user_albums enable row level security;
 alter table user_stickers enable row level security;
 
@@ -127,20 +183,16 @@ create policy "users own stickers" on user_stickers
   );
 ```
 
-## Objetivos principales
-
-1. **Inventario**: saber qué figuritas tengo, cuáles me faltan y cuáles están repetidas
-2. **Exhibición**: UI visualmente destacada con flip-card 3D (CSS transform3d, sin Three.js), estado del álbum, progreso por sección
-3. **Compartir**: URL pública compartible por WhatsApp con inventario codificado (base64url), sin backend para la vista pública
-
 ## Reglas de negocio clave
 
-- Una figurita puede tener estado `owned`, `repeated`, o no existir en `user_stickers` (= faltante)
-- Las figuritas faltantes se calculan por diferencia entre el catálogo y `user_stickers`
-- El enlace público codifica el inventario completo en la URL (`?s=<base64url>`) — funciona sin login
-- Al primer login con Google se migra automáticamente el inventario de localStorage a Supabase
-- `FiguriteCard` usa CSS `transform-style: preserve-3d` y `rotateY(180deg)` — sin librerías 3D externas
-- La cuadrícula de figuritas usa virtualización para manejar 600+ items sin degradar rendimiento
+- Estado de figurita: `owned` | `repeated` | `undefined` (= faltante, no está en `user_stickers`)
+- Faltantes = catálogo total − (owned + repeated)
+- Badge en FiguriteCard: `+N` en vista "tengo" (copias extra), `×N` en vista "repetidas"
+- El token de compartir codifica toda la info en la URL — funciona sin login, sin servidor
+- `useUserAlbums` expone `AVAILABLE_ALBUMS` con los slugs disponibles y metadata de cada álbum
+- `mergeWithInventory(catalog, inventory)` produce `StickerWithState[]` con qty y userState
+- La migración localStorage→Supabase ocurre automáticamente en el primer login (hook `useMigrateToSupabase`)
+- `FiguriteCard` detecta transición missing→owned con `useRef(prevIsOwned)` para disparar animaciones
 
 ## Variables de entorno necesarias
 
@@ -149,17 +201,16 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-## Fases del proyecto
-
-- **Fase 1** (actual): frontend solo, localStorage, URL compartible sin backend ✓
-- **Fase 2** (en desarrollo): Google Auth + Supabase BD + carga manual de figuritas
-- **Fase 3** (futura): intercambios entre usuarios, notificaciones, grupos
-
 ## Comandos útiles
 
 ```bash
-npx create-next-app@latest panini-album --typescript --tailwind --app
-npm install @supabase/ssr @supabase/supabase-js zustand @tanstack/react-query
-npx supabase init
-npx supabase start   # BD local para desarrollo
+npm run dev          # Servidor de desarrollo
+npm run build        # Build de producción
+npx tsc --noEmit     # Verificar tipos sin compilar
 ```
+
+## Fases del proyecto
+
+- **Fase 1** ✓: frontend solo, localStorage, URL compartible sin backend
+- **Fase 2** ✓: Google Auth + Supabase BD + multi-álbum + carga manual + ruta /share dual-mode
+- **Fase 3** (futura): intercambios entre usuarios, notificaciones, grupos

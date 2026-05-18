@@ -59,15 +59,16 @@ export default async function LoginPage() {
         pointerEvents: 'none',
       }} />
 
-      {/* Giant trophy — decorative */}
+      {/* Logo 1 — ghosted watermark behind card (invert makes white bg→black so it vanishes on dark) */}
       <div style={{
-        position: 'absolute', right: '-20px', bottom: '-30px',
-        color: 'rgba(255,255,255,0.04)',
+        position: 'absolute', right: '-5%', bottom: '-4%',
+        width: '54vw', maxWidth: '340px',
         pointerEvents: 'none',
-        transform: 'scale(4)',
+        filter: 'grayscale(1) invert(1) opacity(0.07) brightness(2)',
         transformOrigin: 'bottom right',
       }}>
-        <TrophySilhouette />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/world-cup-logo.png" alt="" style={{ width: '100%', height: 'auto' }} />
       </div>
 
       {/* "2026" large background text */}
@@ -108,15 +109,17 @@ export default async function LoginPage() {
           {/* Logo + title */}
           <div style={{ textAlign: 'center', marginBottom: '36px' }}>
             <div style={{
-              width: '76px', height: '76px',
-              background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
-              borderRadius: '22px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '38px',
+              width: '84px', height: '84px',
               margin: '0 auto 20px',
-              boxShadow: '0 8px 32px rgba(29,78,216,0.5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              filter: 'drop-shadow(0 8px 24px rgba(29,78,216,0.55))',
             }}>
-              ⚽
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/world-cup-logo-2.png"
+                alt="FIFA World Cup 26"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
             </div>
 
             <h1 style={{
@@ -138,7 +141,7 @@ export default async function LoginPage() {
             </p>
 
             <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: '14px', margin: 0, lineHeight: 1.5 }}>
-              Gestioná tu colección de figuritas
+              Gestiona tu colección de figuras
             </p>
           </div>
 
@@ -149,7 +152,7 @@ export default async function LoginPage() {
             color: 'rgba(255,255,255,0.25)',
             marginTop: '22px', lineHeight: 1.7,
           }}>
-            También podés usar la app sin cuenta.<br />
+            También puedes usar la app sin cuenta.<br />
             Tu progreso se guarda localmente.
           </p>
 

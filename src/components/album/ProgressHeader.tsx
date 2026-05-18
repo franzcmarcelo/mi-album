@@ -1,4 +1,8 @@
-﻿interface ProgressHeaderProps {
+'use client';
+
+import { useEffect, useState } from 'react';
+
+interface ProgressHeaderProps {
   albumName: string;
   albumType?: string;
   owned: number;
@@ -6,6 +10,7 @@
   missing: number;
   total: number;
   progress: number;
+  onRename?: (name: string) => void;
 }
 
 export function ProgressHeader({
@@ -16,8 +21,37 @@ export function ProgressHeader({
   missing,
   total,
   progress,
+  onRename,
 }: ProgressHeaderProps) {
+  const [editing, setEditing] = useState(false);
+  const [draftName, setDraftName] = useState(albumName);
+
+  useEffect(() => {
+    setDraftName(albumName);
+  }, [albumName]);
+
   const isComplete = progress >= 100;
+  const canEdit = typeof onRename === 'function';
+
+  function submitRename() {
+    const trimmed = draftName.trim();
+    if (trimmed && trimmed !== albumName) {
+      onRename?.(trimmed);
+    }
+    setEditing(false);
+  }
+
+  function cancelRename() {
+    setDraftName(albumName);
+    setEditing(false);
+  }
+
+  const stats = [
+    { value: owned,    label: 'Tengo',    color: '#34d399',          bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.2)' },
+    { value: repeated, label: 'Repet.',   color: '#fbbf24',          bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.2)' },
+    { value: missing,  label: 'Faltan',   color: 'var(--text-2)',    bg: 'var(--bg-raised)',      border: 'var(--bg-border)' },
+    { value: total,    label: 'Total',    color: 'var(--text-3)',    bg: 'transparent',           border: 'var(--bg-border)' },
+  ];
 
   return (
     <div
@@ -29,11 +63,8 @@ export function ProgressHeader({
         overflow: 'hidden',
       }}
     >
-      {/* Gold top bar */}
-      <div style={{
-        height: '3px',
-        background: 'var(--accent-grad-h)',
-      }} />
+      {/* Accent top bar */}
+      <div style={{ height: '3px', background: 'var(--accent-grad-h)' }} />
 
       {/* WC diagonal stripes */}
       <div className="wc-stripes" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.35 }} />
@@ -46,14 +77,60 @@ export function ProgressHeader({
       }} />
 
       <div style={{ padding: '16px', position: 'relative', zIndex: 1 }}>
-        {/* Name + % */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-          <div>
-            <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: '18px', margin: 0, letterSpacing: '-0.01em' }}>
-              {albumName}
-            </h1>
+        {/* Name + percentage */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', gap: '12px' }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              {editing ? (
+                <input
+                  value={draftName}
+                  onChange={(e) => setDraftName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') submitRename();
+                    if (e.key === 'Escape') cancelRename();
+                  }}
+                  onBlur={submitRename}
+                  autoFocus
+                  style={{
+                    fontSize: '18px', fontWeight: 800, color: 'var(--text-1)',
+                    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)',
+                    borderRadius: '10px', padding: '8px 10px', minWidth: '220px', colorScheme: 'dark',
+                    outline: 'none', width: '100%', maxWidth: '100%',
+                  }}
+                />
+              ) : (
+                <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: '18px', margin: 0, letterSpacing: '-0.01em', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                  {albumName}
+                  {canEdit && (
+                    <button
+                      onClick={() => setEditing(true)}
+                      className="pressable"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        background: 'rgba(255,255,255,0.06)',
+                        color: 'var(--text-1)',
+                        cursor: 'pointer',
+                        padding: 0,
+                      }}
+                      type="button"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+                      </svg>
+                    </button>
+                  )}
+                </h1>
+              )}
+            </div>
             {albumType && (
-              <p style={{ color: 'var(--text-3)', fontSize: '12px', margin: '2px 0 0', fontWeight: 500 }}>
+              <p style={{ color: 'var(--text-3)', fontSize: '12px', margin: '8px 0 0', fontWeight: 500 }}>
                 {albumType}
               </p>
             )}
@@ -82,31 +159,10 @@ export function ProgressHeader({
           </div>
         </div>
 
-        {/* Progress bar */}
-        <div style={{
-          height: '4px', borderRadius: '99px',
-          background: 'var(--bg-raised)',
-          overflow: 'hidden', marginBottom: '14px',
-        }}>
-          <div style={{
-            height: '100%', borderRadius: '99px',
-            width: `${progress}%`,
-            background: isComplete
-              ? 'linear-gradient(90deg, #f59e0b, #fcd34d)'
-              : 'var(--accent-grad-h)',
-            transition: 'width 0.5s var(--ease-out)',
-          }} />
-        </div>
-
         {/* Stat chips */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
-          {[
-            { value: owned,    label: 'Tengo',     color: '#10b981', bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.2)' },
-            { value: repeated, label: 'Repetidas', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)' },
-            { value: missing,  label: 'Faltan',    color: 'var(--text-2)', bg: 'var(--bg-raised)',   border: 'var(--bg-border)' },
-            { value: total,    label: 'Total',     color: 'var(--text-3)', bg: 'transparent',       border: 'var(--bg-border)' },
-          ].map(({ value, label, color, bg, border }) => (
-            <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '10px', padding: '8px 10px' }}>
+        <div style={{ display: 'flex', gap: '6px', marginBottom: '14px' }}>
+          {stats.map(({ value, label, color, bg, border }) => (
+            <div key={label} style={{ flex: 1, background: bg, border: `1px solid ${border}`, borderRadius: '10px', padding: '8px 10px' }}>
               <span style={{ display: 'block', fontSize: '20px', fontWeight: 900, color, lineHeight: 1 }}>
                 {value}
               </span>
@@ -115,6 +171,22 @@ export function ProgressHeader({
               </span>
             </div>
           ))}
+        </div>
+
+        {/* Progress bar */}
+        <div style={{
+          height: '4px', borderRadius: '99px',
+          background: 'var(--bg-raised)',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            height: '100%', borderRadius: '99px',
+            width: `${Math.min(progress, 100)}%`,
+            background: isComplete
+              ? 'linear-gradient(90deg, #f59e0b, #fcd34d)'
+              : 'var(--accent-grad)',
+            transition: 'width 0.5s var(--ease-out)',
+          }} />
         </div>
       </div>
     </div>

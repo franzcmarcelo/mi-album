@@ -18,7 +18,7 @@ export function SearchInput() {
         type="search"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Buscar figurita..."
+        placeholder="Buscar figura..."
         style={{
           width: '100%',
           background: 'var(--bg-surface)',

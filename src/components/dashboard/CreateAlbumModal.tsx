@@ -133,7 +133,7 @@ export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
                       {album.name}
                     </p>
                     <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
-                      {album.totalStickers} figuritas
+                      {album.totalStickers} figuras
                     </p>
                   </div>
                   {isSelected && (

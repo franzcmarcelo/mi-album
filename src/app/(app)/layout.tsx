@@ -1,6 +1,6 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { NavMenu } from './NavMenu';
-import { BottomNav } from './BottomNav';
+import { HeaderActions } from './HeaderActions';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -37,19 +37,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
           {/* Brand */}
           <Link href="/" className="pressable flex items-center gap-2.5" style={{ textDecoration: 'none' }}>
-            <div
+            {/*
+              mix-blend-mode: screen → dark pixels of logo-2 become transparent
+              on the dark navbar, leaving only the coloured "26" sphere visible.
+            */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/world-cup-logo-2.png"
+              alt="FIFA World Cup 26"
               style={{
-                width: '34px', height: '34px',
-                background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
+                width: '36px',
+                height: '36px',
+                objectFit: 'cover',
+                objectPosition: '50% 18%',   /* crop to sphere, skip text below */
                 borderRadius: '10px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '18px',
-                boxShadow: '0 2px 14px var(--accent-glow)',
                 flexShrink: 0,
+                mixBlendMode: 'screen',
               }}
-            >
-              ⚽
-            </div>
+            />
             <div style={{ lineHeight: 1 }}>
               <span style={{
                 display: 'block', color: 'var(--text-1)',
@@ -67,18 +72,53 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </Link>
 
-          <NavMenu />
+          <div className="flex items-center gap-3">
+            <HeaderActions />
+            <NavMenu />
+          </div>
         </div>
       </nav>
 
       <main
-        className="mx-auto max-w-2xl px-4 py-4 pb-28 sm:pb-6"
+        className="mx-auto max-w-2xl px-4 py-4"
         style={{ position: 'relative', zIndex: 1 }}
       >
         {children}
       </main>
 
-      <BottomNav />
+      {/*
+        Bottom logo wave — logo 1 inverted so its white bg becomes black
+        (invisible on dark), leaving the trophy as a faint light ghost that
+        anchors the page visually like a watermark rising from the bottom.
+      */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        padding: '16px 0 0',
+        overflow: 'hidden',
+        position: 'relative',
+        zIndex: 1,
+        pointerEvents: 'none',
+        userSelect: 'none',
+      }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/world-cup-logo.png"
+          alt=""
+          aria-hidden="true"
+          style={{
+            width: 'min(480px, 80vw)',
+            height: 'auto',
+            filter: 'grayscale(1) invert(1) brightness(3) opacity(0.07)',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 35%, black 75%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 35%, black 75%, transparent 100%)',
+          }}
+        />
+      </div>
+
+      {/* Spacer so wave doesn't stick to content */}
+      <div style={{ height: '32px' }} />
     </div>
   );
 }

@@ -47,16 +47,26 @@ function WCHero({ firstName }: { firstName: string | null }) {
       {/* Diagonal stripes */}
       <div className="wc-stripes" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
 
-      {/* Trophy silhouette — decorative, bottom right */}
-      <div style={{
-        position: 'absolute', right: '-4px', bottom: '-8px',
-        color: 'rgba(255,255,255,0.055)',
-        pointerEvents: 'none',
-        transform: 'scale(1.5)',
-        transformOrigin: 'bottom right',
-      }}>
-        <TrophySilhouette />
-      </div>
+      {/*
+        Logo 2 — positioned so the sphere is visible inside the card but the
+        "MUNDIAL 2026" text overflows below and is clipped by overflow:hidden.
+        Approx proportions: sphere = top 52%, text = bottom 48%.
+        At width 170px → height ≈ 221px. bottom:-105px clips the text portion.
+      */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/world-cup-logo-2.png"
+        alt=""
+        aria-hidden="true"
+        style={{
+          position: 'absolute', right: '6px', bottom: '-105px',
+          width: '170px',
+          height: 'auto',
+          pointerEvents: 'none',
+          mixBlendMode: 'screen',
+          opacity: 0.65,
+        }}
+      />
 
       {/* Content */}
       <div style={{ padding: '18px 20px 20px', position: 'relative', zIndex: 1 }}>
@@ -158,43 +168,29 @@ export default function DashboardPage() {
             padding: '5px',
           }}
         >
-          {/* Title pill */}
-          <span style={{
-            padding: '6px 10px',
-            fontSize: '12px', fontWeight: 700,
-            color: 'var(--text-2)',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}>
-            Mis Álbunes
-          </span>
-
           {/* Publisher filter pills — only when multiple publishers */}
           {hasMultiplePublishers && (
-            <>
-              <div style={{ width: '1px', height: '20px', background: 'var(--bg-border-hi)', flexShrink: 0 }} />
-              <div className="flex flex-1 gap-0.5">
-                {PUBLISHER_FILTERS.map((f) => {
-                  const active = publisherFilter === f.value;
-                  return (
-                    <button
-                      key={String(f.value)}
-                      onClick={() => setPublisherFilter(f.value)}
-                      className="pressable flex-1 rounded-[9px] py-1.5 text-xs font-semibold"
-                      style={{
-                        background: active ? 'var(--bg-raised)' : 'transparent',
-                        color: active ? 'var(--text-1)' : 'var(--text-3)',
-                        border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
-                        cursor: 'pointer',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {f.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </>
+            <div className="flex flex-1 gap-1">
+              {PUBLISHER_FILTERS.map((f) => {
+                const active = publisherFilter === f.value;
+                return (
+                  <button
+                    key={String(f.value)}
+                    onClick={() => setPublisherFilter(f.value)}
+                    className="pressable flex-1 rounded-[9px] px-2 py-1.5 text-xs font-semibold"
+                    style={{
+                      background: active ? 'var(--bg-raised)' : 'transparent',
+                      color: active ? 'var(--text-1)' : 'var(--text-3)',
+                      border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
           )}
 
           <div style={{ flex: 1 }} />
@@ -296,10 +292,10 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
           ⚽
         </div>
         <h2 style={{ fontWeight: 800, fontSize: '17px', color: 'white', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
-          Empezá tu colección
+          Empieza tu colección
         </h2>
         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', margin: '0 0 24px', maxWidth: '240px', lineHeight: 1.55 }}>
-          Agregá tu primer álbum y empezá a registrar tus figuritas del Mundial
+          Agrega tu primer álbum y empieza a registrar tus figuras del Mundial
         </p>
         <button
           onClick={onAdd}

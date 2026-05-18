@@ -1,26 +1,32 @@
-﻿'use client';
+'use client';
 
-import { use } from 'react';
+import { use, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
 import { useUserAlbums, AVAILABLE_ALBUMS } from '@/hooks/useUserAlbums';
 import { useAlbumData } from '@/hooks/useAlbumData';
 import { useInventory } from '@/hooks/useInventory';
 import { useFilters } from '@/hooks/useFilters';
-import { useShare } from '@/hooks/useShare';
 import { mergeWithInventory, getStats, getSections } from '@/lib/catalogHelpers';
 import { FiguriteGrid } from '@/components/album/FiguriteGrid';
 import { AlbumToolbar } from '@/components/album/AlbumToolbar';
 import { SectionNav } from '@/components/album/SectionNav';
 import { ProgressHeader } from '@/components/album/ProgressHeader';
 import { SearchInput } from '@/components/ui/SearchInput';
-import { ShareModal } from '@/components/share/ShareModal';
+import { AddOwnedModal } from '@/components/album/AddOwnedModal';
+import { AddRepeatedModal } from '@/components/album/AddRepeatedModal';
 import { useUIStore } from '@/store/uiStore';
 
 export default function AlbumPage({ params }: { params: Promise<{ albumId: string }> }) {
   const { albumId: instanceId } = use(params);
+  const router = useRouter();
   const { user, loading: sessionLoading } = useSession();
-  const { openShareModal } = useUIStore();
-  const { getInstanceById, isLoading: albumsLoading } = useUserAlbums(user);
+  const { filter, setFilter, setActiveSection } = useUIStore();
+  const { getInstanceById, isLoading: albumsLoading, renameAlbum } = useUserAlbums(user);
+
+  const [addOwnedOpen, setAddOwnedOpen] = useState(false);
+  const [addRepeatedOpen, setAddRepeatedOpen] = useState(false);
 
   const instance = getInstanceById(instanceId);
   const catalogMeta = instance ? AVAILABLE_ALBUMS.find((a) => a.slug === instance.slug) : null;
@@ -33,10 +39,16 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
   const stats = getStats(stickers);
   const sections = getSections(catalog);
 
-  const { generateUrl } = useShare(stickers, instance?.slug ?? '');
-  const shareUrl = typeof window !== 'undefined' ? generateUrl() : '';
+  useEffect(() => {
+    setFilter('all');
+    setActiveSection(null);
+  }, [instanceId, setFilter, setActiveSection]);
 
   const isLoading = sessionLoading || albumsLoading || catalogLoading;
+
+  // Get missing and owned stickers for modals
+  const missingStickers = stickers.filter((s) => !s.userState);
+  const repeatableStickers = stickers.filter((s) => s.userState === 'owned' || s.userState === 'repeated');
 
   if (isLoading || !instance) {
     return (
@@ -46,6 +58,27 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
 
   return (
     <div className="space-y-4">
+      {/* Breadcrumb */}
+      <Link
+        href="/"
+        className="pressable inline-flex items-center gap-2"
+        style={{
+          fontSize: '13px',
+          fontWeight: 500,
+          color: 'rgba(241,245,249,0.56)',
+          textDecoration: 'none',
+          padding: '8px 0',
+          transition: 'color 200ms',
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.8)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.56)'; }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        Mi colección
+      </Link>
+
       <ProgressHeader
         albumName={instance.name}
         albumType={catalogMeta ? `${catalogMeta.publisher} · ${catalogMeta.name}` : ''}
@@ -54,26 +87,97 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         missing={stats.missing}
         total={stats.total}
         progress={stats.progress}
+        onRename={(name) => renameAlbum(instanceId, name)}
       />
 
       <ShareBanner
-        onShare={openShareModal}
+        onShare={() => router.push(`/share/${instanceId}`)}
         faltantes={stats.missing}
         repetidas={stats.repeated}
       />
 
       <AlbumToolbar />
 
+      {/* Add button for "Tengo" filter */}
+      {filter === 'owned' && (
+        <button
+          onClick={() => setAddOwnedOpen(true)}
+          className="pressable w-full"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '10px 14px',
+            background: 'rgba(16,185,129,0.1)',
+            border: '1px solid rgba(16,185,129,0.3)',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: 600,
+            color: '#10b981',
+          }}
+        >
+          <span style={{ fontSize: '16px' }}>+</span>
+          Agregar figuras que tengo
+        </button>
+      )}
+
+      {/* Add button for "Repetidas" filter */}
+      {filter === 'repeated' && (
+        <button
+          onClick={() => setAddRepeatedOpen(true)}
+          className="pressable w-full"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '10px 14px',
+            background: 'rgba(234,179,8,0.1)',
+            border: '1px solid rgba(234,179,8,0.3)',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: 600,
+            color: '#eab308',
+          }}
+        >
+          <span style={{ fontSize: '16px' }}>+</span>
+          Marcar como repetidas
+        </button>
+      )}
+
       <SearchInput />
       <SectionNav sections={sections} stickers={stickers} />
 
       <FiguriteGrid
         stickers={filtered}
+        currentFilter={filter}
         onUpdate={(id, state, qty) => update.mutate({ stickerId: id, state, quantity: qty })}
         isLoading={isLoading}
       />
 
-      <ShareModal shareUrl={shareUrl} albumName={instance.name} publisher={catalogMeta?.publisher ?? ''} stickers={stickers} />
+      {/* Modals */}
+      <AddOwnedModal
+        open={addOwnedOpen}
+        onClose={() => setAddOwnedOpen(false)}
+        missingStickers={missingStickers}
+        onAdd={(stickerIds) => {
+          stickerIds.forEach((id) => {
+            update.mutate({ stickerId: id, state: 'owned', quantity: 1 });
+          });
+        }}
+      />
+
+      <AddRepeatedModal
+        open={addRepeatedOpen}
+        onClose={() => setAddRepeatedOpen(false)}
+        repeatableStickers={repeatableStickers}
+        onAdd={(selections) => {
+          selections.forEach(({ stickerId, quantity }) => {
+            update.mutate({ stickerId, state: 'repeated', quantity });
+          });
+        }}
+      />
     </div>
   );
 }
@@ -129,6 +233,9 @@ function ShareBanner({ onShare, faltantes, repetidas }: {
         </p>
         <p style={{ margin: '2px 0 0', fontSize: '11px', color: 'var(--text-3)' }}>
           {tags.join(' · ')}
+        </p>
+        <p style={{ margin: '3px 0 0', fontSize: '10px', color: 'var(--text-3)', opacity: 0.6, lineHeight: 1.4 }}>
+          Comparte con amigos para intercambiar repetidas y completar tu álbum más rápido
         </p>
       </div>
 

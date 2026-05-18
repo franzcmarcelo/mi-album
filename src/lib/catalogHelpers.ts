@@ -17,7 +17,8 @@ export function mergeWithInventory(
 export function applyFilter(stickers: StickerWithState[], filter: FilterType): StickerWithState[] {
   switch (filter) {
     case 'owned':
-      return stickers.filter((s) => s.userState === 'owned');
+      // Repeated stickers are still "tengo" — you have them, just more than one
+      return stickers.filter((s) => s.userState === 'owned' || s.userState === 'repeated');
     case 'missing':
       return stickers.filter((s) => !s.userState);
     case 'repeated':
@@ -29,10 +30,12 @@ export function applyFilter(stickers: StickerWithState[], filter: FilterType): S
 
 export function getStats(stickers: StickerWithState[]) {
   const total = stickers.length;
-  const owned = stickers.filter((s) => s.userState === 'owned').length;
-  const repeated = stickers.filter((s) => s.userState === 'repeated').length;
-  const missing = total - owned - repeated;
-  const progress = total > 0 ? Math.round(((owned + repeated) / total) * 100) : 0;
+  const owned = stickers.filter((s) => s.userState === 'owned' || s.userState === 'repeated').length;
+  const repeated = stickers
+    .filter((s) => s.userState === 'repeated')
+    .reduce((sum, sticker) => sum + (sticker.quantity ?? 1), 0);
+  const missing = total - owned;
+  const progress = total > 0 ? Math.round((owned / total) * 100) : 0;
 
   return { total, owned, repeated, missing, progress };
 }
