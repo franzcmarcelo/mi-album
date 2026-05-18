@@ -5,8 +5,9 @@ import { useSession } from '@/hooks/useSession';
 import { useUserAlbums, AVAILABLE_ALBUMS } from '@/hooks/useUserAlbums';
 import { useMigrateToSupabase } from '@/hooks/useMigrateToSupabase';
 import { useAlbumData } from '@/hooks/useAlbumData';
+import { useAlbumStats } from '@/hooks/useAlbumStats';
 import { useInventory } from '@/hooks/useInventory';
-import { mergeWithInventory, getStats } from '@/lib/catalogHelpers';
+import { mergeWithInventory } from '@/lib/catalogHelpers';
 import { AlbumCover } from '@/components/dashboard/AlbumCover';
 import { CreateAlbumModal } from '@/components/dashboard/CreateAlbumModal';
 import { UserAlbumInstance } from '@/types';
@@ -55,16 +56,16 @@ function WCHero({ firstName }: { firstName: string | null }) {
       */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/world-cup-logo-2.png"
+        src="/images/world-cup-logo.png"
         alt=""
         aria-hidden="true"
         style={{
-          position: 'absolute', right: '6px', bottom: '-105px',
-          width: '170px',
+          position: 'absolute', right: '-18px', bottom: '0px',
+          width: 'clamp(220px, 34vw, 148px)',
           height: 'auto',
           pointerEvents: 'none',
+          filter: 'grayscale(1) invert(1) brightness(2.8) opacity(0.17)',
           mixBlendMode: 'screen',
-          opacity: 0.65,
         }}
       />
 
@@ -117,7 +118,7 @@ function AlbumCard({ instance, userId, onRemove, onRename }: {
   const catalog = AVAILABLE_ALBUMS.find((a) => a.slug === instance.slug)!;
   const { data: stickers = [] } = useAlbumData(instance.slug);
   const { data: inventory = {} } = useInventory(instance.id, userId);
-  const stats = getStats(mergeWithInventory(stickers, inventory));
+  const stats = useAlbumStats(mergeWithInventory(stickers, inventory));
 
   return (
     <AlbumCover
@@ -170,39 +171,40 @@ export default function DashboardPage() {
         >
           {/* Publisher filter pills — only when multiple publishers */}
           {hasMultiplePublishers && (
-            <div className="flex flex-1 gap-1">
-              {PUBLISHER_FILTERS.map((f) => {
-                const active = publisherFilter === f.value;
-                return (
-                  <button
-                    key={String(f.value)}
-                    onClick={() => setPublisherFilter(f.value)}
-                    className="pressable flex-1 rounded-[9px] px-2 py-1.5 text-xs font-semibold"
-                    style={{
-                      background: active ? 'var(--bg-raised)' : 'transparent',
-                      color: active ? 'var(--text-1)' : 'var(--text-3)',
-                      border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {f.label}
-                  </button>
-                );
-              })}
-            </div>
+            <>
+              <div className="flex gap-1" style={{ flex: 1, minWidth: 0 }}>
+                {PUBLISHER_FILTERS.map((f) => {
+                  const active = publisherFilter === f.value;
+                  return (
+                    <button
+                      key={String(f.value)}
+                      onClick={() => setPublisherFilter(f.value)}
+                      className="pressable flex-1 rounded-[9px] px-2 py-1.5 text-xs font-semibold"
+                      style={{
+                        background: active ? 'var(--bg-raised)' : 'transparent',
+                        color: active ? 'var(--text-1)' : 'var(--text-3)',
+                        border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        minWidth: 0,
+                      }}
+                    >
+                      {f.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Divider — only with pills */}
+              <div style={{ width: '1px', height: '20px', background: 'var(--bg-border-hi)', flexShrink: 0 }} />
+            </>
           )}
 
-          <div style={{ flex: 1 }} />
-
-          {/* Divider */}
-          <div style={{ width: '1px', height: '20px', background: 'var(--bg-border-hi)', flexShrink: 0 }} />
-
-          {/* Add button */}
+          {/* Add button — marginLeft:auto pushes it right when there are no pills */}
           <button
             onClick={() => setShowModal(true)}
             className="pressable rounded-[9px] px-3 py-1.5 text-xs font-bold"
             style={{
+              marginLeft: hasMultiplePublishers ? 0 : 'auto',
               background: 'var(--bg-raised)',
               color: 'var(--text-1)',
               border: '1px solid var(--bg-border-hi)',
@@ -225,7 +227,7 @@ export default function DashboardPage() {
       ) : instances.length === 0 ? (
         <EmptyState onAdd={() => setShowModal(true)} />
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredInstances.map((instance) => (
             <AlbumCard
               key={instance.id}

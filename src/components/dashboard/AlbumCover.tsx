@@ -248,7 +248,7 @@ export function AlbumCover({
                   src={style.logoSrc}
                   alt=""
                   style={{
-                    width: '88px',
+                    width: 'clamp(52px, 17vw, 88px)',
                     height: 'auto',
                     objectFit: 'contain',
                     mixBlendMode: style.logoBlend,
@@ -302,10 +302,10 @@ export function AlbumCover({
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
                 {/* Stat chips */}
-                <div style={{ display: 'flex', gap: '4px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                   <div style={{
                     background: 'rgba(16,185,129,0.18)', border: '1px solid rgba(16,185,129,0.22)',
-                    borderRadius: '7px', padding: '3px 6px', flex: 1,
+                    borderRadius: '7px', padding: '3px 6px', flex: '1 1 32%', minWidth: '64px',
                   }}>
                     <span style={{ fontSize: '13px', fontWeight: 900, color: '#34d399', display: 'block', lineHeight: 1 }}>
                       {owned}

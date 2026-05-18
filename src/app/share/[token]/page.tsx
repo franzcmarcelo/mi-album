@@ -6,7 +6,8 @@ import { useSession } from '@/hooks/useSession';
 import { useUserAlbums, AVAILABLE_ALBUMS } from '@/hooks/useUserAlbums';
 import { useAlbumData } from '@/hooks/useAlbumData';
 import { useInventory } from '@/hooks/useInventory';
-import { mergeWithInventory, getStats } from '@/lib/catalogHelpers';
+import { useAlbumStats } from '@/hooks/useAlbumStats';
+import { mergeWithInventory } from '@/lib/catalogHelpers';
 import { encodeInventory, decodeInventory } from '@/lib/shareEncoder';
 import { getSectionColor } from '@/lib/sectionColors';
 import { StickerWithState } from '@/types';
@@ -183,10 +184,7 @@ function ShareContent({
   publisher: string;
   label: string;
 }) {
-  const owned = stickers.filter((s) => s.userState === 'owned').length;
-  const repeated = stickers.filter((s) => s.userState === 'repeated').length;
-  const missing = stickers.length - owned - repeated;
-  const progress = Math.round(((owned + repeated) / stickers.length) * 100);
+  const { owned, repeated, missing, progress } = useAlbumStats(stickers);
   const isComplete = progress >= 100;
   const repetidasList = stickers.filter((s) => s.userState === 'repeated');
 
@@ -437,7 +435,7 @@ function ShareContent({
                 margin: '0 0 12px',
               }}
             >
-              Repetidas · {repetidasList.length}
+              Repetidas · {repeated}
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {Object.entries(bySection).map(([section, items]) => {
@@ -488,11 +486,9 @@ function ShareContent({
                           }}
                         >
                           #{s.number}
-                          {(s.quantity ?? 1) > 1 && (
-                            <span style={{ opacity: 0.7, marginLeft: '3px' }}>
-                              ×{s.quantity}
-                            </span>
-                          )}
+                          <span style={{ opacity: 0.7, marginLeft: '3px' }}>
+                            ×{s.quantity ?? 1}
+                          </span>
                         </span>
                       ))}
                     </div>
@@ -665,7 +661,7 @@ function OwnerView({ instanceId }: { instanceId: string }) {
   const { data: inventory = {} } = useInventory(instanceId, user?.id ?? null);
 
   const stickers = mergeWithInventory(catalog, inventory);
-  const stats = getStats(stickers);
+  const stats = useAlbumStats(stickers);
 
   const shareToken =
     typeof window !== 'undefined' && stickers.length > 0

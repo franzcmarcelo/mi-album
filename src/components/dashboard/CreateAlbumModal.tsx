@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AlbumCatalog } from '@/types';
 
 interface CreateAlbumModalProps {
@@ -27,6 +27,13 @@ export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
   const [albumName, setAlbumName] = useState('');
   const [nameTouched, setNameTouched] = useState(false);
 
+  // Lock body scroll while modal is open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   function handleSelectAlbum(slug: string) {
     setSelected(slug);
     const publisher = AVAILABLE_ALBUMS.find((a) => a.slug === slug)!.publisher;
@@ -49,6 +56,7 @@ export function CreateAlbumModal({ onAdd, onClose }: CreateAlbumModalProps) {
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
+      onTouchMove={(e) => { if (e.target === e.currentTarget) e.preventDefault(); }}
     >
       <div
         className="modal-content w-full max-w-sm space-y-5 rounded-2xl p-6"

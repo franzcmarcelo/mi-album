@@ -44,10 +44,10 @@ src/
 │   ├── album/
 │   │   ├── FiguriteCard.tsx            # Tarjeta de figurita con animaciones (bounce, shine, stamp)
 │   │   ├── FiguriteGrid.tsx            # Cuadrícula de figuritas (virtualizada para 600+ items)
-│   │   ├── SectionNav.tsx              # Nav horizontal de secciones con pills + barra de progreso
-│   │   ├── AlbumToolbar.tsx            # Filtros (Todas/Tengo/Faltan/Repetidas) + tamaño de carta
+│   │   ├── SectionNav.tsx              # Nav horizontal de secciones; pills con checkbox toggle (sin "Todas" fijo)
+│   │   ├── AlbumToolbar.tsx            # Solo filtros (Todas/Tengo/Faltan/Repetidas); size toggle está en la página
 │   │   ├── ProgressHeader.tsx          # Header con stats (tengo/repet./faltan/total) + barra
-│   │   ├── AddOwnedModal.tsx           # Modal para marcar figuritas como "tengo" en lote
+│   │   ├── AddOwnedModal.tsx           # Modal para marcar figuritas como "tengo" en lote (exporta ModalSheet, SectionGroup)
 │   │   └── AddRepeatedModal.tsx        # Modal para marcar figuritas como "repetidas" con cantidad
 │   ├── dashboard/
 │   │   ├── AlbumCover.tsx              # Portada de álbum con logo oficial, stats y hover lift
@@ -68,6 +68,7 @@ src/
 │   ├── useUserAlbums.ts                # CRUD de álbumes del usuario + AVAILABLE_ALBUMS
 │   ├── useInventory.ts                 # CRUD de figuritas del inventario contra Supabase
 │   ├── useAlbumData.ts                 # Carga catálogo JSON del álbum (panini/3reyes)
+│   ├── useAlbumStats.ts                # useMemo wrapper sobre getStats(stickers)
 │   ├── useFilters.ts                   # Aplica filtros + búsqueda al listado de stickers
 │   ├── useMigrateToSupabase.ts         # Migra inventario de localStorage → Supabase al primer login
 │   └── useShare.ts                     # Genera y decodifica URL de intercambio (legacy)
@@ -89,19 +90,26 @@ src/
 public/
 └── images/
     ├── world-cup-logo.png              # Logo 1: trofeo FIFA, fondo BLANCO
-    └── world-cup-logo-2.png            # Logo 2: esfera "26", fondo OSCURO
+    ├── world-cup-logo-2.png            # Logo 2: esfera "26", fondo OSCURO
+    └── favicon.png                     # Ícono de la app (navbar + favicon)
 ```
 
 ## Guía de uso de los logos
 
-| Contexto | Logo | Técnica |
+| Contexto | Imagen | Técnica |
 |---|---|---|
-| Navbar (fondo oscuro) | logo-2 | `mix-blend-mode: screen` + `objectFit: cover` cropeado a la esfera |
-| Dashboard WCHero | logo-2 | `mix-blend-mode: screen`, posicionado `bottom:-105px` para clipear texto |
+| Navbar | favicon.png | `objectFit: contain`, 36×36px, sin blend mode |
+| Favicon / shortcut / apple icon | favicon.png | Metadata `icons` en `app/layout.tsx` |
+| Dashboard WCHero | logo-1 (trofeo) | `grayscale + invert + brightness + opacity + screen` — copa ghost en esquina |
 | Login card | logo-2 | `filter: drop-shadow(...)` sobre fondo oscuro |
-| Portada álbum Panini | logo-1 | `mix-blend-mode: multiply` (fondo blanco × azul oscuro = transparente) |
+| Portada álbum Panini | logo-2 | `mix-blend-mode: multiply` (fondo blanco × azul oscuro = transparente) |
 | Portada álbum 3 Reyes | logo-2 | `mix-blend-mode: screen` |
 | Watermark página (ghost) | logo-1 | `filter: grayscale(1) invert(1) brightness(X) opacity(Y)` |
+
+### Tamaños responsivos con `clamp()`
+- Navbar logo: `36×36px` fijo (pequeño, no necesita responsive)
+- WCHero logo ghost: `clamp(100px, 34vw, 148px)`
+- Portadas de álbum: `clamp(52px, 17vw, 88px)` — proporcional al grid de 2 columnas
 
 ## Animaciones CSS (globals.css)
 
@@ -182,6 +190,27 @@ create policy "users own stickers" on user_stickers
     )
   );
 ```
+
+## Patrones de UI
+
+### Layout del álbum (`album/[albumId]/page.tsx`)
+- **AlbumToolbar**: solo filtros de estado (Todas / Tengo / Faltan / Repetidas)
+- **Fila size + búsqueda**: `[S M L]` a la izquierda + `<SearchInput />` expandible a la derecha — inline en la página, no en AlbumToolbar
+- **SectionNav**: pills de sección con checkbox toggle; sin botón "Todas" separado — clicar la sección activa la deselecciona
+- **Controles de tamaño**: etiquetas S / M / L (no "SM" / "MD" / "LG")
+
+### Modales (`ModalSheet` — compartido por AddOwnedModal y AddRepeatedModal)
+- Bottom sheet en mobile (`items-end`), centrado en desktop (`sm:items-center`)
+- `maxHeight: 88vh` con header fijo + área scrollable + footer fijo
+- **Scroll lock**: `document.body.style.overflow = 'hidden'` via `useEffect` al montar; se restaura al desmontar
+- **Scroll containment**: `overscrollBehavior: 'contain'` en el div scrollable — impide que el scroll se propague al body cuando llega al tope/fondo
+- **Touch bleed prevention**: `onTouchMove` en el backdrop cancela el evento si el target es el propio overlay
+- `ModalSheet` y `SectionGroup` se exportan desde `AddOwnedModal.tsx` para ser reutilizados por `AddRepeatedModal.tsx`
+
+### Dashboard controls bar (`page.tsx`)
+- Cuando hay múltiples publishers: `[pills flex-1] | [+ Nuevo álbum]`
+- Cuando hay un solo publisher: solo `[+ Nuevo álbum]` con `marginLeft: auto`
+- Sin spacer `flex:1` fijo — evita distorsión en distintos anchos de pantalla
 
 ## Reglas de negocio clave
 

@@ -9,8 +9,9 @@ export const metadata: Metadata = {
   title: 'Mi Álbum - Mundial 2026',
   description: 'Gestiona tu coleccion de figuras digitalmente',
   icons: {
-    icon: '/images/world-cup-logo-2.png',
-    shortcut: '/images/world-cup-logo-2.png',
+    icon: '/images/favicon.png',
+    shortcut: '/images/favicon.png',
+    apple: '/images/favicon.png',
   },
 };
 

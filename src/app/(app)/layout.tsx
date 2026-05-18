@@ -37,22 +37,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
           {/* Brand */}
           <Link href="/" className="pressable flex items-center gap-2.5" style={{ textDecoration: 'none' }}>
-            {/*
-              mix-blend-mode: screen → dark pixels of logo-2 become transparent
-              on the dark navbar, leaving only the coloured "26" sphere visible.
-            */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/world-cup-logo-2.png"
-              alt="FIFA World Cup 26"
+              src="/images/favicon.png"
+              alt="Mi Álbum"
               style={{
                 width: '36px',
                 height: '36px',
-                objectFit: 'cover',
-                objectPosition: '50% 18%',   /* crop to sphere, skip text below */
+                objectFit: 'contain',
                 borderRadius: '10px',
                 flexShrink: 0,
-                mixBlendMode: 'screen',
               }}
             />
             <div style={{ lineHeight: 1 }}>

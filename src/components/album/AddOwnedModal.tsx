@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StickerWithState } from '@/types';
 import { CardSize } from '@/store/uiStore';
 import { getSectionColor } from '@/lib/sectionColors';
@@ -134,11 +134,19 @@ export function ModalSheet({ title, subtitle, onClose, confirmLabel, confirmDisa
   onConfirm: () => void;
   children: React.ReactNode;
 }) {
+  // Lock body scroll while modal is open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-6"
       style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' }}
       onClick={onClose}
+      onTouchMove={(e) => { if (e.target === e.currentTarget) e.preventDefault(); }}
     >
       <div
         className="w-full sm:max-w-[580px] rounded-t-[20px] sm:rounded-[20px]"
@@ -183,7 +191,7 @@ export function ModalSheet({ title, subtitle, onClose, confirmLabel, confirmDisa
         </div>
 
         {/* Scrollable content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', overscrollBehavior: 'contain' }}>
           {children}
         </div>
 

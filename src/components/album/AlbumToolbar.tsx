@@ -1,6 +1,6 @@
 'use client';
 
-import { useUIStore, CardSize } from '@/store/uiStore';
+import { useUIStore } from '@/store/uiStore';
 import { FilterType } from '@/types';
 
 interface FilterOption {
@@ -64,14 +64,8 @@ const FILTERS: FilterOption[] = [
   },
 ];
 
-const SIZES: { value: CardSize; label: string }[] = [
-  { value: 'sm', label: 'S' },
-  { value: 'md', label: 'M' },
-  { value: 'lg', label: 'L' },
-];
-
 export function AlbumToolbar() {
-  const { filter, setFilter, cardSize, setCardSize } = useUIStore();
+  const { filter, setFilter } = useUIStore();
 
   return (
     <div
@@ -111,30 +105,6 @@ export function AlbumToolbar() {
         })}
       </div>
 
-      {/* Divider */}
-      <div style={{ width: '1px', height: '20px', background: 'var(--bg-border-hi)', flexShrink: 0 }} />
-
-      {/* Size toggle */}
-      <div className="flex gap-0.5 shrink-0">
-        {SIZES.map((s) => {
-          const active = cardSize === s.value;
-          return (
-            <button
-              key={s.value}
-              onClick={() => setCardSize(s.value)}
-              className="pressable rounded-[9px] px-2 py-1.5 text-xs font-bold"
-              style={{
-                background: active ? 'var(--bg-raised)' : 'transparent',
-                color: active ? 'var(--text-1)' : 'var(--text-3)',
-                border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
-                cursor: 'pointer',
-              }}
-            >
-              {s.label}
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 }

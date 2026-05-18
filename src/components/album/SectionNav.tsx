@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useRef } from 'react';
 import { useUIStore } from '@/store/uiStore';
@@ -16,19 +16,11 @@ export function SectionNav({ sections, stickers }: SectionNavProps) {
   const navRef = useRef<HTMLDivElement>(null);
 
   function scrollLeft() {
-    const nav = navRef.current;
-    if (!nav) return;
-    nav.scrollBy({ left: -220, behavior: 'smooth' });
+    navRef.current?.scrollBy({ left: -220, behavior: 'smooth' });
   }
-
   function scrollRight() {
-    const nav = navRef.current;
-    if (!nav) return;
-    nav.scrollBy({ left: 220, behavior: 'smooth' });
+    navRef.current?.scrollBy({ left: 220, behavior: 'smooth' });
   }
-
-  const totalOwned  = stickers.filter((s) => s.userState === 'owned' || s.userState === 'repeated').length;
-  const totalProgress = stickers.length > 0 ? Math.round((totalOwned / stickers.length) * 100) : 0;
 
   return (
     <div
@@ -42,7 +34,7 @@ export function SectionNav({ sections, stickers }: SectionNavProps) {
         gap: '4px',
       }}
     >
-      {/* Left scroll arrow */}
+      {/* Left arrow */}
       <button
         type="button"
         onClick={scrollLeft}
@@ -59,111 +51,83 @@ export function SectionNav({ sections, stickers }: SectionNavProps) {
         </svg>
       </button>
 
-      {/* Scrollable row — "Todas" is the first item */}
+      {/* Scrollable section pills */}
       <div
         ref={navRef}
         className="flex gap-1.5 overflow-x-auto scrollbar-none"
         style={{ flex: 1, minWidth: 0, scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
       >
-        {/* "Todas las secciones" pill */}
-        <button
-          onClick={() => setActiveSection(null)}
-          className="pressable shrink-0 rounded-[9px]"
-          style={{
-            padding: '5px 10px',
-            minWidth: '68px',
-            background: activeSection === null ? 'var(--bg-raised)' : 'transparent',
-            border: `1px solid ${activeSection === null ? 'var(--bg-border-hi)' : 'transparent'}`,
-            cursor: 'pointer',
-            textAlign: 'left',
-          }}
-        >
-          <span style={{
-            display: 'block', fontSize: '11px', fontWeight: 700,
-            color: activeSection === null ? 'var(--text-1)' : 'var(--text-3)',
-            whiteSpace: 'nowrap',
-          }}>
-            Todas
-          </span>
-          <div style={{
-            width: '100%', height: '3px',
-            background: activeSection === null ? 'var(--bg-border-hi)' : 'var(--bg-raised)',
-            borderRadius: '2px', marginTop: '4px', overflow: 'hidden',
-          }}>
-            <div style={{
-              width: `${totalProgress}%`, height: '100%',
-              background: activeSection === null ? 'var(--accent-grad-h)' : 'var(--text-3)',
-              borderRadius: '2px',
-            }} />
-          </div>
-          <span style={{
-            display: 'block', fontSize: '9px', marginTop: '3px', fontWeight: 600,
-            color: activeSection === null ? 'var(--text-2)' : 'var(--text-3)',
-          }}>
-            {totalOwned}/{stickers.length}
-          </span>
-        </button>
+        {sections.map((section) => {
+          const stats = getSectionStats(stickers, section);
+          const colors = getSectionColor(section);
+          const isActive = activeSection === section;
 
-        {/* Divider */}
-        <div style={{ width: '1px', background: 'var(--bg-border)', alignSelf: 'stretch', flexShrink: 0, margin: '2px 0' }} />
+          return (
+            <button
+              key={section}
+              onClick={() => setActiveSection(isActive ? null : section)}
+              className="pressable shrink-0"
+              style={{
+                padding: '5px 9px',
+                background: isActive ? colors.bg : 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                minWidth: '68px',
+                borderRadius: '9px',
+              }}
+            >
+              {/* Label + checkbox */}
+              <span style={{
+                display: 'flex', alignItems: 'center', gap: '4px',
+                fontSize: '11px', fontWeight: 700,
+                color: isActive ? 'white' : 'var(--text-2)',
+                whiteSpace: 'nowrap',
+              }}>
+                {/* Checkbox indicator */}
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: '12px', height: '12px', borderRadius: '3px', flexShrink: 0,
+                  background: isActive ? 'rgba(255,255,255,0.9)' : 'transparent',
+                  border: isActive ? 'none' : `1.5px solid ${isActive ? 'transparent' : 'rgba(255,255,255,0.2)'}`,
+                  transition: 'all 150ms',
+                }}>
+                  {isActive && (
+                    <svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="#0f172a" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1.5 5l2.5 2.5 5-5" />
+                    </svg>
+                  )}
+                </span>
+                {section}
+              </span>
 
-      {sections.map((section) => {
-        const stats = getSectionStats(stickers, section);
-        const colors = getSectionColor(section);
-        const isActive = activeSection === section;
-
-        return (
-          <button
-            key={section}
-            onClick={() => setActiveSection(section === activeSection ? null : section)}
-            className="pressable shrink-0 rounded-xl"
-            style={{
-              padding: '5px 10px',
-              background: isActive ? colors.bg : 'transparent',
-              border: `1px solid ${isActive ? 'transparent' : 'transparent'}`,
-              cursor: 'pointer',
-              textAlign: 'left',
-              minWidth: '72px',
-              borderRadius: '9px',
-            }}
-          >
-            <span style={{
-              display: 'block',
-              fontSize: '11px',
-              fontWeight: 700,
-              color: isActive ? 'white' : 'var(--text-2)',
-              whiteSpace: 'nowrap',
-            }}>
-              {section}
-            </span>
-
-            {/* Progress bar */}
-            <div style={{
-              width: '100%', height: '3px',
-              background: isActive ? 'rgba(255,255,255,0.25)' : 'var(--bg-raised)',
-              borderRadius: '2px', marginTop: '4px', overflow: 'hidden',
-            }}>
+              {/* Progress bar */}
               <div style={{
-                width: `${stats.progress}%`, height: '100%',
-                background: isActive ? 'rgba(255,255,255,0.8)' : colors.bg,
-                borderRadius: '2px',
-                transition: 'width 0.4s var(--ease-out)',
-              }} />
-            </div>
+                width: '100%', height: '3px',
+                background: isActive ? 'rgba(255,255,255,0.25)' : 'var(--bg-raised)',
+                borderRadius: '2px', marginTop: '5px', overflow: 'hidden',
+              }}>
+                <div style={{
+                  width: `${stats.progress}%`, height: '100%',
+                  background: isActive ? 'rgba(255,255,255,0.8)' : colors.bg,
+                  borderRadius: '2px',
+                  transition: 'width 0.4s var(--ease-out)',
+                }} />
+              </div>
 
-            <span style={{
-              display: 'block', fontSize: '9px', marginTop: '3px',
-              color: isActive ? 'rgba(255,255,255,0.7)' : 'var(--text-3)',
-              fontWeight: 600,
-            }}>
-              {stats.owned}/{stats.total}
-            </span>
-          </button>
-        );
-      })}
+              <span style={{
+                display: 'block', fontSize: '9px', marginTop: '3px',
+                color: isActive ? 'rgba(255,255,255,0.7)' : 'var(--text-3)',
+                fontWeight: 600,
+              }}>
+                {stats.owned}/{stats.total}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Right scroll arrow */}
+      {/* Right arrow */}
       <button
         type="button"
         onClick={scrollRight}

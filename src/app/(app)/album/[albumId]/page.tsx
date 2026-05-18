@@ -7,8 +7,9 @@ import { useSession } from '@/hooks/useSession';
 import { useUserAlbums, AVAILABLE_ALBUMS } from '@/hooks/useUserAlbums';
 import { useAlbumData } from '@/hooks/useAlbumData';
 import { useInventory } from '@/hooks/useInventory';
+import { useAlbumStats } from '@/hooks/useAlbumStats';
 import { useFilters } from '@/hooks/useFilters';
-import { mergeWithInventory, getStats, getSections } from '@/lib/catalogHelpers';
+import { mergeWithInventory, getSections } from '@/lib/catalogHelpers';
 import { FiguriteGrid } from '@/components/album/FiguriteGrid';
 import { AlbumToolbar } from '@/components/album/AlbumToolbar';
 import { SectionNav } from '@/components/album/SectionNav';
@@ -16,13 +17,13 @@ import { ProgressHeader } from '@/components/album/ProgressHeader';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { AddOwnedModal } from '@/components/album/AddOwnedModal';
 import { AddRepeatedModal } from '@/components/album/AddRepeatedModal';
-import { useUIStore } from '@/store/uiStore';
+import { useUIStore, CardSize } from '@/store/uiStore';
 
 export default function AlbumPage({ params }: { params: Promise<{ albumId: string }> }) {
   const { albumId: instanceId } = use(params);
   const router = useRouter();
   const { user, loading: sessionLoading } = useSession();
-  const { filter, setFilter, setActiveSection } = useUIStore();
+  const { filter, setFilter, setActiveSection, cardSize, setCardSize } = useUIStore();
   const { getInstanceById, isLoading: albumsLoading, renameAlbum } = useUserAlbums(user);
 
   const [addOwnedOpen, setAddOwnedOpen] = useState(false);
@@ -36,7 +37,7 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
 
   const stickers = mergeWithInventory(catalog, inventory);
   const filtered = useFilters(stickers);
-  const stats = getStats(stickers);
+  const stats = useAlbumStats(stickers);
   const sections = getSections(catalog);
 
   useEffect(() => {
@@ -146,7 +147,43 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         </button>
       )}
 
-      <SearchInput />
+      {/* Size toggle + Search combined row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Size pills */}
+        <div
+          style={{
+            display: 'flex', gap: '2px', flexShrink: 0,
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--bg-border)',
+            borderRadius: '12px',
+            padding: '4px',
+          }}
+        >
+          {(['sm', 'md', 'lg'] as CardSize[]).map((s) => {
+            const active = cardSize === s;
+            return (
+              <button
+                key={s}
+                onClick={() => setCardSize(s)}
+                className="pressable rounded-[8px] px-2.5 py-1.5 text-xs font-bold"
+                style={{
+                  background: active ? 'var(--bg-raised)' : 'transparent',
+                  color: active ? 'var(--text-1)' : 'var(--text-3)',
+                  border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                {s === 'sm' ? 'S' : s === 'md' ? 'M' : 'L'}
+              </button>
+            );
+          })}
+        </div>
+        {/* Search */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <SearchInput />
+        </div>
+      </div>
+
       <SectionNav sections={sections} stickers={stickers} />
 
       <FiguriteGrid

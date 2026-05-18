@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useUIStore } from '@/store/uiStore';
+import { useAlbumStats } from '@/hooks/useAlbumStats';
 import { StickerWithState } from '@/types';
 
 interface ShareModalProps {
@@ -150,10 +151,11 @@ export function ShareModal({ shareUrl, albumName, publisher, stickers }: ShareMo
 
   if (!shareModalOpen) return null;
 
+  const stats = useAlbumStats(stickers);
   const faltantesText = buildFaltantesText(publisher, stickers);
   const repetidasText = buildRepetidasText(publisher, stickers);
-  const faltantesCount = stickers.filter((s) => !s.userState).length;
-  const repetidasCount = stickers.filter((s) => s.userState === 'repeated').length;
+  const faltantesCount = stats.missing;
+  const repetidasCount = stats.repeated;
   const waUrlText = `Mira mi álbum "${albumName}" 🏆 ${shareUrl}`;
 
   return (
