@@ -60,6 +60,7 @@ src/
 │   │   ├── GridSelector.tsx            # Cuadrícula para marcar figuritas clic a clic
 │   │   └── SectionSelector.tsx        # Marcar sección completa de un tirón
 │   ├── share/
+│   │   ├── ShareAlbumView.tsx          # Componentes compartidos: AlbumStatsCard, StickerGrid, ShareFooter
 │   │   └── ShareModal.tsx             # Modal de compartir (legacy — la lógica principal está en /share)
 │   └── ui/
 │       ├── Button.tsx
@@ -129,30 +130,37 @@ public/
 | `.wc-stripes` | Líneas diagonales sutiles (identidad WC) |
 | `.wc-hex` | Patrón hexagonal tipo balón de fútbol |
 
+## Componentes compartidos de share (`ShareAlbumView.tsx`)
+
+`AlbumStatsCard`, `StickerGrid` y `ShareFooter` son usados por ambas rutas de compartir.
+
+- **`AlbumStatsCard`**: muestra publisher + catalogName + nombre del dueño (`ownerName`), nombre del álbum, %, barra de progreso y chips Tengo/Repetidas/Faltan/Total
+- **`StickerGrid`**: grilla por secciones con control S/M/L; verde = tengo, ámbar (`#fbbf24`) = repetida con badge ×N, gris = falta
+- **`groupBySection`**: helper exportado y usado también para generar textos de WhatsApp
+
 ## Ruta `/share/[token]` (solo propietario)
 
 Requiere sesión activa (redirect a `/login` si no hay usuario). Solo acepta UUIDs.
 
-- Muestra breadcrumb: `Mi colección > Nombre álbum > Compartir`
-- Panel con `CopyCard` que apunta a `/external-share/<instanceId>` (enlace público)
-- Grid por secciones con ×N para repetidas (vista de propietario)
+- Breadcrumb: `Mi colección > Nombre álbum > Compartir`
+- Panel con `CopyCard` apuntando a `/external-share/<instanceId>`, texto faltantes y texto repetidas
+- `ownerName` proviene de `user.user_metadata.full_name` (sesión activa)
 - `CopyCard`: botón copiar con flash 2s + botón WhatsApp
 
 ## Ruta `/external-share/[albumId]` (pública)
 
 Accesible sin sesión. El `albumId` es el UUID de `user_albums` en Supabase.
 
-- Página standalone (fuera del layout `(app)`) — sin navbar ni info del usuario
-- Header mínimo: logo + "Mi Álbum · Copa del Mundo 2026" + badge "Solo lectura"
-- `useExternalAlbum`: fetch con cliente anon de Supabase (las políticas RLS permiten SELECT público por UUID)
-- UUID validation con regex antes de hacer la query (`enabled: isValidUUID`)
-- Grid de figuritas por sección, solo lectura: verde = tengo, verde brillante + ×N = repetida, gris = falta
-- `InvalidLink` component para UUIDs no encontrados o rutas inválidas
-- Sin mutaciones, sin `onClick` handlers en las figuritas, `userSelect: 'none'`
+- Página standalone fuera del layout `(app)` — sin navbar ni info privada
+- Header mínimo: logo + "Mi Álbum · Copa del Mundo 2026"
+- `useExternalAlbum`: fetch con cliente anon; trae `albumName`, `ownerName` (vía tabla `profiles`), `slug`, `stickers`
+- UUID validation con regex antes de hacer la query (`enabled: isValidUUID`, `retry: false`)
+- `InvalidLink` para UUIDs no encontrados o rutas inválidas
+- Sin mutaciones, sin `onClick` en figuritas, `userSelect: 'none'`
 
-### Security headers (middleware.ts)
+### Security headers (`proxy.ts`)
 
-El middleware intercepta `/external-share/*`:
+El proxy intercepta `/external-share/*`:
 - Non-UUID paths → 404 inmediato (sin consultar Supabase)
 - `X-Frame-Options: DENY` — anti-clickjacking
 - `Content-Security-Policy` — `form-action 'none'`, `frame-ancestors 'none'`
@@ -207,6 +215,32 @@ create policy "users own stickers" on user_stickers
       select id from user_albums where user_id = auth.uid()
     )
   );
+
+-- Perfiles públicos (display_name del dueño para /external-share)
+create table profiles (
+  id uuid references auth.users(id) on delete cascade primary key,
+  display_name text
+);
+
+alter table profiles enable row level security;
+
+create policy "profiles_public_read" on profiles for select using (true);
+create policy "profiles_owner_update" on profiles for update using (auth.uid() = id);
+
+-- Trigger: auto-crea perfil al registrarse un usuario
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, display_name)
+  values (new.id, coalesce(new.raw_user_meta_data->>'full_name', new.email))
+  on conflict (id) do nothing;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
 ```
 
 ## Patrones de UI
