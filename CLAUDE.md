@@ -46,11 +46,11 @@ src/
 │   │   ├── FiguriteGrid.tsx            # Cuadrícula de figuritas (virtualizada para 600+ items)
 │   │   ├── SectionNav.tsx              # Nav horizontal de secciones; pills con checkbox toggle (sin "Todas" fijo)
 │   │   ├── AlbumToolbar.tsx            # Solo filtros (Todas/Tengo/Faltan/Repetidas); size toggle está en la página
-│   │   ├── ProgressHeader.tsx          # Header con stats (tengo/repet./faltan/total) + barra
+│   │   ├── ProgressHeader.tsx          # Header: barra top segmentada, % grande, tres pills (Tengo/Repet./Faltan)
 │   │   ├── AddOwnedModal.tsx           # Modal para marcar figuritas como "tengo" en lote (exporta ModalSheet, SectionGroup)
 │   │   └── AddRepeatedModal.tsx        # Modal para marcar figuritas como "repetidas" con cantidad
 │   ├── dashboard/
-│   │   ├── AlbumCover.tsx              # Portada de álbum con logo oficial, stats y hover lift
+│   │   ├── AlbumCover.tsx              # Portada de álbum rediseñada (Panini: blobs de colores; 3 Reyes: bandas diagonales)
 │   │   ├── CreateAlbumModal.tsx        # Modal para crear un nuevo álbum de la colección
 │   │   └── StatCard.tsx               # Tarjeta de métrica genérica (no usada actualmente)
 │   ├── cargar/
@@ -102,8 +102,8 @@ public/
 | Favicon / shortcut / apple icon | favicon.png | Metadata `icons` en `app/layout.tsx` |
 | Dashboard WCHero | logo-1 (trofeo) | `grayscale + invert + brightness + opacity + screen` — copa ghost en esquina |
 | Login card | logo-2 | `filter: drop-shadow(...)` sobre fondo oscuro |
-| Portada álbum Panini | logo-2 | `mix-blend-mode: multiply` (fondo blanco × azul oscuro = transparente) |
-| Portada álbum 3 Reyes | logo-2 | `mix-blend-mode: screen` |
+| Portada álbum Panini | logo-2 | centrado en overlay, sin blend mode (fondo ya es oscuro) |
+| Portada álbum 3 Reyes | logo-2 | centrado en overlay, sin blend mode |
 | Watermark página (ghost) | logo-1 | `filter: grayscale(1) invert(1) brightness(X) opacity(Y)` |
 
 ### Tamaños responsivos con `clamp()`
@@ -116,8 +116,8 @@ public/
 | Clase / keyframe | Uso |
 |---|---|
 | `badge-pop` | Badge de qty en FiguriteCard, se activa con `key={qty}` |
-| `card-owned-pop` | Bounce del card al marcar como "tengo" (via ref DOM) |
-| `card-shine-sweep` | Destello diagonal al marcar como "tengo" |
+| `card-owned-pop` | Bounce del card al marcar como "tengo" — **750ms** (via ref DOM) |
+| `card-shine-sweep` | Destello diagonal al marcar como "tengo" — **820ms**, se muestra 900ms |
 | `check-stamp` | Sello ✓ que aparece al marcar como "tengo" |
 | `foil-sweep` | Brillo metálico en álbumes completos |
 | `aurora-drift-1/2` | Blobs de aurora en el layout |
@@ -211,6 +211,37 @@ create policy "users own stickers" on user_stickers
 - Cuando hay múltiples publishers: `[pills flex-1] | [+ Nuevo álbum]`
 - Cuando hay un solo publisher: solo `[+ Nuevo álbum]` con `marginLeft: auto`
 - Sin spacer `flex:1` fijo — evita distorsión en distintos anchos de pantalla
+
+### Portadas de álbum (`AlbumCover.tsx`)
+
+Cada álbum tiene un `variant` (`'panini'` | `'3reyes'`) definido en `COVER_META`.
+
+**Panini** (`variant: 'panini'`):
+- Fondo: gradiente azul oscuro `#05112a → #0c2260 → #060e22`
+- Decoración izquierda: tira vertical de 9 blobs de colores (`PANINI_BLOBS`), con `borderRadius: '0 45% 45% 0'`
+- Decoración derecha: misma tira espejada con `opacity: 0.18`
+- Centro: texto "OFFICIAL STICKER COLLECTION" (tiny caps) + "26" grande gradiente + logo-2 + "FIFA WORLD CUP"
+
+**3 Reyes** (`variant: '3reyes'`):
+- Fondo: gradiente verde oscuro `#021a07 → #053012 → #010e03`
+- Decoración: 5 bandas diagonales (`transform: 'skewY(-18deg)'`) con `TREYES_STRIPES`, posición absoluta
+- Centro: "COPA" pequeño + "26" verde gradiente grande + logo-2 + "MUNDIAL 2026"
+
+**Info overlay** (común a ambas variantes):
+- `position: absolute, bottom: 0` con gradiente `transparent → rgba(0,0,0,0.82)`
+- Nombre del álbum, chips de stats (`StatChip`), mini barra de progreso segmentada (verde + amarillo)
+- `MenuBtn` (⋯) para acciones de renombrar/eliminar
+
+### ProgressHeader (`ProgressHeader.tsx`)
+
+Estructura de arriba hacia abajo:
+1. **Barra top de 3px** — flex: verde (`ownedPct%`) + amarillo (`repeatedPct%`) + gris (resto)
+2. **Fila título + %**: nombre editable inline (pencil icon) a la izquierda; porcentaje 34px degradado a la derecha con `collected/total` debajo
+3. **Barra de progreso de 7px** — segmentada: verde (owned) + amarillo (repeated), con `border-radius` condicional
+4. **Tres pills** en fila:
+   - 🟢 **Tengo** — número grande verde, sublabel "pegadas"
+   - 🟡 **Repet.** — número grande amarillo, sublabel "a canjear"
+   - ⬜ **Faltan** — número grande gris, sublabel "de X total"
 
 ## Reglas de negocio clave
 
