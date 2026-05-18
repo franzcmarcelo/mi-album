@@ -167,13 +167,12 @@ export function AlbumCover({
                 <StatChip value={missing} label="faltan" color="rgba(255,255,255,0.35)" bg="rgba(255,255,255,0.06)" />
               </div>
 
-              {/* Progress bar */}
-              <div style={{ height: '3px', borderRadius: '99px', background: 'rgba(255,255,255,0.12)', overflow: 'hidden', display: 'flex' }}>
-                <div style={{ width: `${(owned / total) * 100}%`,    background: '#10b981', transition: 'width 0.5s var(--ease-out)' }} />
-                <div style={{ width: `${(repeated / total) * 100}%`, background: '#f59e0b', transition: 'width 0.5s var(--ease-out)' }} />
+              {/* Progress bar — solo pegadas (owned), no repetidas */}
+              <div style={{ height: '3px', borderRadius: '99px', background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+                <div style={{ width: `${(owned / total) * 100}%`, height: '100%', background: '#10b981', borderRadius: '99px', transition: 'width 0.5s var(--ease-out)' }} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
-                <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.28)', fontWeight: 500 }}>{owned + repeated} / {total}</span>
+                <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.28)', fontWeight: 500 }}>{owned} / {total}</span>
                 <span style={{ fontSize: '10px', fontWeight: 900, color: isComplete ? '#fbbf24' : 'white' }}>{progress}%</span>
               </div>
             </div>

@@ -40,7 +40,7 @@ export function ProgressHeader({
 
   const ownedPct    = total > 0 ? (owned    / total) * 100 : 0;
   const repeatedPct = total > 0 ? (repeated / total) * 100 : 0;
-  const collected   = owned + repeated;
+  const restPct = Math.max(0, 100 - ownedPct - repeatedPct);
 
   return (
     <div
@@ -51,11 +51,14 @@ export function ProgressHeader({
         overflow: 'hidden',
       }}
     >
-      {/* Top accent bar — segmented colours */}
+      {/* Top thin segmented bar: owned (green) | repeated (amber) | rest (grey) */}
       <div style={{ height: '3px', display: 'flex' }}>
-        <div style={{ width: `${ownedPct}%`,    background: '#10b981', transition: 'width 0.6s var(--ease-out)' }} />
-        <div style={{ width: `${repeatedPct}%`, background: '#f59e0b', transition: 'width 0.6s var(--ease-out)' }} />
-        <div style={{ flex: 1,                  background: 'var(--bg-raised)' }} />
+        {ownedPct > 0 ? (
+          <div style={{ width: `${ownedPct}%`, background: 'linear-gradient(90deg, #10b981, #34d399)' }} />
+        ) : null}
+        {restPct > 0 ? (
+          <div style={{ width: `${restPct}%`, background: 'var(--bg-raised)' }} />
+        ) : null}
       </div>
 
       <div style={{ padding: '14px 16px 16px' }}>
@@ -119,33 +122,9 @@ export function ProgressHeader({
             {isComplete ? (
               <span style={{ fontSize: '8px', fontWeight: 800, color: '#fbbf24', letterSpacing: '0.14em', textTransform: 'uppercase' }}>COMPLETO</span>
             ) : (
-              <span style={{ fontSize: '10px', color: 'var(--text-3)', fontWeight: 500 }}>{collected}/{total}</span>
+              <span style={{ fontSize: '10px', color: 'var(--text-3)', fontWeight: 500 }}>{owned}/{total}</span>
             )}
           </div>
-        </div>
-
-        {/* ── Segmented progress bar ─────────────────────── */}
-        <div style={{ height: '7px', borderRadius: '99px', background: 'var(--bg-raised)', overflow: 'hidden', display: 'flex', marginBottom: '10px' }}>
-          {/* owned (green) */}
-          {ownedPct > 0 && (
-            <div style={{
-              width: `${ownedPct}%`,
-              background: 'linear-gradient(90deg, #059669, #34d399)',
-              borderRadius: repeatedPct === 0 ? '99px' : '99px 0 0 99px',
-              transition: 'width 0.6s var(--ease-out)',
-              flexShrink: 0,
-            }} />
-          )}
-          {/* repeated (yellow) */}
-          {repeatedPct > 0 && (
-            <div style={{
-              width: `${repeatedPct}%`,
-              background: 'linear-gradient(90deg, #d97706, #fbbf24)',
-              borderRadius: ownedPct === 0 ? '99px 0 0 99px' : '0',
-              transition: 'width 0.6s var(--ease-out)',
-              flexShrink: 0,
-            }} />
-          )}
         </div>
 
         {/* ── Stat pills ─────────────────────────────────── */}
