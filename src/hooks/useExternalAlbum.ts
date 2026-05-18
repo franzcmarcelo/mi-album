@@ -12,7 +12,7 @@ async function fetchExternalAlbum(albumId: string) {
 
   const { data: albumRow, error: albumErr } = await supabase
     .from('user_albums')
-    .select('name, albums_catalog!inner(slug)')
+    .select('user_id, name, albums_catalog!inner(slug)')
     .eq('id', albumId)
     .single();
 
@@ -20,6 +20,15 @@ async function fetchExternalAlbum(albumId: string) {
 
   const slug = (albumRow.albums_catalog as unknown as { slug: string }).slug;
   const albumName = (albumRow.name as string) ?? '';
+  const userId = albumRow.user_id as string;
+
+  // Fetch owner display name from public profiles
+  const { data: profileRow } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', userId)
+    .maybeSingle();
+  const ownerName = profileRow?.display_name ?? '';
 
   const { data: stickerRows, error: stickersErr } = await supabase
     .from('user_stickers')
@@ -45,7 +54,7 @@ async function fetchExternalAlbum(albumId: string) {
   const mod = await import(`@/data/${file}.json`);
   const stickers: StickerWithState[] = mergeWithInventory(mod.default, inventory);
 
-  return { slug, albumName, stickers };
+  return { slug, albumName, ownerName, stickers };
 }
 
 export function useExternalAlbum(albumId: string) {
