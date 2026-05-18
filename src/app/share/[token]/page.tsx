@@ -311,13 +311,29 @@ function AlbumShareView({ instanceId }: { instanceId: string }) {
     <>
       {isOwner && (
         <>
-          {/* Back link */}
-          <Link href={`/album/${instanceId}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 500, color: 'rgba(241,245,249,0.56)', textDecoration: 'none', padding: '4px 0' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
+          {/* Breadcrumb — owner only, never shown to third-party visitors */}
+          <nav style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 0' }}>
+            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '13px', fontWeight: 500, color: 'rgba(241,245,249,0.45)', textDecoration: 'none', transition: 'color 150ms' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.75)'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.45)'; }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+              Mi colección
+            </Link>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(241,245,249,0.25)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
             </svg>
-            Mi álbum
-          </Link>
+            <Link href={`/album/${instanceId}`} style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(241,245,249,0.45)', textDecoration: 'none', transition: 'color 150ms', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '160px' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.75)'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.45)'; }}>
+              {albumName || 'Mi álbum'}
+            </Link>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(241,245,249,0.25)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(241,245,249,0.7)' }}>Compartir</span>
+          </nav>
 
           {/* Share actions */}
           <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>

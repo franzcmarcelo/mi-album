@@ -224,12 +224,6 @@ function ShareBanner({ onShare, faltantes, repetidas }: {
   faltantes: number;
   repetidas: number;
 }) {
-  const tags = [
-    faltantes > 0 && `${faltantes} faltantes`,
-    repetidas > 0 && `${repetidas} repetidas`,
-    'enlace',
-  ].filter(Boolean) as string[];
-
   return (
     <button
       onClick={onShare}
@@ -237,24 +231,29 @@ function ShareBanner({ onShare, faltantes, repetidas }: {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--bg-border)',
-        borderRadius: '14px',
-        padding: '12px 14px',
+        gap: '14px',
+        background: 'linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(6,182,212,0.12) 100%)',
+        border: '1px solid rgba(99,102,241,0.35)',
+        borderRadius: '16px',
+        padding: '14px 16px',
         cursor: 'pointer',
         textAlign: 'left',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      {/* subtle glow top-right */}
+      <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
       {/* Icon */}
       <div style={{
-        width: '38px', height: '38px', flexShrink: 0,
-        background: 'var(--accent-grad)',
-        borderRadius: '11px',
+        width: '42px', height: '42px', flexShrink: 0,
+        background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
+        borderRadius: '13px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 2px 12px rgba(29,78,216,0.35)',
+        boxShadow: '0 4px 16px rgba(99,102,241,0.45)',
       }}>
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
           <circle cx="18" cy="5" r="3" />
           <circle cx="6" cy="12" r="3" />
           <circle cx="18" cy="19" r="3" />
@@ -265,19 +264,18 @@ function ShareBanner({ onShare, faltantes, repetidas }: {
 
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: 'var(--text-1)' }}>
-          Compartir álbum
+        <p style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-1)', letterSpacing: '-0.01em' }}>
+          Compartir mi álbum
         </p>
-        <p style={{ margin: '2px 0 0', fontSize: '11px', color: 'var(--text-3)' }}>
-          {tags.join(' · ')}
-        </p>
-        <p style={{ margin: '3px 0 0', fontSize: '10px', color: 'var(--text-3)', opacity: 0.6, lineHeight: 1.4 }}>
-          Comparte con amigos para intercambiar repetidas y completar tu álbum más rápido
+        <p style={{ margin: '3px 0 0', fontSize: '11px', color: 'rgba(165,180,252,0.75)', lineHeight: 1.4 }}>
+          {[faltantes > 0 && `${faltantes} faltantes`, repetidas > 0 && `${repetidas} para intercambiar`].filter(Boolean).join(' · ') || 'Comparte tu progreso'}
+          {' · '}
+          <span style={{ color: 'rgba(103,232,249,0.8)' }}>siempre actualizado</span>
         </p>
       </div>
 
       {/* Arrow */}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(165,180,252,0.7)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
         <path d="M9 18l6-6-6-6" />
       </svg>
     </button>
