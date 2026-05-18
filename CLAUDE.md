@@ -306,6 +306,16 @@ Estructura de arriba hacia abajo:
 - Autenticación obligatoria: `useEffect(() => { if (!sessionLoading && !user) router.replace('/login') }, [...])`
 - UUID del álbum actúa como token de acceso público en `/external-share/<albumId>`
 
+### Seguridad RLS crítica
+
+`user_albums` tiene DOS políticas:
+- `user_albums_owner` (ALL): solo el dueño puede escribir — `auth.uid() = user_id`
+- `public_read_user_albums` (SELECT): lectura pública para `/external-share` — `true`
+
+**IMPORTANTE**: Por la política de lectura pública, `fetchInstances` en `useUserAlbums.ts` DEBE filtrar explícitamente con `.eq('user_id', userId)`. Sin este filtro, todos los usuarios verían los álbumes de todos. El RLS solo controla permisos de acceso, NO filtra el resultado de SELECT cuando hay una política `using (true)`.
+
+Lo mismo aplica a `user_stickers` (`public_read_user_stickers`): las mutaciones en `archiveInstance` y `renameInstance` siempre incluyen `.eq('user_id', user.id)` además del filtro por `id`, como segunda capa de protección.
+
 ## Variables de entorno necesarias
 
 ```env

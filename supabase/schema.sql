@@ -106,7 +106,7 @@ create policy "catalogs_read_all"
 create policy "stickers_catalog_read_all"
   on stickers_catalog for select using (true);
 
--- user_albums: cada usuario solo ve y modifica los suyos
+-- user_albums: lectura pública (para /external-share); escritura solo del dueño
 alter table user_albums enable row level security;
 
 create policy "user_albums_owner"
@@ -114,7 +114,12 @@ create policy "user_albums_owner"
   using  (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
--- user_stickers: acceso vía el user_album_id que les pertenece
+-- Lectura pública necesaria para /external-share.
+-- IMPORTANTE: fetchInstances en useUserAlbums DEBE filtrar por user_id explícitamente.
+create policy "public_read_user_albums"
+  on user_albums for select using (true);
+
+-- user_stickers: lectura pública (para /external-share); escritura solo del dueño
 alter table user_stickers enable row level security;
 
 create policy "user_stickers_owner"
@@ -129,6 +134,10 @@ create policy "user_stickers_owner"
       select id from user_albums where user_id = auth.uid()
     )
   );
+
+-- Lectura pública necesaria para /external-share.
+create policy "public_read_user_stickers"
+  on user_stickers for select using (true);
 
 
 -- =============================================================================

@@ -11,11 +11,12 @@ export const AVAILABLE_ALBUMS: AlbumCatalog[] = [
   { id: '3reyes-2024', slug: '3reyes-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: '3 Reyes', totalStickers: 150 },
 ];
 
-async function fetchInstances(): Promise<UserAlbumInstance[]> {
+async function fetchInstances(userId: string): Promise<UserAlbumInstance[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('user_albums')
     .select('id, name, status, started_at, albums_catalog!inner(slug)')
+    .eq('user_id', userId)
     .neq('status', 'archived')
     .order('started_at', { ascending: true });
 
@@ -54,19 +55,25 @@ async function createInstance(slug: string, name: string): Promise<void> {
 
 async function archiveInstance(instanceId: string): Promise<void> {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('No autenticado');
   const { error } = await supabase
     .from('user_albums')
     .update({ status: 'archived' })
-    .eq('id', instanceId);
+    .eq('id', instanceId)
+    .eq('user_id', user.id);
   if (error) throw error;
 }
 
 async function renameInstance(instanceId: string, name: string): Promise<void> {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('No autenticado');
   const { error } = await supabase
     .from('user_albums')
     .update({ name })
-    .eq('id', instanceId);
+    .eq('id', instanceId)
+    .eq('user_id', user.id);
   if (error) throw error;
 }
 
@@ -75,7 +82,7 @@ export function useUserAlbums(user: User | null) {
 
   const query = useQuery({
     queryKey: ['user-albums', user?.id],
-    queryFn: fetchInstances,
+    queryFn: () => fetchInstances(user!.id),
     enabled: !!user,
   });
 
