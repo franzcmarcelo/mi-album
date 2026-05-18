@@ -3,7 +3,7 @@
 import { use } from 'react';
 import { useExternalAlbum, ALBUM_UUID_RE } from '@/hooks/useExternalAlbum';
 import { AVAILABLE_ALBUMS } from '@/hooks/useUserAlbums';
-import { AlbumStatsCard, StickerGrid, ShareFooter } from '@/components/share/ShareAlbumView';
+import { AlbumStatsCard, StickerGrid, ShareFooter, SharePageSkeleton } from '@/components/share/ShareAlbumView';
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -45,13 +45,7 @@ function AlbumView({ albumId }: { albumId: string }) {
 
   if (!isValidUUID) return <InvalidLink />;
 
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
-        <p style={{ color: 'var(--text-3)', fontSize: '14px' }}>Cargando…</p>
-      </div>
-    );
-  }
+  if (isLoading) return <SharePageSkeleton />;
 
   if (error || !data) return <InvalidLink />;
 

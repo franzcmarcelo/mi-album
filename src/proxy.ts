@@ -59,7 +59,24 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // ── Protected routes: redirect to /login if unauthenticated ──────────────
+  const isProtected =
+    pathname === '/' ||
+    pathname.startsWith('/album/') ||
+    pathname.startsWith('/share/');
+
+  if (isProtected && !user) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // ── Redirect /login to / if already authenticated ─────────────────────────
+  if (pathname.startsWith('/login') && user) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
 
   return supabaseResponse;
 }

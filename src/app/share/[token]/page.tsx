@@ -9,7 +9,7 @@ import { useAlbumData } from '@/hooks/useAlbumData';
 import { useInventory } from '@/hooks/useInventory';
 import { useAlbumStats } from '@/hooks/useAlbumStats';
 import { mergeWithInventory } from '@/lib/catalogHelpers';
-import { AlbumStatsCard, StickerGrid, ShareFooter, groupBySection } from '@/components/share/ShareAlbumView';
+import { AlbumStatsCard, StickerGrid, ShareFooter, SharePageSkeleton, groupBySection } from '@/components/share/ShareAlbumView';
 import { StickerWithState } from '@/types';
 
 // ─── Text builders ────────────────────────────────────────────────────────────
@@ -128,13 +128,7 @@ function AlbumShareView({ instanceId }: { instanceId: string }) {
 
   const isLoading = sessionLoading || albumsLoading || catalogLoading;
 
-  if (isLoading || !user) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
-        <p style={{ color: 'var(--text-3)', fontSize: '14px' }}>Cargando…</p>
-      </div>
-    );
-  }
+  if (isLoading || !user) return <SharePageSkeleton />;
 
   if (!instance) {
     return <p style={{ color: 'var(--text-3)', fontSize: '15px', textAlign: 'center' }}>Álbum no encontrado.</p>;

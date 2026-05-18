@@ -1,8 +1,13 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 import { NavMenu } from './NavMenu';
 import { HeaderActions } from './HeaderActions';
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
       {/* Aurora background — fixed, respects prefers-reduced-motion via CSS */}

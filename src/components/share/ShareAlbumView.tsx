@@ -194,3 +194,63 @@ export function ShareFooter() {
     </p>
   );
 }
+
+// ─── SharePageSkeleton ────────────────────────────────────────────────────────
+
+export function SharePageSkeleton() {
+  return (
+    <>
+      {/* Stats card skeleton */}
+      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', overflow: 'hidden' }}>
+        <div className="skeleton" style={{ height: '3px' }} />
+        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Publisher + owner row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="skeleton" style={{ width: '26px', height: '26px', borderRadius: '8px', flexShrink: 0 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div className="skeleton" style={{ width: '140px', height: '10px', borderRadius: '5px' }} />
+                <div className="skeleton" style={{ width: '90px', height: '9px', borderRadius: '5px' }} />
+              </div>
+            </div>
+            <div className="skeleton" style={{ width: '52px', height: '32px', borderRadius: '8px' }} />
+          </div>
+          {/* Album name */}
+          <div className="skeleton" style={{ width: '60%', height: '20px', borderRadius: '8px' }} />
+          {/* Progress bar */}
+          <div className="skeleton" style={{ height: '4px', borderRadius: '99px' }} />
+          {/* Stat chips */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="skeleton" style={{ height: '52px', borderRadius: '10px' }} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Grid skeleton */}
+      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="skeleton" style={{ width: '80px', height: '14px', borderRadius: '6px', marginRight: 'auto' }} />
+          <div className="skeleton" style={{ width: '72px', height: '26px', borderRadius: '10px' }} />
+          <div className="skeleton" style={{ width: '130px', height: '14px', borderRadius: '6px' }} />
+        </div>
+        {/* Sections */}
+        {[12, 10, 8].map((cols, i) => (
+          <div key={i}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+              <div className="skeleton" style={{ width: '7px', height: '7px', borderRadius: '50%' }} />
+              <div className="skeleton" style={{ width: '80px', height: '9px', borderRadius: '4px' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))', gap: '3px' }}>
+              {Array.from({ length: cols }).map((_, j) => (
+                <div key={j} className="skeleton" style={{ aspectRatio: '1', borderRadius: '6px' }} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
