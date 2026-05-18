@@ -45,6 +45,10 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
     setActiveSection(null);
   }, [instanceId, setFilter, setActiveSection]);
 
+  useEffect(() => {
+    if (!sessionLoading && !user) router.replace('/login');
+  }, [user, sessionLoading, router]);
+
   const isLoading = sessionLoading || albumsLoading || catalogLoading;
 
   // Get missing and owned stickers for modals

@@ -1,11 +1,14 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
 import { useUserAlbums, AVAILABLE_ALBUMS } from '@/hooks/useUserAlbums';
-import { usePublicAlbum, isShareableId } from '@/hooks/usePublicAlbum';
+import { useAlbumData } from '@/hooks/useAlbumData';
+import { useInventory } from '@/hooks/useInventory';
 import { useAlbumStats } from '@/hooks/useAlbumStats';
+import { mergeWithInventory } from '@/lib/catalogHelpers';
 import { getSectionColor } from '@/lib/sectionColors';
 import { StickerWithState } from '@/types';
 
@@ -49,9 +52,7 @@ function buildRepetidasText(publisher: string, albumName: string, stickers: Stic
 
 // ─── CopyCard ────────────────────────────────────────────────────────────────
 
-function CopyCard({
-  icon, title, description, content, waContent, preview,
-}: {
+function CopyCard({ icon, title, description, content, waContent, preview }: {
   icon: string; title: string; description: string;
   content: string; waContent?: string; preview: string;
 }) {
@@ -96,9 +97,13 @@ function CopyCard({
   );
 }
 
-// ─── ShareContent ─────────────────────────────────────────────────────────────
+// ─── ShareContent (grid por secciones) ───────────────────────────────────────
 
-function ShareContent({ stickers, albumName, publisher }: { stickers: StickerWithState[]; albumName: string; publisher: string }) {
+function ShareContent({ stickers, albumName, publisher }: {
+  stickers: StickerWithState[];
+  albumName: string;
+  publisher: string;
+}) {
   const { owned, repeated, missing, progress } = useAlbumStats(stickers);
   const isComplete = progress >= 100;
   const bySection = groupBySection(stickers);
@@ -109,7 +114,6 @@ function ShareContent({ stickers, albumName, publisher }: { stickers: StickerWit
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ height: '3px', background: 'var(--accent-grad-h)' }} />
         <div className="wc-stripes" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.3 }} />
-        <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '180px', background: 'radial-gradient(circle at top right, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
         <div style={{ padding: '16px', position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
@@ -121,7 +125,7 @@ function ShareContent({ stickers, albumName, publisher }: { stickers: StickerWit
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
             <div>
-              <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: '18px', margin: 0, letterSpacing: '-0.01em' }}>{albumName || 'Copa del Mundo 2026'}</h1>
+              <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: '18px', margin: 0, letterSpacing: '-0.01em' }}>{albumName}</h1>
               {isComplete && <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>ÁLBUM COMPLETO ✦</span>}
             </div>
             <span style={{ fontSize: '30px', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, flexShrink: 0, background: isComplete ? 'linear-gradient(135deg, #f59e0b, #fcd34d)' : 'linear-gradient(135deg, #6366f1, #06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
@@ -129,18 +133,16 @@ function ShareContent({ stickers, albumName, publisher }: { stickers: StickerWit
             </span>
           </div>
 
-          {/* Segmented progress bar */}
           <div style={{ height: '4px', borderRadius: '99px', background: 'var(--bg-raised)', overflow: 'hidden', marginBottom: '14px', display: 'flex' }}>
-            {owned > 0 && <div style={{ width: `${(owned / stickers.length) * 100}%`, background: 'linear-gradient(90deg, #059669, #34d399)', transition: 'width 0.6s' }} />}
+            {owned > 0 && <div style={{ width: `${(owned / stickers.length) * 100}%`, background: 'linear-gradient(90deg, #059669, #34d399)' }} />}
           </div>
 
-          {/* Stat chips */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
             {[
-              { value: owned,            label: 'Tengo',     color: '#10b981', bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.2)' },
-              { value: repeated,         label: 'Repetidas', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)' },
-              { value: missing,          label: 'Faltan',    color: 'var(--text-2)', bg: 'var(--bg-raised)', border: 'var(--bg-border)' },
-              { value: stickers.length,  label: 'Total',     color: 'var(--text-3)', bg: 'transparent',     border: 'var(--bg-border)' },
+              { value: owned,           label: 'Tengo',     color: '#10b981', bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.2)' },
+              { value: repeated,        label: 'Repetidas', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)' },
+              { value: missing,         label: 'Faltan',    color: 'var(--text-2)', bg: 'var(--bg-raised)', border: 'var(--bg-border)' },
+              { value: stickers.length, label: 'Total',     color: 'var(--text-3)', bg: 'transparent',     border: 'var(--bg-border)' },
             ].map(({ value, label, color, bg, border }) => (
               <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '10px', padding: '8px 10px' }}>
                 <span style={{ display: 'block', fontSize: '20px', fontWeight: 900, color, lineHeight: 1 }}>{value}</span>
@@ -155,7 +157,6 @@ function ShareContent({ stickers, albumName, publisher }: { stickers: StickerWit
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: '14px', margin: 0 }}>Figuritas</h2>
-          {/* Legend */}
           <div style={{ display: 'flex', gap: '10px' }}>
             {[
               { color: '#10b981', bg: 'rgba(16,185,129,0.15)', label: 'Tengo' },
@@ -172,61 +173,30 @@ function ShareContent({ stickers, albumName, publisher }: { stickers: StickerWit
 
         {Object.entries(bySection).map(([section, items]) => {
           const colors = getSectionColor(section);
-          const collectedInSection = items.filter((s) => s.userState === 'owned' || s.userState === 'repeated').length;
+          const collected = items.filter((s) => s.userState === 'owned' || s.userState === 'repeated').length;
 
           return (
             <div key={section}>
-              {/* Section header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                 <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: colors.bg, flexShrink: 0 }} />
-                <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: colors.bg }}>
-                  {section}
-                </span>
-                <span style={{ fontSize: '10px', color: 'var(--text-3)', marginLeft: 'auto' }}>
-                  {collectedInSection}/{items.length}
-                </span>
+                <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: colors.bg }}>{section}</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-3)', marginLeft: 'auto' }}>{collected}/{items.length}</span>
               </div>
-
-              {/* Sticker grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))', gap: '3px' }}>
                 {items.map((s) => {
                   const isOwned    = s.userState === 'owned';
                   const isRepeated = s.userState === 'repeated';
                   const isCollected = isOwned || isRepeated;
-
                   return (
-                    <div
-                      key={s.id}
-                      title={`#${s.number} ${s.name}`}
-                      style={{
-                        aspectRatio: '1',
-                        borderRadius: '6px',
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'relative',
-                        background: isRepeated
-                          ? 'rgba(16,185,129,0.28)'
-                          : isOwned
-                          ? 'rgba(16,185,129,0.14)'
-                          : 'var(--bg-raised)',
+                    <div key={s.id} title={`#${s.number} ${s.name}`}
+                      style={{ aspectRatio: '1', borderRadius: '6px', fontSize: '10px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
+                        background: isRepeated ? 'rgba(16,185,129,0.28)' : isOwned ? 'rgba(16,185,129,0.14)' : 'var(--bg-raised)',
                         border: `1px solid ${isCollected ? 'rgba(16,185,129,0.35)' : 'var(--bg-border)'}`,
                         color: isCollected ? '#34d399' : 'var(--text-3)',
-                      }}
-                    >
+                      }}>
                       {s.number}
                       {isRepeated && (
-                        <span style={{
-                          position: 'absolute',
-                          bottom: 1,
-                          right: 2,
-                          fontSize: '6px',
-                          fontWeight: 900,
-                          color: '#6ee7b7',
-                          lineHeight: 1,
-                        }}>
+                        <span style={{ position: 'absolute', bottom: 1, right: 2, fontSize: '6px', fontWeight: 900, color: '#6ee7b7', lineHeight: 1 }}>
                           ×{s.quantity ?? 1}
                         </span>
                       )}
@@ -239,7 +209,6 @@ function ShareContent({ stickers, albumName, publisher }: { stickers: StickerWit
         })}
       </div>
 
-      {/* Footer */}
       <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-3)', margin: 0 }}>
         Creado con{' '}
         <span style={{ fontWeight: 700, background: 'linear-gradient(90deg, #6366f1, #06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
@@ -272,32 +241,26 @@ export default function SharePage({ params }: Props) {
 // ─── AlbumShareView ───────────────────────────────────────────────────────────
 
 function AlbumShareView({ instanceId }: { instanceId: string }) {
-  const { user } = useSession();
-  const { getInstanceById } = useUserAlbums(user);
-  const { data, isLoading, error } = usePublicAlbum(instanceId);
+  const router = useRouter();
+  const { user, loading: sessionLoading } = useSession();
+  const { getInstanceById, isLoading: albumsLoading } = useUserAlbums(user);
+
+  useEffect(() => {
+    if (!sessionLoading && !user) router.replace('/login');
+  }, [user, sessionLoading, router]);
 
   const instance = getInstanceById(instanceId);
-  const isOwner = !!user && !!instance;
+  const catalogMeta = AVAILABLE_ALBUMS.find((a) => a.slug === instance?.slug);
 
-  if (!isShareableId(instanceId)) {
-    return (
-      <div style={{ textAlign: 'center', padding: '48px 16px' }}>
-        <p style={{ fontSize: '32px', marginBottom: '12px' }}>🔒</p>
-        <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: '16px', margin: '0 0 8px' }}>
-          Compartir requiere cuenta
-        </p>
-        <p style={{ color: 'var(--text-3)', fontSize: '13px', margin: '0 0 20px', lineHeight: 1.5 }}>
-          Para compartir tu álbum en tiempo real iniciá sesión.<br />
-          Tu progreso se sincroniza automáticamente.
-        </p>
-        <Link href="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'var(--accent-grad)', borderRadius: '12px', color: 'white', fontWeight: 700, fontSize: '13px', textDecoration: 'none' }}>
-          Iniciar sesión con Google
-        </Link>
-      </div>
-    );
-  }
+  const { data: catalog = [], isLoading: catalogLoading } = useAlbumData(instance?.slug ?? '');
+  const { data: inventory = {} } = useInventory(instanceId, user?.id ?? null);
 
-  if (isLoading) {
+  const stickers = mergeWithInventory(catalog, inventory);
+  const { missing, repeated } = useAlbumStats(stickers);
+
+  const isLoading = sessionLoading || albumsLoading || catalogLoading;
+
+  if (isLoading || !user) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
         <p style={{ color: 'var(--text-3)', fontSize: '14px' }}>Cargando…</p>
@@ -305,91 +268,78 @@ function AlbumShareView({ instanceId }: { instanceId: string }) {
     );
   }
 
-  if (error || !data) {
+  if (!instance) {
     return (
       <p style={{ color: 'var(--text-3)', fontSize: '15px', textAlign: 'center' }}>
-        Álbum no encontrado o enlace inválido.
+        Álbum no encontrado.
       </p>
     );
   }
 
-  const { stickers, albumName, slug } = data;
-  const catalogMeta = AVAILABLE_ALBUMS.find((a) => a.slug === slug);
   const publisher = catalogMeta?.publisher ?? 'Panini';
-
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const faltantesText = buildFaltantesText(publisher, albumName, stickers);
-  const repetidasText = buildRepetidasText(publisher, albumName, stickers);
-  const waUrlText = `Mira mi álbum "${albumName}" 🏆 ${shareUrl}`;
-
-  const missing = stickers.filter((s) => !s.userState).length;
-  const repeated = stickers.filter((s) => s.userState === 'repeated').length;
+  const faltantesText = buildFaltantesText(publisher, instance.name, stickers);
+  const repetidasText = buildRepetidasText(publisher, instance.name, stickers);
+  const waUrlText = `Mira mi álbum "${instance.name}" 🏆 ${shareUrl}`;
 
   return (
     <>
-      {isOwner && (
-        <>
-          {/* Breadcrumb — owner only, never shown to third-party visitors */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 0' }}>
-            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '13px', fontWeight: 500, color: 'rgba(241,245,249,0.45)', textDecoration: 'none', transition: 'color 150ms' }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.75)'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.45)'; }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-              Mi colección
-            </Link>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(241,245,249,0.25)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-            <Link href={`/album/${instanceId}`} style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(241,245,249,0.45)', textDecoration: 'none', transition: 'color 150ms', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '160px' }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.75)'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.45)'; }}>
-              {albumName || 'Mi álbum'}
-            </Link>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(241,245,249,0.25)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(241,245,249,0.7)' }}>Compartir</span>
-          </nav>
+      {/* Breadcrumb */}
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 0' }}>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '13px', fontWeight: 500, color: 'rgba(241,245,249,0.45)', textDecoration: 'none' }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.75)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.45)'; }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          Mi colección
+        </Link>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(241,245,249,0.25)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+        <Link href={`/album/${instanceId}`} style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(241,245,249,0.45)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '160px' }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.75)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(241,245,249,0.45)'; }}>
+          {instance.name}
+        </Link>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(241,245,249,0.25)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+        <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(241,245,249,0.7)' }}>Compartir</span>
+      </nav>
 
-          {/* Share actions */}
-          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: '14px', margin: '0 0 2px' }}>Compartir</h2>
+      {/* Share actions */}
+      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: '14px', margin: '0 0 2px' }}>Compartir</h2>
 
-            <CopyCard
-              icon="🔗"
-              title="Enlace"
-              description="Cualquiera con el link ve tu progreso actualizado en tiempo real"
-              content={shareUrl}
-              waContent={waUrlText}
-              preview={shareUrl}
-            />
+        <CopyCard
+          icon="🔗"
+          title="Enlace"
+          description="Comparte tu progreso con quien quieras"
+          content={shareUrl}
+          waContent={waUrlText}
+          preview={shareUrl}
+        />
 
-            {missing > 0 && faltantesText && (
-              <CopyCard
-                icon="❌"
-                title={`Faltantes · ${missing} figuras`}
-                description="Texto listo para pedir figuras a tus contactos"
-                content={faltantesText}
-                preview={`Me faltan ${missing} figuras del álbum "${albumName}"…`}
-              />
-            )}
+        {missing > 0 && faltantesText && (
+          <CopyCard
+            icon="❌"
+            title={`Faltantes · ${missing} figuras`}
+            description="Texto listo para pedir figuras a tus contactos"
+            content={faltantesText}
+            preview={`Me faltan ${missing} figuras del álbum "${instance.name}"…`}
+          />
+        )}
 
-            {repeated > 0 && repetidasText && (
-              <CopyCard
-                icon="🔄"
-                title={`Repetidas · ${repeated} figuras`}
-                description="Texto para ofrecer tus repetidas e intercambiar"
-                content={repetidasText}
-                preview={`Tengo ${repeated} repetidas del álbum "${albumName}"…`}
-              />
-            )}
-          </div>
-        </>
-      )}
+        {repeated > 0 && repetidasText && (
+          <CopyCard
+            icon="🔄"
+            title={`Repetidas · ${repeated} figuras`}
+            description="Texto para ofrecer tus repetidas e intercambiar"
+            content={repetidasText}
+            preview={`Tengo ${repeated} repetidas del álbum "${instance.name}"…`}
+          />
+        )}
+      </div>
 
-      <ShareContent stickers={stickers} albumName={albumName} publisher={publisher} />
+      {/* Album content */}
+      <ShareContent stickers={stickers} albumName={instance.name} publisher={publisher} />
     </>
   );
 }

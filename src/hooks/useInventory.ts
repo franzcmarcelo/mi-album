@@ -4,21 +4,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { InventoryMap, StickerState } from '@/types';
 
-const LOCAL_KEY = (instanceId: string) => `inventory_${instanceId}`;
-
-function getLocalInventory(instanceId: string): InventoryMap {
-  if (typeof window === 'undefined') return {};
-  try {
-    return JSON.parse(localStorage.getItem(LOCAL_KEY(instanceId)) ?? '{}');
-  } catch {
-    return {};
-  }
-}
-
-function setLocalInventory(instanceId: string, map: InventoryMap) {
-  localStorage.setItem(LOCAL_KEY(instanceId), JSON.stringify(map));
-}
-
 async function fetchCatalogUUIDs(instanceId: string): Promise<Record<string, string>> {
   const supabase = createClient();
   const { data: userAlbum } = await supabase
@@ -44,6 +29,33 @@ async function fetchCatalogUUIDs(instanceId: string): Promise<Record<string, str
   return map;
 }
 
+async function fetchInventory(instanceId: string): Promise<InventoryMap> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('user_stickers')
+    .select('sticker_catalog_id, state, quantity, marked_at, stickers_catalog!inner(number, album_id, albums_catalog!inner(slug))')
+    .eq('user_album_id', instanceId);
+
+  if (error) throw error;
+
+  const map: InventoryMap = {};
+  for (const row of data ?? []) {
+    const sc = row.stickers_catalog as unknown as {
+      number: number;
+      albums_catalog: { slug: string };
+    };
+    const prefix = sc.albums_catalog.slug.startsWith('3reyes') ? 'treyes' : 'panini';
+    const localId = `${prefix}-${sc.number}`;
+    map[localId] = {
+      stickerId: localId,
+      state: row.state as StickerState,
+      quantity: row.quantity,
+      markedAt: row.marked_at,
+    };
+  }
+  return map;
+}
+
 export function useInventory(instanceId: string, userId: string | null) {
   const qc = useQueryClient();
 
@@ -56,39 +68,10 @@ export function useInventory(instanceId: string, userId: string | null) {
 
   const query = useQuery({
     queryKey: ['inventory', instanceId, userId],
-    enabled: !!instanceId,
-    queryFn: async () => {
-      if (!userId) return getLocalInventory(instanceId);
-
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('user_stickers')
-        .select('sticker_catalog_id, state, quantity, marked_at, stickers_catalog!inner(number, album_id, albums_catalog!inner(slug))')
-        .eq('user_album_id', instanceId);
-
-      if (error) throw error;
-
-      const map: InventoryMap = {};
-      for (const row of data ?? []) {
-        const sc = row.stickers_catalog as unknown as {
-          number: number;
-          album_id: string;
-          albums_catalog: { slug: string };
-        };
-        const prefix = sc.albums_catalog.slug.startsWith('3reyes') ? 'treyes' : 'panini';
-        const localId = `${prefix}-${sc.number}`;
-        map[localId] = {
-          stickerId: localId,
-          state: row.state as StickerState,
-          quantity: row.quantity,
-          markedAt: row.marked_at,
-        };
-      }
-      return map;
-    },
+    enabled: !!instanceId && !!userId,
+    queryFn: () => fetchInventory(instanceId),
   });
 
-  // update: set an explicit state (and optional quantity) or remove (state = null)
   const update = useMutation({
     onMutate: async ({ stickerId, state, quantity = 1 }) => {
       const queryKey = ['inventory', instanceId, userId];
@@ -100,12 +83,7 @@ export function useInventory(instanceId: string, userId: string | null) {
         if (state === null) {
           delete updated[stickerId];
         } else {
-          updated[stickerId] = {
-            stickerId,
-            state,
-            quantity,
-            markedAt: new Date().toISOString(),
-          };
+          updated[stickerId] = { stickerId, state, quantity, markedAt: new Date().toISOString() };
         }
         return updated;
       });
@@ -127,16 +105,7 @@ export function useInventory(instanceId: string, userId: string | null) {
       state: StickerState | null;
       quantity?: number;
     }) => {
-      if (!userId) {
-        const map = getLocalInventory(instanceId);
-        if (state === null) {
-          delete map[stickerId];
-        } else {
-          map[stickerId] = { stickerId, state, quantity, markedAt: new Date().toISOString() };
-        }
-        setLocalInventory(instanceId, map);
-        return;
-      }
+      if (!userId) return;
 
       let uuidMap = qc.getQueryData<Record<string, string>>(['catalog-uuids', instanceId]);
       if (!uuidMap) {

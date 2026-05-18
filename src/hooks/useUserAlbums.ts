@@ -1,40 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import { AlbumCatalog, UserAlbumInstance } from '@/types';
-
-const LOCAL_STORAGE_KEY = 'user_album_instances';
 
 export const AVAILABLE_ALBUMS: AlbumCatalog[] = [
   { id: 'panini-2024', slug: 'panini-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: 'Panini', totalStickers: 145 },
   { id: '3reyes-2024', slug: '3reyes-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: '3 Reyes', totalStickers: 150 },
 ];
 
-// ─── LocalStorage (no autenticado) ───────────────────────────────────────────
-
-function loadLocalInstances(): UserAlbumInstance[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? '[]');
-  } catch {
-    return [];
-  }
-}
-
-function saveLocalInstances(instances: UserAlbumInstance[]) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(instances));
-}
-
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-// ─── Supabase (autenticado) ───────────────────────────────────────────────────
-
-async function fetchSupabaseInstances(): Promise<UserAlbumInstance[]> {
+async function fetchInstances(): Promise<UserAlbumInstance[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('user_albums')
@@ -52,9 +29,8 @@ async function fetchSupabaseInstances(): Promise<UserAlbumInstance[]> {
   }));
 }
 
-async function createSupabaseInstance(slug: string, name: string): Promise<void> {
+async function createInstance(slug: string, name: string): Promise<void> {
   const supabase = createClient();
-
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('No autenticado');
 
@@ -76,7 +52,7 @@ async function createSupabaseInstance(slug: string, name: string): Promise<void>
   if (error) throw error;
 }
 
-async function archiveSupabaseInstance(instanceId: string): Promise<void> {
+async function archiveInstance(instanceId: string): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase
     .from('user_albums')
@@ -85,7 +61,7 @@ async function archiveSupabaseInstance(instanceId: string): Promise<void> {
   if (error) throw error;
 }
 
-async function renameSupabaseInstance(instanceId: string, name: string): Promise<void> {
+async function renameInstance(instanceId: string, name: string): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase
     .from('user_albums')
@@ -94,89 +70,39 @@ async function renameSupabaseInstance(instanceId: string, name: string): Promise
   if (error) throw error;
 }
 
-// ─── Hook principal ───────────────────────────────────────────────────────────
-
 export function useUserAlbums(user: User | null) {
   const qc = useQueryClient();
-  const isAuth = !!user;
 
-  // --- Modo Supabase ---
-  const supabaseQuery = useQuery({
+  const query = useQuery({
     queryKey: ['user-albums', user?.id],
-    queryFn: fetchSupabaseInstances,
-    enabled: isAuth,
+    queryFn: fetchInstances,
+    enabled: !!user,
   });
 
   const createMutation = useMutation({
-    mutationFn: ({ slug, name }: { slug: string; name: string }) =>
-      createSupabaseInstance(slug, name),
+    mutationFn: ({ slug, name }: { slug: string; name: string }) => createInstance(slug, name),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['user-albums', user?.id] }),
     onError: (err) => console.error('[createAlbum]', err),
   });
 
   const archiveMutation = useMutation({
-    mutationFn: (instanceId: string) => archiveSupabaseInstance(instanceId),
+    mutationFn: (instanceId: string) => archiveInstance(instanceId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['user-albums', user?.id] }),
   });
 
   const renameMutation = useMutation({
     mutationFn: ({ instanceId, name }: { instanceId: string; name: string }) =>
-      renameSupabaseInstance(instanceId, name),
+      renameInstance(instanceId, name),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['user-albums', user?.id] }),
   });
 
-  // --- Modo localStorage ---
-  const [localInstances, setLocalInstances] = useState<UserAlbumInstance[]>([]);
+  const instances = query.data ?? [];
+  const isLoading = !!user && query.isLoading;
 
-  useEffect(() => {
-    if (!isAuth) setLocalInstances(loadLocalInstances());
-  }, [isAuth]);
-
-  const addLocalAlbum = useCallback((slug: string, name: string) => {
-    const next: UserAlbumInstance = {
-      id: generateId(),
-      slug,
-      name: name.trim() || 'Mi Álbum',
-      createdAt: new Date().toISOString(),
-    };
-    setLocalInstances((prev) => {
-      const updated = [...prev, next];
-      saveLocalInstances(updated);
-      return updated;
-    });
-  }, []);
-
-  const removeLocalAlbum = useCallback((instanceId: string) => {
-    setLocalInstances((prev) => {
-      const updated = prev.filter((i) => i.id !== instanceId);
-      saveLocalInstances(updated);
-      return updated;
-    });
-  }, []);
-
-  const renameLocalAlbum = useCallback((instanceId: string, name: string) => {
-    setLocalInstances((prev) => {
-      const updated = prev.map((i) => (i.id === instanceId ? { ...i, name } : i));
-      saveLocalInstances(updated);
-      return updated;
-    });
-  }, []);
-
-  // --- API unificada ---
-  const instances = isAuth ? (supabaseQuery.data ?? []) : localInstances;
-  const isLoading = isAuth ? supabaseQuery.isLoading : false;
-
-  const addAlbum = isAuth
-    ? (slug: string, name: string) => createMutation.mutate({ slug, name })
-    : addLocalAlbum;
-
-  const removeAlbum = isAuth
-    ? (instanceId: string) => archiveMutation.mutate(instanceId)
-    : removeLocalAlbum;
-
-  const renameAlbum = isAuth
-    ? (instanceId: string, name: string) => renameMutation.mutate({ instanceId, name })
-    : renameLocalAlbum;
+  const addAlbum = (slug: string, name: string) => createMutation.mutate({ slug, name });
+  const removeAlbum = (instanceId: string) => archiveMutation.mutate(instanceId);
+  const renameAlbum = (instanceId: string, name: string) =>
+    renameMutation.mutate({ instanceId, name });
 
   const getInstanceById = useCallback(
     (instanceId: string) => instances.find((i) => i.id === instanceId) ?? null,

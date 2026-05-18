@@ -1,9 +1,9 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
 import { useUserAlbums, AVAILABLE_ALBUMS } from '@/hooks/useUserAlbums';
-import { useMigrateToSupabase } from '@/hooks/useMigrateToSupabase';
 import { useAlbumData } from '@/hooks/useAlbumData';
 import { useAlbumStats } from '@/hooks/useAlbumStats';
 import { useInventory } from '@/hooks/useInventory';
@@ -136,12 +136,15 @@ function AlbumCard({ instance, userId, onRemove, onRename }: {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { user, loading: sessionLoading } = useSession();
   const { instances, isLoading: albumsLoading, addAlbum, removeAlbum, renameAlbum } = useUserAlbums(user);
   const [showModal, setShowModal] = useState(false);
   const [publisherFilter, setPublisherFilter] = useState<string | null>(null);
 
-  useMigrateToSupabase(user);
+  useEffect(() => {
+    if (!sessionLoading && !user) router.replace('/login');
+  }, [user, sessionLoading, router]);
 
   const isLoading = sessionLoading || albumsLoading;
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] ?? null;
