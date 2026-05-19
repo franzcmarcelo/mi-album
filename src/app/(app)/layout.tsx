@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { NavMenu } from './NavMenu';
@@ -42,17 +43,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
           {/* Brand */}
           <Link href="/" className="pressable flex items-center gap-2.5" style={{ textDecoration: 'none' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+              <Image
               src="/images/favicon.png"
               alt="Mi Álbum"
-              style={{
-                width: '36px',
-                height: '36px',
-                objectFit: 'contain',
-                borderRadius: '10px',
-                flexShrink: 0,
-              }}
+              width={36}
+              height={36}
+              style={{ objectFit: 'contain', borderRadius: '10px', flexShrink: 0 }}
             />
             <div style={{ lineHeight: 1 }}>
               <span style={{
@@ -101,11 +97,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         pointerEvents: 'none',
         userSelect: 'none',
       }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src="/images/world-cup-logo.png"
           alt=""
           aria-hidden="true"
+          width={480}
+          height={480}
           style={{
             width: 'min(480px, 80vw)',
             height: 'auto',

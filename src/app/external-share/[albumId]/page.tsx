@@ -1,6 +1,7 @@
 'use client';
 
 import { use } from 'react';
+import Image from 'next/image';
 import { useExternalAlbum, ALBUM_UUID_RE } from '@/hooks/useExternalAlbum';
 import { AVAILABLE_ALBUMS } from '@/hooks/useUserAlbums';
 import { AlbumStatsCard, StickerGrid, ShareFooter, SharePageSkeleton } from '@/components/share/ShareAlbumView';
@@ -25,8 +26,7 @@ export default function ExternalSharePage({ params }: Props) {
         alignItems: 'center',
         gap: '10px',
       }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/favicon.png" alt="Mi Álbum" style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '8px' }} />
+        <Image src="/images/favicon.png" alt="Mi Álbum" width={28} height={28} style={{ objectFit: 'contain', borderRadius: '8px' }} />
         <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-2)' }}>Mi Álbum · Copa del Mundo 2026</span>
       </header>
 
