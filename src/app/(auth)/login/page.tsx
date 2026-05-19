@@ -1,6 +1,15 @@
-﻿import { createClient } from '@/lib/supabase/server';
+﻿import type { Metadata } from 'next';
+import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import Image from 'next/image';
 import { LoginButton } from './LoginButton';
+
+export const metadata: Metadata = {
+  title: 'Empieza gratis — Mi Álbum del Mundial 2026',
+  description:
+    'Gestiona tu colección de figuras Panini y 3 Reyes del Mundial 2026. Controla lo que tienes, lo que te falta y tus repetidas. Comparte tu progreso con amigos. ¡Gratis!',
+  alternates: { canonical: 'https://mi-album-phi.vercel.app/login' },
+};
 
 function TrophySilhouette() {
   return (
@@ -59,7 +68,7 @@ export default async function LoginPage() {
         pointerEvents: 'none',
       }} />
 
-      {/* Logo 1 — ghosted watermark behind card (invert makes white bg→black so it vanishes on dark) */}
+      {/* Logo 1 — ghosted watermark */}
       <div style={{
         position: 'absolute', right: '-5%', bottom: '-4%',
         width: '54vw', maxWidth: '340px',
@@ -67,8 +76,7 @@ export default async function LoginPage() {
         filter: 'grayscale(1) invert(1) opacity(0.07) brightness(2)',
         transformOrigin: 'bottom right',
       }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/world-cup-logo.png" alt="" style={{ width: '100%', height: 'auto' }} />
+        <Image src="/images/world-cup-logo.png" alt="" width={340} height={340} style={{ width: '100%', height: 'auto' }} />
       </div>
 
       {/* "2026" large background text */}
@@ -85,6 +93,25 @@ export default async function LoginPage() {
       }}>
         2026
       </div>
+
+      {/* JSON-LD structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            name: 'Mi Álbum',
+            url: 'https://mi-album-phi.vercel.app',
+            description:
+              'Gestiona tu colección de figuras Panini y 3 Reyes del Mundial 2026. Controla lo que tienes, lo que te falta y tus repetidas.',
+            applicationCategory: 'SportsApplication',
+            operatingSystem: 'Web',
+            inLanguage: 'es',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+          }),
+        }}
+      />
 
       {/* Card */}
       <div
@@ -114,11 +141,12 @@ export default async function LoginPage() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               filter: 'drop-shadow(0 8px 24px rgba(29,78,216,0.55))',
             }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="/images/world-cup-logo-2.png"
                 alt="FIFA World Cup 26"
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                width={84}
+                height={84}
+                style={{ objectFit: 'contain' }}
               />
             </div>
 
@@ -147,15 +175,6 @@ export default async function LoginPage() {
 
           <LoginButton />
 
-          <p style={{
-            textAlign: 'center', fontSize: '12px',
-            color: 'rgba(255,255,255,0.25)',
-            marginTop: '22px', lineHeight: 1.7,
-          }}>
-            También puedes usar la app sin cuenta.<br />
-            Tu progreso se guarda localmente.
-          </p>
-
           {/* Host countries */}
           <div style={{
             display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -175,6 +194,33 @@ export default async function LoginPage() {
           </div>
         </div>
       </div>
+      {/* Features section — below card, indexable by search engines */}
+      <div style={{
+        width: '100%', maxWidth: '380px',
+        marginTop: '28px',
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px',
+        position: 'relative', zIndex: 10,
+      }}>
+        {[
+          { icon: '⚽', title: 'Panini & 3 Reyes', desc: 'Ambas editoriales del Mundial 2026' },
+          { icon: '📊', title: 'Control exacto', desc: 'Figuras que tienes, repetidas y faltantes en tiempo real' },
+          { icon: '🔗', title: 'Comparte fácil', desc: 'Link público o mensaje para WhatsApp listo' },
+          { icon: '✅', title: 'Gratis y online', desc: 'Sincronizado en todos tus dispositivos' },
+        ].map(({ icon, title, desc }) => (
+          <div key={title} style={{
+            background: 'rgba(7,13,35,0.6)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: '14px',
+            padding: '14px',
+            backdropFilter: 'blur(10px)',
+          }}>
+            <span style={{ fontSize: '20px', display: 'block', marginBottom: '6px' }}>{icon}</span>
+            <p style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.8)', lineHeight: 1.3 }}>{title}</p>
+            <p style={{ margin: '3px 0 0', fontSize: '11px', color: 'rgba(255,255,255,0.35)', lineHeight: 1.4 }}>{desc}</p>
+          </div>
+        ))}
+      </div>
+
     </div>
   );
 }
