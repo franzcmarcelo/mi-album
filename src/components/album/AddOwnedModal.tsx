@@ -56,7 +56,7 @@ export function AddOwnedModal({ open, onClose, onAdd, missingStickers }: AddOwne
 
   return (
     <ModalSheet
-      title="Agregar figuritas"
+      title="Agregar figuras"
       subtitle={selected.size > 0 ? `${selected.size} seleccionada${selected.size > 1 ? 's' : ''}` : 'Toca las que tienes'}
       onClose={handleClose}
       confirmLabel={selected.size > 0 ? `Agregar ${selected.size}` : 'Agregar'}

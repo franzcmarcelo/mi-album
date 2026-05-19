@@ -140,7 +140,7 @@ export function ProgressHeader({
               <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(52,211,153,0.7)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Tengo</span>
             </div>
             <span style={{ display: 'block', fontSize: '22px', fontWeight: 900, color: '#34d399', lineHeight: 1, letterSpacing: '-0.02em' }}>{owned}</span>
-            <span style={{ fontSize: '9px', color: 'rgba(52,211,153,0.5)', fontWeight: 500 }}>pegadas</span>
+            <span style={{ fontSize: '9px', color: 'rgba(52,211,153,0.5)', fontWeight: 500 }}>en el álbum</span>
           </div>
 
           {/* Repetidas (a canjear) */}
@@ -153,7 +153,7 @@ export function ProgressHeader({
               <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(251,191,36,0.7)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Repet.</span>
             </div>
             <span style={{ display: 'block', fontSize: '22px', fontWeight: 900, color: '#fbbf24', lineHeight: 1, letterSpacing: '-0.02em' }}>{repeated}</span>
-            <span style={{ fontSize: '9px', color: 'rgba(251,191,36,0.5)', fontWeight: 500 }}>a canjear</span>
+            <span style={{ fontSize: '9px', color: 'rgba(251,191,36,0.5)', fontWeight: 500 }}>para intercambiar</span>
           </div>
 
           {/* Faltan */}

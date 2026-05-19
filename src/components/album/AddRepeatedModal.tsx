@@ -75,7 +75,7 @@ export function AddRepeatedModal({ open, onClose, onAdd, repeatableStickers }: A
   return (
     <ModalSheet
       title="Marcar repetidas"
-      subtitle={selected > 0 ? `${selected} figurita${selected > 1 ? 's' : ''} seleccionada${selected > 1 ? 's' : ''}` : 'Toca las que repites'}
+      subtitle={selected > 0 ? `${selected} figura${selected > 1 ? 's' : ''} seleccionada${selected > 1 ? 's' : ''}` : 'Toca las que repites'}
       onClose={handleClose}
       confirmLabel={selected > 0 ? `Guardar ${selected}` : 'Guardar'}
       confirmDisabled={selected === 0}
