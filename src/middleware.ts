@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── external-share security ───────────────────────────────────────────────
@@ -15,7 +15,6 @@ export async function proxy(request: NextRequest) {
     }
 
     const res = NextResponse.next({ request });
-
     res.headers.set('X-Frame-Options', 'DENY');
     res.headers.set(
       'Content-Security-Policy',
@@ -33,7 +32,6 @@ export async function proxy(request: NextRequest) {
     res.headers.set('X-Robots-Tag', 'noindex, nofollow');
     res.headers.set('X-Content-Type-Options', 'nosniff');
     res.headers.set('Referrer-Policy', 'no-referrer');
-
     return res;
   }
 
@@ -45,9 +43,7 @@ export async function proxy(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
+        getAll() { return request.cookies.getAll(); },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({ request });
