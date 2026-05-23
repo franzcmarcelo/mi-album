@@ -19,6 +19,8 @@ Aplicación web para gestionar el inventario digital de álbumes de figuritas Pa
 - `/external-share/<albumId>` — vista pública de solo lectura (sin auth), protegida con security headers y metadatos OG dinámicos
 - UI con tema oscuro, World Cup identity (logos, colores, animaciones)
 - SEO completo: robots.txt, sitemap.xml, metadatos globales, OG dinámico por álbum, JSON-LD
+- Catálogo 3 Reyes completo: **705 figuras reales** (584 numeradas + 6 letras A-F + 67 REPECHAJE E1-E67 + 48 ESCUDOS TROQUELADOS T1-T48)
+- Figuras especiales (`isSpecial: true`): UI dorada diferenciada en `FiguriteCard` — borde, fondo, shimmer, insignia ✦
 
 ## Convenciones de idioma
 
@@ -57,7 +59,7 @@ src/
 │       └── auth/callback/route.ts        # Callback OAuth de Supabase
 ├── components/
 │   ├── album/
-│   │   ├── FiguriteCard.tsx              # Tarjeta de figurita con animaciones (bounce, shine, stamp)
+│   │   ├── FiguriteCard.tsx              # Tarjeta de figurita con animaciones (bounce, shine, stamp, UI dorada para especiales)
 │   │   ├── FiguriteGrid.tsx              # Cuadrícula de figuritas (virtualizada para 600+ items)
 │   │   ├── SectionNav.tsx                # Nav horizontal de secciones; pills con checkbox toggle
 │   │   ├── AlbumToolbar.tsx              # Solo filtros (Todas/Tengo/Faltan/Repetidas)
@@ -99,7 +101,7 @@ src/
 │   └── catalogHelpers.ts                 # mergeWithInventory, getStats, getSections, getSectionStats
 ├── data/
 │   ├── panini.json                       # Catálogo Panini (id, number, name, section)
-│   └── treyes.json                       # Catálogo 3 Reyes
+│   └── treyes.json                       # Catálogo 3 Reyes — 705 figuras reales con isSpecial
 └── types/
     └── index.ts                          # Sticker, StickerWithState, UserAlbumInstance, etc.
 
@@ -183,6 +185,8 @@ Breakpoints cubiertos:
 | `card-owned-pop` | Bounce del card al marcar como "tengo" — **750ms** |
 | `card-shine-sweep` | Destello diagonal al marcar como "tengo" — **820ms** |
 | `check-stamp` | Sello ✓ al marcar como "tengo" |
+| `special-shimmer` / `.special-shimmer-anim` | Shimmer dorado en bucle — figuras especiales no conseguidas — **3.5s** |
+| `special-star-pulse` | Pulso suave de la insignia ✦ en figuras especiales — **2.5s** |
 | `foil-sweep` | Brillo metálico en álbumes completos |
 | `aurora-drift-1/2` | Blobs de aurora en el layout |
 | `skeleton` | Shimmer para estados de carga |
@@ -346,6 +350,25 @@ Estructura de arriba hacia abajo:
    - 🟡 **Repet.** — número grande amarillo, sublabel "para intercambiar"
    - ⬜ **Faltan** — número grande gris, sublabel "de X total"
 
+## Catálogo 3 Reyes — estructura y convenciones
+
+El catálogo 3 Reyes tiene **705 figuras** distribuidas en:
+
+| Tipo | Cantidad | `code` | `isSpecial` |
+|---|---|---|---|
+| Figuras numeradas (países) | 584 | `"1"` … `"N"` | `false` |
+| Letras de sección (A-F) | 6 | `"A"` … `"F"` | `true` |
+| REPECHAJE | 67 | `"E1"` … `"E67"` | `false` |
+| ESCUDOS TROQUELADOS | 48 | `"T1"` … `"T48"` | `true` |
+
+**Patrón `number` vs `code`:**
+- `number` (`INT`): clave de orden interno secuencial 1-705 — nunca se muestra al usuario
+- `code` (`TEXT`): identificador visible — puede ser numérico (`"33"`), letra (`"A"`), alfanumérico (`"T1"`, `"E67"`)
+
+Las letras A-F se insertan dentro de la secuencia numérica de su país (ej: REPÚBLICA CHECA tiene 33-48, la letra A es el número interno 33 con `code="A"`).
+
+`mergeWithInventory` usa spread `...sticker` por lo que `isSpecial` se propaga automáticamente desde el JSON sin tocar `useInventory.ts`.
+
 ## Reglas de negocio clave
 
 - Estado de figurita: `owned` | `repeated` | `undefined` (= faltante, no está en `user_stickers`)
@@ -356,6 +379,17 @@ Estructura de arriba hacia abajo:
 - `FiguriteCard` detecta transición missing→owned con `useRef(prevIsOwned)` para disparar animaciones
 - Autenticación obligatoria: `useEffect(() => { if (!sessionLoading && !user) router.replace('/login') }, [...])`
 - UUID del álbum actúa como token de acceso público en `/external-share/<albumId>`
+
+### Figuras especiales (`isSpecial: true`)
+
+Las figuras especiales (letras A-F y ESCUDOS TROQUELADOS T1-T48, 54 en total) reciben un tratamiento visual diferenciado en `FiguriteCard`:
+
+- **Borde dorado**: `rgba(251,191,36,0.55)` si conseguida, `rgba(251,191,36,0.3)` si faltante
+- **Fondo**: gradiente verde+dorado si conseguida, tinte dorado tenue si faltante
+- **Strip de sección**: gradiente del color de sección hacia dorado
+- **Insignia ✦**: esquina superior derecha, siempre visible, pulsa con `special-star-pulse`
+- **Shimmer dorado en bucle**: solo para especiales NO conseguidas (animación `special-shimmer`, 3.5 s)
+- Todos los efectos respetan `prefers-reduced-motion`
 
 ### Seguridad RLS crítica
 
@@ -387,4 +421,5 @@ npx tsc --noEmit     # Verificar tipos sin compilar
 - **Fase 1** ✓: frontend solo, localStorage, URL compartible sin backend
 - **Fase 2** ✓: Google Auth + Supabase BD + multi-álbum + autenticación obligatoria + share público `/external-share`
 - **Fase 2.5** ✓: SEO (robots, sitemap, metadatos globales, OG dinámico), seguridad (middleware consolidado, RLS fix), responsive login, español neutro en UI
+- **Fase 2.6** ✓: Catálogo 3 Reyes completo (705 figuras reales), campo `isSpecial`, UI dorada para figuras especiales
 - **Fase 3** (futura): intercambios entre usuarios, notificaciones, grupos
