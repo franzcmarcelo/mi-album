@@ -32,7 +32,7 @@ async function fetchExternalAlbum(albumId: string) {
 
   const { data: stickerRows, error: stickersErr } = await supabase
     .from('user_stickers')
-    .select('state, quantity, stickers_catalog!inner(number)')
+    .select('state, quantity, stickers_catalog!inner(code)')
     .eq('user_album_id', albumId);
 
   if (stickersErr) throw stickersErr;
@@ -40,8 +40,8 @@ async function fetchExternalAlbum(albumId: string) {
   const prefix = slug.startsWith('3reyes') ? 'treyes' : 'panini';
   const inventory: InventoryMap = {};
   for (const row of stickerRows ?? []) {
-    const sc = row.stickers_catalog as unknown as { number: number };
-    const localId = `${prefix}-${sc.number}`;
+    const sc = row.stickers_catalog as unknown as { code: string };
+    const localId = `${prefix}-${sc.code}`;
     inventory[localId] = {
       stickerId: localId,
       state: row.state as StickerState,

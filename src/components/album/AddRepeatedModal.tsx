@@ -131,7 +131,7 @@ export function AddRepeatedModal({ open, onClose, onAdd, repeatableStickers }: A
                   {/* Number — tap to select/deselect */}
                   <button
                     onClick={() => setQty(s.id, isSelected ? 0 : 1)}
-                    title={`#${s.number} — ${s.name}`}
+                    title={`#${s.code} — ${s.name}`}
                     style={{
                       flex: 1, width: '100%', border: 'none', background: 'transparent',
                       cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -141,7 +141,7 @@ export function AddRepeatedModal({ open, onClose, onAdd, repeatableStickers }: A
                       padding: 0,
                     }}
                   >
-                    {s.number}
+                    {s.code}
                   </button>
 
                   {/* Qty stepper — only when selected */}

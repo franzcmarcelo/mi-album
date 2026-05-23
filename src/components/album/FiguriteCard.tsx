@@ -86,7 +86,7 @@ export const FiguriteCard = React.memo(function FiguriteCard({
     <div ref={wrapperRef} style={{ aspectRatio: '3/4', width: '100%' }}>
       <div
         onClick={handleClick}
-        title={`#${sticker.number} — ${sticker.name}`}
+        title={`#${sticker.code} — ${sticker.name}`}
         style={{
           width: '100%', height: '100%',
           borderRadius: '8px',
@@ -155,7 +155,7 @@ export const FiguriteCard = React.memo(function FiguriteCard({
             transition: 'color 200ms',
             flexShrink: 0,
           }}>
-            {sticker.number}
+            {sticker.code}
           </span>
           {showName && (
             <span style={{

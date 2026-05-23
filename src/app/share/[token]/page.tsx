@@ -20,7 +20,7 @@ function buildFaltantesText(publisher: string, albumName: string, stickers: Stic
   const bySection = groupBySection(faltantes);
   const lines: string[] = [`Me faltan estas figuras:\n`, `📘 Álbum: ${publisher} — ${albumName}\n`];
   for (const [section, items] of Object.entries(bySection)) {
-    lines.push(`📌 ${section}: ${items.map((s) => `#${s.number}`).join(', ')}`);
+    lines.push(`📌 ${section}: ${items.map((s) => `#${s.code}`).join(', ')}`);
   }
   lines.push('\n¡Si tienes alguna, avísame! 🙌');
   return lines.join('\n');
@@ -33,7 +33,7 @@ function buildRepetidasText(publisher: string, albumName: string, stickers: Stic
   const lines: string[] = [`Tengo repetidas:\n`, `📘 Álbum: ${publisher} — ${albumName}\n`];
   for (const [section, items] of Object.entries(bySection)) {
     const nums = items
-      .map((s) => ((s.quantity ?? 1) > 1 ? `#${s.number} ×${s.quantity}` : `#${s.number}`))
+      .map((s) => ((s.quantity ?? 1) > 1 ? `#${s.code} ×${s.quantity}` : `#${s.code}`))
       .join(', ');
     lines.push(`🔄 ${section}: ${nums}`);
   }

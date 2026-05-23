@@ -3,7 +3,8 @@ export type StickerState = 'owned' | 'repeated';
 export interface Sticker {
   id: string;
   albumId: string;
-  number: number;
+  number: number;  // orden secuencial interno (1, 2, 3…) — no se muestra al usuario
+  code: string;    // identificador visible: "1", "T-1", "E-67"
   name: string;
   section: string;
   imageUrl?: string | null;

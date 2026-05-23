@@ -1,8 +1,9 @@
-[
+﻿[
     {
         "id":  "panini-1",
         "albumId":  "panini-2024",
         "number":  1,
+        "code":  "1",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 1"
@@ -11,6 +12,7 @@
         "id":  "panini-2",
         "albumId":  "panini-2024",
         "number":  2,
+        "code":  "2",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 2"
@@ -19,6 +21,7 @@
         "id":  "panini-3",
         "albumId":  "panini-2024",
         "number":  3,
+        "code":  "3",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 3"
@@ -27,6 +30,7 @@
         "id":  "panini-4",
         "albumId":  "panini-2024",
         "number":  4,
+        "code":  "4",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 4"
@@ -35,6 +39,7 @@
         "id":  "panini-5",
         "albumId":  "panini-2024",
         "number":  5,
+        "code":  "5",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 5"
@@ -43,6 +48,7 @@
         "id":  "panini-6",
         "albumId":  "panini-2024",
         "number":  6,
+        "code":  "6",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 6"
@@ -51,6 +57,7 @@
         "id":  "panini-7",
         "albumId":  "panini-2024",
         "number":  7,
+        "code":  "7",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 7"
@@ -59,6 +66,7 @@
         "id":  "panini-8",
         "albumId":  "panini-2024",
         "number":  8,
+        "code":  "8",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 8"
@@ -67,6 +75,7 @@
         "id":  "panini-9",
         "albumId":  "panini-2024",
         "number":  9,
+        "code":  "9",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 9"
@@ -75,6 +84,7 @@
         "id":  "panini-10",
         "albumId":  "panini-2024",
         "number":  10,
+        "code":  "10",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 10"
@@ -83,6 +93,7 @@
         "id":  "panini-11",
         "albumId":  "panini-2024",
         "number":  11,
+        "code":  "11",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 11"
@@ -91,6 +102,7 @@
         "id":  "panini-12",
         "albumId":  "panini-2024",
         "number":  12,
+        "code":  "12",
         "section":  "Selecciones",
         "imageUrl":  null,
         "name":  "Selecciones 12"
@@ -99,6 +111,7 @@
         "id":  "panini-13",
         "albumId":  "panini-2024",
         "number":  13,
+        "code":  "13",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 1"
@@ -107,6 +120,7 @@
         "id":  "panini-14",
         "albumId":  "panini-2024",
         "number":  14,
+        "code":  "14",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 2"
@@ -115,6 +129,7 @@
         "id":  "panini-15",
         "albumId":  "panini-2024",
         "number":  15,
+        "code":  "15",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 3"
@@ -123,6 +138,7 @@
         "id":  "panini-16",
         "albumId":  "panini-2024",
         "number":  16,
+        "code":  "16",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 4"
@@ -131,6 +147,7 @@
         "id":  "panini-17",
         "albumId":  "panini-2024",
         "number":  17,
+        "code":  "17",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 5"
@@ -139,6 +156,7 @@
         "id":  "panini-18",
         "albumId":  "panini-2024",
         "number":  18,
+        "code":  "18",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 6"
@@ -147,6 +165,7 @@
         "id":  "panini-19",
         "albumId":  "panini-2024",
         "number":  19,
+        "code":  "19",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 7"
@@ -155,6 +174,7 @@
         "id":  "panini-20",
         "albumId":  "panini-2024",
         "number":  20,
+        "code":  "20",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 8"
@@ -163,6 +183,7 @@
         "id":  "panini-21",
         "albumId":  "panini-2024",
         "number":  21,
+        "code":  "21",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 9"
@@ -171,6 +192,7 @@
         "id":  "panini-22",
         "albumId":  "panini-2024",
         "number":  22,
+        "code":  "22",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 10"
@@ -179,6 +201,7 @@
         "id":  "panini-23",
         "albumId":  "panini-2024",
         "number":  23,
+        "code":  "23",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 11"
@@ -187,6 +210,7 @@
         "id":  "panini-24",
         "albumId":  "panini-2024",
         "number":  24,
+        "code":  "24",
         "section":  "Grupo A",
         "imageUrl":  null,
         "name":  "Grupo A 12"
@@ -195,6 +219,7 @@
         "id":  "panini-25",
         "albumId":  "panini-2024",
         "number":  25,
+        "code":  "25",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 1"
@@ -203,6 +228,7 @@
         "id":  "panini-26",
         "albumId":  "panini-2024",
         "number":  26,
+        "code":  "26",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 2"
@@ -211,6 +237,7 @@
         "id":  "panini-27",
         "albumId":  "panini-2024",
         "number":  27,
+        "code":  "27",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 3"
@@ -219,6 +246,7 @@
         "id":  "panini-28",
         "albumId":  "panini-2024",
         "number":  28,
+        "code":  "28",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 4"
@@ -227,6 +255,7 @@
         "id":  "panini-29",
         "albumId":  "panini-2024",
         "number":  29,
+        "code":  "29",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 5"
@@ -235,6 +264,7 @@
         "id":  "panini-30",
         "albumId":  "panini-2024",
         "number":  30,
+        "code":  "30",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 6"
@@ -243,6 +273,7 @@
         "id":  "panini-31",
         "albumId":  "panini-2024",
         "number":  31,
+        "code":  "31",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 7"
@@ -251,6 +282,7 @@
         "id":  "panini-32",
         "albumId":  "panini-2024",
         "number":  32,
+        "code":  "32",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 8"
@@ -259,6 +291,7 @@
         "id":  "panini-33",
         "albumId":  "panini-2024",
         "number":  33,
+        "code":  "33",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 9"
@@ -267,6 +300,7 @@
         "id":  "panini-34",
         "albumId":  "panini-2024",
         "number":  34,
+        "code":  "34",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 10"
@@ -275,6 +309,7 @@
         "id":  "panini-35",
         "albumId":  "panini-2024",
         "number":  35,
+        "code":  "35",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 11"
@@ -283,6 +318,7 @@
         "id":  "panini-36",
         "albumId":  "panini-2024",
         "number":  36,
+        "code":  "36",
         "section":  "Grupo B",
         "imageUrl":  null,
         "name":  "Grupo B 12"
@@ -291,6 +327,7 @@
         "id":  "panini-37",
         "albumId":  "panini-2024",
         "number":  37,
+        "code":  "37",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 1"
@@ -299,6 +336,7 @@
         "id":  "panini-38",
         "albumId":  "panini-2024",
         "number":  38,
+        "code":  "38",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 2"
@@ -307,6 +345,7 @@
         "id":  "panini-39",
         "albumId":  "panini-2024",
         "number":  39,
+        "code":  "39",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 3"
@@ -315,6 +354,7 @@
         "id":  "panini-40",
         "albumId":  "panini-2024",
         "number":  40,
+        "code":  "40",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 4"
@@ -323,6 +363,7 @@
         "id":  "panini-41",
         "albumId":  "panini-2024",
         "number":  41,
+        "code":  "41",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 5"
@@ -331,6 +372,7 @@
         "id":  "panini-42",
         "albumId":  "panini-2024",
         "number":  42,
+        "code":  "42",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 6"
@@ -339,6 +381,7 @@
         "id":  "panini-43",
         "albumId":  "panini-2024",
         "number":  43,
+        "code":  "43",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 7"
@@ -347,6 +390,7 @@
         "id":  "panini-44",
         "albumId":  "panini-2024",
         "number":  44,
+        "code":  "44",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 8"
@@ -355,6 +399,7 @@
         "id":  "panini-45",
         "albumId":  "panini-2024",
         "number":  45,
+        "code":  "45",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 9"
@@ -363,6 +408,7 @@
         "id":  "panini-46",
         "albumId":  "panini-2024",
         "number":  46,
+        "code":  "46",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 10"
@@ -371,6 +417,7 @@
         "id":  "panini-47",
         "albumId":  "panini-2024",
         "number":  47,
+        "code":  "47",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 11"
@@ -379,6 +426,7 @@
         "id":  "panini-48",
         "albumId":  "panini-2024",
         "number":  48,
+        "code":  "48",
         "section":  "Grupo C",
         "imageUrl":  null,
         "name":  "Grupo C 12"
@@ -387,6 +435,7 @@
         "id":  "panini-49",
         "albumId":  "panini-2024",
         "number":  49,
+        "code":  "49",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 1"
@@ -395,6 +444,7 @@
         "id":  "panini-50",
         "albumId":  "panini-2024",
         "number":  50,
+        "code":  "50",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 2"
@@ -403,6 +453,7 @@
         "id":  "panini-51",
         "albumId":  "panini-2024",
         "number":  51,
+        "code":  "51",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 3"
@@ -411,6 +462,7 @@
         "id":  "panini-52",
         "albumId":  "panini-2024",
         "number":  52,
+        "code":  "52",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 4"
@@ -419,6 +471,7 @@
         "id":  "panini-53",
         "albumId":  "panini-2024",
         "number":  53,
+        "code":  "53",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 5"
@@ -427,6 +480,7 @@
         "id":  "panini-54",
         "albumId":  "panini-2024",
         "number":  54,
+        "code":  "54",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 6"
@@ -435,6 +489,7 @@
         "id":  "panini-55",
         "albumId":  "panini-2024",
         "number":  55,
+        "code":  "55",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 7"
@@ -443,6 +498,7 @@
         "id":  "panini-56",
         "albumId":  "panini-2024",
         "number":  56,
+        "code":  "56",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 8"
@@ -451,6 +507,7 @@
         "id":  "panini-57",
         "albumId":  "panini-2024",
         "number":  57,
+        "code":  "57",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 9"
@@ -459,6 +516,7 @@
         "id":  "panini-58",
         "albumId":  "panini-2024",
         "number":  58,
+        "code":  "58",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 10"
@@ -467,6 +525,7 @@
         "id":  "panini-59",
         "albumId":  "panini-2024",
         "number":  59,
+        "code":  "59",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 11"
@@ -475,6 +534,7 @@
         "id":  "panini-60",
         "albumId":  "panini-2024",
         "number":  60,
+        "code":  "60",
         "section":  "Grupo D",
         "imageUrl":  null,
         "name":  "Grupo D 12"
@@ -483,6 +543,7 @@
         "id":  "panini-61",
         "albumId":  "panini-2024",
         "number":  61,
+        "code":  "61",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 1"
@@ -491,6 +552,7 @@
         "id":  "panini-62",
         "albumId":  "panini-2024",
         "number":  62,
+        "code":  "62",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 2"
@@ -499,6 +561,7 @@
         "id":  "panini-63",
         "albumId":  "panini-2024",
         "number":  63,
+        "code":  "63",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 3"
@@ -507,6 +570,7 @@
         "id":  "panini-64",
         "albumId":  "panini-2024",
         "number":  64,
+        "code":  "64",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 4"
@@ -515,6 +579,7 @@
         "id":  "panini-65",
         "albumId":  "panini-2024",
         "number":  65,
+        "code":  "65",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 5"
@@ -523,6 +588,7 @@
         "id":  "panini-66",
         "albumId":  "panini-2024",
         "number":  66,
+        "code":  "66",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 6"
@@ -531,6 +597,7 @@
         "id":  "panini-67",
         "albumId":  "panini-2024",
         "number":  67,
+        "code":  "67",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 7"
@@ -539,6 +606,7 @@
         "id":  "panini-68",
         "albumId":  "panini-2024",
         "number":  68,
+        "code":  "68",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 8"
@@ -547,6 +615,7 @@
         "id":  "panini-69",
         "albumId":  "panini-2024",
         "number":  69,
+        "code":  "69",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 9"
@@ -555,6 +624,7 @@
         "id":  "panini-70",
         "albumId":  "panini-2024",
         "number":  70,
+        "code":  "70",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 10"
@@ -563,6 +633,7 @@
         "id":  "panini-71",
         "albumId":  "panini-2024",
         "number":  71,
+        "code":  "71",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 11"
@@ -571,6 +642,7 @@
         "id":  "panini-72",
         "albumId":  "panini-2024",
         "number":  72,
+        "code":  "72",
         "section":  "Grupo E",
         "imageUrl":  null,
         "name":  "Grupo E 12"
@@ -579,6 +651,7 @@
         "id":  "panini-73",
         "albumId":  "panini-2024",
         "number":  73,
+        "code":  "73",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 1"
@@ -587,6 +660,7 @@
         "id":  "panini-74",
         "albumId":  "panini-2024",
         "number":  74,
+        "code":  "74",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 2"
@@ -595,6 +669,7 @@
         "id":  "panini-75",
         "albumId":  "panini-2024",
         "number":  75,
+        "code":  "75",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 3"
@@ -603,6 +678,7 @@
         "id":  "panini-76",
         "albumId":  "panini-2024",
         "number":  76,
+        "code":  "76",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 4"
@@ -611,6 +687,7 @@
         "id":  "panini-77",
         "albumId":  "panini-2024",
         "number":  77,
+        "code":  "77",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 5"
@@ -619,6 +696,7 @@
         "id":  "panini-78",
         "albumId":  "panini-2024",
         "number":  78,
+        "code":  "78",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 6"
@@ -627,6 +705,7 @@
         "id":  "panini-79",
         "albumId":  "panini-2024",
         "number":  79,
+        "code":  "79",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 7"
@@ -635,6 +714,7 @@
         "id":  "panini-80",
         "albumId":  "panini-2024",
         "number":  80,
+        "code":  "80",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 8"
@@ -643,6 +723,7 @@
         "id":  "panini-81",
         "albumId":  "panini-2024",
         "number":  81,
+        "code":  "81",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 9"
@@ -651,6 +732,7 @@
         "id":  "panini-82",
         "albumId":  "panini-2024",
         "number":  82,
+        "code":  "82",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 10"
@@ -659,6 +741,7 @@
         "id":  "panini-83",
         "albumId":  "panini-2024",
         "number":  83,
+        "code":  "83",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 11"
@@ -667,6 +750,7 @@
         "id":  "panini-84",
         "albumId":  "panini-2024",
         "number":  84,
+        "code":  "84",
         "section":  "Grupo F",
         "imageUrl":  null,
         "name":  "Grupo F 12"
@@ -675,6 +759,7 @@
         "id":  "panini-85",
         "albumId":  "panini-2024",
         "number":  85,
+        "code":  "85",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 1"
@@ -683,6 +768,7 @@
         "id":  "panini-86",
         "albumId":  "panini-2024",
         "number":  86,
+        "code":  "86",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 2"
@@ -691,6 +777,7 @@
         "id":  "panini-87",
         "albumId":  "panini-2024",
         "number":  87,
+        "code":  "87",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 3"
@@ -699,6 +786,7 @@
         "id":  "panini-88",
         "albumId":  "panini-2024",
         "number":  88,
+        "code":  "88",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 4"
@@ -707,6 +795,7 @@
         "id":  "panini-89",
         "albumId":  "panini-2024",
         "number":  89,
+        "code":  "89",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 5"
@@ -715,6 +804,7 @@
         "id":  "panini-90",
         "albumId":  "panini-2024",
         "number":  90,
+        "code":  "90",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 6"
@@ -723,6 +813,7 @@
         "id":  "panini-91",
         "albumId":  "panini-2024",
         "number":  91,
+        "code":  "91",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 7"
@@ -731,6 +822,7 @@
         "id":  "panini-92",
         "albumId":  "panini-2024",
         "number":  92,
+        "code":  "92",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 8"
@@ -739,6 +831,7 @@
         "id":  "panini-93",
         "albumId":  "panini-2024",
         "number":  93,
+        "code":  "93",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 9"
@@ -747,6 +840,7 @@
         "id":  "panini-94",
         "albumId":  "panini-2024",
         "number":  94,
+        "code":  "94",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 10"
@@ -755,6 +849,7 @@
         "id":  "panini-95",
         "albumId":  "panini-2024",
         "number":  95,
+        "code":  "95",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 11"
@@ -763,6 +858,7 @@
         "id":  "panini-96",
         "albumId":  "panini-2024",
         "number":  96,
+        "code":  "96",
         "section":  "Grupo G",
         "imageUrl":  null,
         "name":  "Grupo G 12"
@@ -771,6 +867,7 @@
         "id":  "panini-97",
         "albumId":  "panini-2024",
         "number":  97,
+        "code":  "97",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 1"
@@ -779,6 +876,7 @@
         "id":  "panini-98",
         "albumId":  "panini-2024",
         "number":  98,
+        "code":  "98",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 2"
@@ -787,6 +885,7 @@
         "id":  "panini-99",
         "albumId":  "panini-2024",
         "number":  99,
+        "code":  "99",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 3"
@@ -795,6 +894,7 @@
         "id":  "panini-100",
         "albumId":  "panini-2024",
         "number":  100,
+        "code":  "100",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 4"
@@ -803,6 +903,7 @@
         "id":  "panini-101",
         "albumId":  "panini-2024",
         "number":  101,
+        "code":  "101",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 5"
@@ -811,6 +912,7 @@
         "id":  "panini-102",
         "albumId":  "panini-2024",
         "number":  102,
+        "code":  "102",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 6"
@@ -819,6 +921,7 @@
         "id":  "panini-103",
         "albumId":  "panini-2024",
         "number":  103,
+        "code":  "103",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 7"
@@ -827,6 +930,7 @@
         "id":  "panini-104",
         "albumId":  "panini-2024",
         "number":  104,
+        "code":  "104",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 8"
@@ -835,6 +939,7 @@
         "id":  "panini-105",
         "albumId":  "panini-2024",
         "number":  105,
+        "code":  "105",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 9"
@@ -843,6 +948,7 @@
         "id":  "panini-106",
         "albumId":  "panini-2024",
         "number":  106,
+        "code":  "106",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 10"
@@ -851,6 +957,7 @@
         "id":  "panini-107",
         "albumId":  "panini-2024",
         "number":  107,
+        "code":  "107",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 11"
@@ -859,6 +966,7 @@
         "id":  "panini-108",
         "albumId":  "panini-2024",
         "number":  108,
+        "code":  "108",
         "section":  "Grupo H",
         "imageUrl":  null,
         "name":  "Grupo H 12"
@@ -867,6 +975,7 @@
         "id":  "panini-109",
         "albumId":  "panini-2024",
         "number":  109,
+        "code":  "109",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 1"
@@ -875,6 +984,7 @@
         "id":  "panini-110",
         "albumId":  "panini-2024",
         "number":  110,
+        "code":  "110",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 2"
@@ -883,6 +993,7 @@
         "id":  "panini-111",
         "albumId":  "panini-2024",
         "number":  111,
+        "code":  "111",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 3"
@@ -891,6 +1002,7 @@
         "id":  "panini-112",
         "albumId":  "panini-2024",
         "number":  112,
+        "code":  "112",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 4"
@@ -899,6 +1011,7 @@
         "id":  "panini-113",
         "albumId":  "panini-2024",
         "number":  113,
+        "code":  "113",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 5"
@@ -907,6 +1020,7 @@
         "id":  "panini-114",
         "albumId":  "panini-2024",
         "number":  114,
+        "code":  "114",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 6"
@@ -915,6 +1029,7 @@
         "id":  "panini-115",
         "albumId":  "panini-2024",
         "number":  115,
+        "code":  "115",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 7"
@@ -923,6 +1038,7 @@
         "id":  "panini-116",
         "albumId":  "panini-2024",
         "number":  116,
+        "code":  "116",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 8"
@@ -931,6 +1047,7 @@
         "id":  "panini-117",
         "albumId":  "panini-2024",
         "number":  117,
+        "code":  "117",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 9"
@@ -939,6 +1056,7 @@
         "id":  "panini-118",
         "albumId":  "panini-2024",
         "number":  118,
+        "code":  "118",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 10"
@@ -947,6 +1065,7 @@
         "id":  "panini-119",
         "albumId":  "panini-2024",
         "number":  119,
+        "code":  "119",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 11"
@@ -955,6 +1074,7 @@
         "id":  "panini-120",
         "albumId":  "panini-2024",
         "number":  120,
+        "code":  "120",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 12"
@@ -963,6 +1083,7 @@
         "id":  "panini-121",
         "albumId":  "panini-2024",
         "number":  121,
+        "code":  "121",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 13"
@@ -971,6 +1092,7 @@
         "id":  "panini-122",
         "albumId":  "panini-2024",
         "number":  122,
+        "code":  "122",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 14"
@@ -979,6 +1101,7 @@
         "id":  "panini-123",
         "albumId":  "panini-2024",
         "number":  123,
+        "code":  "123",
         "section":  "Estrellas",
         "imageUrl":  null,
         "name":  "Estrellas 15"
@@ -987,6 +1110,7 @@
         "id":  "panini-124",
         "albumId":  "panini-2024",
         "number":  124,
+        "code":  "124",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 1"
@@ -995,6 +1119,7 @@
         "id":  "panini-125",
         "albumId":  "panini-2024",
         "number":  125,
+        "code":  "125",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 2"
@@ -1003,6 +1128,7 @@
         "id":  "panini-126",
         "albumId":  "panini-2024",
         "number":  126,
+        "code":  "126",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 3"
@@ -1011,6 +1137,7 @@
         "id":  "panini-127",
         "albumId":  "panini-2024",
         "number":  127,
+        "code":  "127",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 4"
@@ -1019,6 +1146,7 @@
         "id":  "panini-128",
         "albumId":  "panini-2024",
         "number":  128,
+        "code":  "128",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 5"
@@ -1027,6 +1155,7 @@
         "id":  "panini-129",
         "albumId":  "panini-2024",
         "number":  129,
+        "code":  "129",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 6"
@@ -1035,6 +1164,7 @@
         "id":  "panini-130",
         "albumId":  "panini-2024",
         "number":  130,
+        "code":  "130",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 7"
@@ -1043,6 +1173,7 @@
         "id":  "panini-131",
         "albumId":  "panini-2024",
         "number":  131,
+        "code":  "131",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 8"
@@ -1051,6 +1182,7 @@
         "id":  "panini-132",
         "albumId":  "panini-2024",
         "number":  132,
+        "code":  "132",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 9"
@@ -1059,6 +1191,7 @@
         "id":  "panini-133",
         "albumId":  "panini-2024",
         "number":  133,
+        "code":  "133",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 10"
@@ -1067,6 +1200,7 @@
         "id":  "panini-134",
         "albumId":  "panini-2024",
         "number":  134,
+        "code":  "134",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 11"
@@ -1075,6 +1209,7 @@
         "id":  "panini-135",
         "albumId":  "panini-2024",
         "number":  135,
+        "code":  "135",
         "section":  "Estadios",
         "imageUrl":  null,
         "name":  "Estadios 12"
@@ -1083,6 +1218,7 @@
         "id":  "panini-136",
         "albumId":  "panini-2024",
         "number":  136,
+        "code":  "136",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 1"
@@ -1091,6 +1227,7 @@
         "id":  "panini-137",
         "albumId":  "panini-2024",
         "number":  137,
+        "code":  "137",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 2"
@@ -1099,6 +1236,7 @@
         "id":  "panini-138",
         "albumId":  "panini-2024",
         "number":  138,
+        "code":  "138",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 3"
@@ -1107,6 +1245,7 @@
         "id":  "panini-139",
         "albumId":  "panini-2024",
         "number":  139,
+        "code":  "139",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 4"
@@ -1115,6 +1254,7 @@
         "id":  "panini-140",
         "albumId":  "panini-2024",
         "number":  140,
+        "code":  "140",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 5"
@@ -1123,6 +1263,7 @@
         "id":  "panini-141",
         "albumId":  "panini-2024",
         "number":  141,
+        "code":  "141",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 6"
@@ -1131,6 +1272,7 @@
         "id":  "panini-142",
         "albumId":  "panini-2024",
         "number":  142,
+        "code":  "142",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 7"
@@ -1139,6 +1281,7 @@
         "id":  "panini-143",
         "albumId":  "panini-2024",
         "number":  143,
+        "code":  "143",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 8"
@@ -1147,6 +1290,7 @@
         "id":  "panini-144",
         "albumId":  "panini-2024",
         "number":  144,
+        "code":  "144",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 9"
@@ -1155,6 +1299,7 @@
         "id":  "panini-145",
         "albumId":  "panini-2024",
         "number":  145,
+        "code":  "145",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 10"

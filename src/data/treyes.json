@@ -1,8 +1,9 @@
-[
+﻿[
     {
         "id":  "treyes-1",
         "albumId":  "3reyes-2024",
         "number":  1,
+        "code":  "1",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 1"
@@ -11,6 +12,7 @@
         "id":  "treyes-2",
         "albumId":  "3reyes-2024",
         "number":  2,
+        "code":  "2",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 2"
@@ -19,6 +21,7 @@
         "id":  "treyes-3",
         "albumId":  "3reyes-2024",
         "number":  3,
+        "code":  "3",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 3"
@@ -27,6 +30,7 @@
         "id":  "treyes-4",
         "albumId":  "3reyes-2024",
         "number":  4,
+        "code":  "4",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 4"
@@ -35,6 +39,7 @@
         "id":  "treyes-5",
         "albumId":  "3reyes-2024",
         "number":  5,
+        "code":  "5",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 5"
@@ -43,6 +48,7 @@
         "id":  "treyes-6",
         "albumId":  "3reyes-2024",
         "number":  6,
+        "code":  "6",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 6"
@@ -51,6 +57,7 @@
         "id":  "treyes-7",
         "albumId":  "3reyes-2024",
         "number":  7,
+        "code":  "7",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 7"
@@ -59,6 +66,7 @@
         "id":  "treyes-8",
         "albumId":  "3reyes-2024",
         "number":  8,
+        "code":  "8",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 8"
@@ -67,6 +75,7 @@
         "id":  "treyes-9",
         "albumId":  "3reyes-2024",
         "number":  9,
+        "code":  "9",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 9"
@@ -75,6 +84,7 @@
         "id":  "treyes-10",
         "albumId":  "3reyes-2024",
         "number":  10,
+        "code":  "10",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 10"
@@ -83,6 +93,7 @@
         "id":  "treyes-11",
         "albumId":  "3reyes-2024",
         "number":  11,
+        "code":  "11",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 11"
@@ -91,6 +102,7 @@
         "id":  "treyes-12",
         "albumId":  "3reyes-2024",
         "number":  12,
+        "code":  "12",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 12"
@@ -99,6 +111,7 @@
         "id":  "treyes-13",
         "albumId":  "3reyes-2024",
         "number":  13,
+        "code":  "13",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 13"
@@ -107,6 +120,7 @@
         "id":  "treyes-14",
         "albumId":  "3reyes-2024",
         "number":  14,
+        "code":  "14",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 14"
@@ -115,6 +129,7 @@
         "id":  "treyes-15",
         "albumId":  "3reyes-2024",
         "number":  15,
+        "code":  "15",
         "section":  "Portada",
         "imageUrl":  null,
         "name":  "Portada 15"
@@ -123,6 +138,7 @@
         "id":  "treyes-16",
         "albumId":  "3reyes-2024",
         "number":  16,
+        "code":  "16",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 1"
@@ -131,6 +147,7 @@
         "id":  "treyes-17",
         "albumId":  "3reyes-2024",
         "number":  17,
+        "code":  "17",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 2"
@@ -139,6 +156,7 @@
         "id":  "treyes-18",
         "albumId":  "3reyes-2024",
         "number":  18,
+        "code":  "18",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 3"
@@ -147,6 +165,7 @@
         "id":  "treyes-19",
         "albumId":  "3reyes-2024",
         "number":  19,
+        "code":  "19",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 4"
@@ -155,6 +174,7 @@
         "id":  "treyes-20",
         "albumId":  "3reyes-2024",
         "number":  20,
+        "code":  "20",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 5"
@@ -163,6 +183,7 @@
         "id":  "treyes-21",
         "albumId":  "3reyes-2024",
         "number":  21,
+        "code":  "21",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 6"
@@ -171,6 +192,7 @@
         "id":  "treyes-22",
         "albumId":  "3reyes-2024",
         "number":  22,
+        "code":  "22",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 7"
@@ -179,6 +201,7 @@
         "id":  "treyes-23",
         "albumId":  "3reyes-2024",
         "number":  23,
+        "code":  "23",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 8"
@@ -187,6 +210,7 @@
         "id":  "treyes-24",
         "albumId":  "3reyes-2024",
         "number":  24,
+        "code":  "24",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 9"
@@ -195,6 +219,7 @@
         "id":  "treyes-25",
         "albumId":  "3reyes-2024",
         "number":  25,
+        "code":  "25",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 10"
@@ -203,6 +228,7 @@
         "id":  "treyes-26",
         "albumId":  "3reyes-2024",
         "number":  26,
+        "code":  "26",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 11"
@@ -211,6 +237,7 @@
         "id":  "treyes-27",
         "albumId":  "3reyes-2024",
         "number":  27,
+        "code":  "27",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 12"
@@ -219,6 +246,7 @@
         "id":  "treyes-28",
         "albumId":  "3reyes-2024",
         "number":  28,
+        "code":  "28",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 13"
@@ -227,6 +255,7 @@
         "id":  "treyes-29",
         "albumId":  "3reyes-2024",
         "number":  29,
+        "code":  "29",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 14"
@@ -235,6 +264,7 @@
         "id":  "treyes-30",
         "albumId":  "3reyes-2024",
         "number":  30,
+        "code":  "30",
         "section":  "Equipos",
         "imageUrl":  null,
         "name":  "Equipos 15"
@@ -243,6 +273,7 @@
         "id":  "treyes-31",
         "albumId":  "3reyes-2024",
         "number":  31,
+        "code":  "31",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 1"
@@ -251,6 +282,7 @@
         "id":  "treyes-32",
         "albumId":  "3reyes-2024",
         "number":  32,
+        "code":  "32",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 2"
@@ -259,6 +291,7 @@
         "id":  "treyes-33",
         "albumId":  "3reyes-2024",
         "number":  33,
+        "code":  "33",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 3"
@@ -267,6 +300,7 @@
         "id":  "treyes-34",
         "albumId":  "3reyes-2024",
         "number":  34,
+        "code":  "34",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 4"
@@ -275,6 +309,7 @@
         "id":  "treyes-35",
         "albumId":  "3reyes-2024",
         "number":  35,
+        "code":  "35",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 5"
@@ -283,6 +318,7 @@
         "id":  "treyes-36",
         "albumId":  "3reyes-2024",
         "number":  36,
+        "code":  "36",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 6"
@@ -291,6 +327,7 @@
         "id":  "treyes-37",
         "albumId":  "3reyes-2024",
         "number":  37,
+        "code":  "37",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 7"
@@ -299,6 +336,7 @@
         "id":  "treyes-38",
         "albumId":  "3reyes-2024",
         "number":  38,
+        "code":  "38",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 8"
@@ -307,6 +345,7 @@
         "id":  "treyes-39",
         "albumId":  "3reyes-2024",
         "number":  39,
+        "code":  "39",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 9"
@@ -315,6 +354,7 @@
         "id":  "treyes-40",
         "albumId":  "3reyes-2024",
         "number":  40,
+        "code":  "40",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 10"
@@ -323,6 +363,7 @@
         "id":  "treyes-41",
         "albumId":  "3reyes-2024",
         "number":  41,
+        "code":  "41",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 11"
@@ -331,6 +372,7 @@
         "id":  "treyes-42",
         "albumId":  "3reyes-2024",
         "number":  42,
+        "code":  "42",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 12"
@@ -339,6 +381,7 @@
         "id":  "treyes-43",
         "albumId":  "3reyes-2024",
         "number":  43,
+        "code":  "43",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 13"
@@ -347,6 +390,7 @@
         "id":  "treyes-44",
         "albumId":  "3reyes-2024",
         "number":  44,
+        "code":  "44",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 14"
@@ -355,6 +399,7 @@
         "id":  "treyes-45",
         "albumId":  "3reyes-2024",
         "number":  45,
+        "code":  "45",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 15"
@@ -363,6 +408,7 @@
         "id":  "treyes-46",
         "albumId":  "3reyes-2024",
         "number":  46,
+        "code":  "46",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 16"
@@ -371,6 +417,7 @@
         "id":  "treyes-47",
         "albumId":  "3reyes-2024",
         "number":  47,
+        "code":  "47",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 17"
@@ -379,6 +426,7 @@
         "id":  "treyes-48",
         "albumId":  "3reyes-2024",
         "number":  48,
+        "code":  "48",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 18"
@@ -387,6 +435,7 @@
         "id":  "treyes-49",
         "albumId":  "3reyes-2024",
         "number":  49,
+        "code":  "49",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 19"
@@ -395,6 +444,7 @@
         "id":  "treyes-50",
         "albumId":  "3reyes-2024",
         "number":  50,
+        "code":  "50",
         "section":  "Jugadores Destacados",
         "imageUrl":  null,
         "name":  "Jugadores Destacados 20"
@@ -403,6 +453,7 @@
         "id":  "treyes-51",
         "albumId":  "3reyes-2024",
         "number":  51,
+        "code":  "51",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 1"
@@ -411,6 +462,7 @@
         "id":  "treyes-52",
         "albumId":  "3reyes-2024",
         "number":  52,
+        "code":  "52",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 2"
@@ -419,6 +471,7 @@
         "id":  "treyes-53",
         "albumId":  "3reyes-2024",
         "number":  53,
+        "code":  "53",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 3"
@@ -427,6 +480,7 @@
         "id":  "treyes-54",
         "albumId":  "3reyes-2024",
         "number":  54,
+        "code":  "54",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 4"
@@ -435,6 +489,7 @@
         "id":  "treyes-55",
         "albumId":  "3reyes-2024",
         "number":  55,
+        "code":  "55",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 5"
@@ -443,6 +498,7 @@
         "id":  "treyes-56",
         "albumId":  "3reyes-2024",
         "number":  56,
+        "code":  "56",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 6"
@@ -451,6 +507,7 @@
         "id":  "treyes-57",
         "albumId":  "3reyes-2024",
         "number":  57,
+        "code":  "57",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 7"
@@ -459,6 +516,7 @@
         "id":  "treyes-58",
         "albumId":  "3reyes-2024",
         "number":  58,
+        "code":  "58",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 8"
@@ -467,6 +525,7 @@
         "id":  "treyes-59",
         "albumId":  "3reyes-2024",
         "number":  59,
+        "code":  "59",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 9"
@@ -475,6 +534,7 @@
         "id":  "treyes-60",
         "albumId":  "3reyes-2024",
         "number":  60,
+        "code":  "60",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 10"
@@ -483,6 +543,7 @@
         "id":  "treyes-61",
         "albumId":  "3reyes-2024",
         "number":  61,
+        "code":  "61",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 11"
@@ -491,6 +552,7 @@
         "id":  "treyes-62",
         "albumId":  "3reyes-2024",
         "number":  62,
+        "code":  "62",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 12"
@@ -499,6 +561,7 @@
         "id":  "treyes-63",
         "albumId":  "3reyes-2024",
         "number":  63,
+        "code":  "63",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 13"
@@ -507,6 +570,7 @@
         "id":  "treyes-64",
         "albumId":  "3reyes-2024",
         "number":  64,
+        "code":  "64",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 14"
@@ -515,6 +579,7 @@
         "id":  "treyes-65",
         "albumId":  "3reyes-2024",
         "number":  65,
+        "code":  "65",
         "section":  "Goles del Torneo",
         "imageUrl":  null,
         "name":  "Goles del Torneo 15"
@@ -523,126 +588,142 @@
         "id":  "treyes-66",
         "albumId":  "3reyes-2024",
         "number":  66,
-        "section":  "Árbitros",
+        "code":  "66",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 1"
+        "name":  "Ãrbitros 1"
     },
     {
         "id":  "treyes-67",
         "albumId":  "3reyes-2024",
         "number":  67,
-        "section":  "Árbitros",
+        "code":  "67",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 2"
+        "name":  "Ãrbitros 2"
     },
     {
         "id":  "treyes-68",
         "albumId":  "3reyes-2024",
         "number":  68,
-        "section":  "Árbitros",
+        "code":  "68",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 3"
+        "name":  "Ãrbitros 3"
     },
     {
         "id":  "treyes-69",
         "albumId":  "3reyes-2024",
         "number":  69,
-        "section":  "Árbitros",
+        "code":  "69",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 4"
+        "name":  "Ãrbitros 4"
     },
     {
         "id":  "treyes-70",
         "albumId":  "3reyes-2024",
         "number":  70,
-        "section":  "Árbitros",
+        "code":  "70",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 5"
+        "name":  "Ãrbitros 5"
     },
     {
         "id":  "treyes-71",
         "albumId":  "3reyes-2024",
         "number":  71,
-        "section":  "Árbitros",
+        "code":  "71",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 6"
+        "name":  "Ãrbitros 6"
     },
     {
         "id":  "treyes-72",
         "albumId":  "3reyes-2024",
         "number":  72,
-        "section":  "Árbitros",
+        "code":  "72",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 7"
+        "name":  "Ãrbitros 7"
     },
     {
         "id":  "treyes-73",
         "albumId":  "3reyes-2024",
         "number":  73,
-        "section":  "Árbitros",
+        "code":  "73",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 8"
+        "name":  "Ãrbitros 8"
     },
     {
         "id":  "treyes-74",
         "albumId":  "3reyes-2024",
         "number":  74,
-        "section":  "Árbitros",
+        "code":  "74",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 9"
+        "name":  "Ãrbitros 9"
     },
     {
         "id":  "treyes-75",
         "albumId":  "3reyes-2024",
         "number":  75,
-        "section":  "Árbitros",
+        "code":  "75",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 10"
+        "name":  "Ãrbitros 10"
     },
     {
         "id":  "treyes-76",
         "albumId":  "3reyes-2024",
         "number":  76,
-        "section":  "Árbitros",
+        "code":  "76",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 11"
+        "name":  "Ãrbitros 11"
     },
     {
         "id":  "treyes-77",
         "albumId":  "3reyes-2024",
         "number":  77,
-        "section":  "Árbitros",
+        "code":  "77",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 12"
+        "name":  "Ãrbitros 12"
     },
     {
         "id":  "treyes-78",
         "albumId":  "3reyes-2024",
         "number":  78,
-        "section":  "Árbitros",
+        "code":  "78",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 13"
+        "name":  "Ãrbitros 13"
     },
     {
         "id":  "treyes-79",
         "albumId":  "3reyes-2024",
         "number":  79,
-        "section":  "Árbitros",
+        "code":  "79",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 14"
+        "name":  "Ãrbitros 14"
     },
     {
         "id":  "treyes-80",
         "albumId":  "3reyes-2024",
         "number":  80,
-        "section":  "Árbitros",
+        "code":  "80",
+        "section":  "Ãrbitros",
         "imageUrl":  null,
-        "name":  "Árbitros 15"
+        "name":  "Ãrbitros 15"
     },
     {
         "id":  "treyes-81",
         "albumId":  "3reyes-2024",
         "number":  81,
+        "code":  "81",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 1"
@@ -651,6 +732,7 @@
         "id":  "treyes-82",
         "albumId":  "3reyes-2024",
         "number":  82,
+        "code":  "82",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 2"
@@ -659,6 +741,7 @@
         "id":  "treyes-83",
         "albumId":  "3reyes-2024",
         "number":  83,
+        "code":  "83",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 3"
@@ -667,6 +750,7 @@
         "id":  "treyes-84",
         "albumId":  "3reyes-2024",
         "number":  84,
+        "code":  "84",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 4"
@@ -675,6 +759,7 @@
         "id":  "treyes-85",
         "albumId":  "3reyes-2024",
         "number":  85,
+        "code":  "85",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 5"
@@ -683,6 +768,7 @@
         "id":  "treyes-86",
         "albumId":  "3reyes-2024",
         "number":  86,
+        "code":  "86",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 6"
@@ -691,6 +777,7 @@
         "id":  "treyes-87",
         "albumId":  "3reyes-2024",
         "number":  87,
+        "code":  "87",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 7"
@@ -699,6 +786,7 @@
         "id":  "treyes-88",
         "albumId":  "3reyes-2024",
         "number":  88,
+        "code":  "88",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 8"
@@ -707,6 +795,7 @@
         "id":  "treyes-89",
         "albumId":  "3reyes-2024",
         "number":  89,
+        "code":  "89",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 9"
@@ -715,6 +804,7 @@
         "id":  "treyes-90",
         "albumId":  "3reyes-2024",
         "number":  90,
+        "code":  "90",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 10"
@@ -723,6 +813,7 @@
         "id":  "treyes-91",
         "albumId":  "3reyes-2024",
         "number":  91,
+        "code":  "91",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 11"
@@ -731,6 +822,7 @@
         "id":  "treyes-92",
         "albumId":  "3reyes-2024",
         "number":  92,
+        "code":  "92",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 12"
@@ -739,6 +831,7 @@
         "id":  "treyes-93",
         "albumId":  "3reyes-2024",
         "number":  93,
+        "code":  "93",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 13"
@@ -747,6 +840,7 @@
         "id":  "treyes-94",
         "albumId":  "3reyes-2024",
         "number":  94,
+        "code":  "94",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 14"
@@ -755,6 +849,7 @@
         "id":  "treyes-95",
         "albumId":  "3reyes-2024",
         "number":  95,
+        "code":  "95",
         "section":  "Historia",
         "imageUrl":  null,
         "name":  "Historia 15"
@@ -763,6 +858,7 @@
         "id":  "treyes-96",
         "albumId":  "3reyes-2024",
         "number":  96,
+        "code":  "96",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 1"
@@ -771,6 +867,7 @@
         "id":  "treyes-97",
         "albumId":  "3reyes-2024",
         "number":  97,
+        "code":  "97",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 2"
@@ -779,6 +876,7 @@
         "id":  "treyes-98",
         "albumId":  "3reyes-2024",
         "number":  98,
+        "code":  "98",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 3"
@@ -787,6 +885,7 @@
         "id":  "treyes-99",
         "albumId":  "3reyes-2024",
         "number":  99,
+        "code":  "99",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 4"
@@ -795,6 +894,7 @@
         "id":  "treyes-100",
         "albumId":  "3reyes-2024",
         "number":  100,
+        "code":  "100",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 5"
@@ -803,6 +903,7 @@
         "id":  "treyes-101",
         "albumId":  "3reyes-2024",
         "number":  101,
+        "code":  "101",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 6"
@@ -811,6 +912,7 @@
         "id":  "treyes-102",
         "albumId":  "3reyes-2024",
         "number":  102,
+        "code":  "102",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 7"
@@ -819,6 +921,7 @@
         "id":  "treyes-103",
         "albumId":  "3reyes-2024",
         "number":  103,
+        "code":  "103",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 8"
@@ -827,6 +930,7 @@
         "id":  "treyes-104",
         "albumId":  "3reyes-2024",
         "number":  104,
+        "code":  "104",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 9"
@@ -835,6 +939,7 @@
         "id":  "treyes-105",
         "albumId":  "3reyes-2024",
         "number":  105,
+        "code":  "105",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 10"
@@ -843,6 +948,7 @@
         "id":  "treyes-106",
         "albumId":  "3reyes-2024",
         "number":  106,
+        "code":  "106",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 11"
@@ -851,6 +957,7 @@
         "id":  "treyes-107",
         "albumId":  "3reyes-2024",
         "number":  107,
+        "code":  "107",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 12"
@@ -859,6 +966,7 @@
         "id":  "treyes-108",
         "albumId":  "3reyes-2024",
         "number":  108,
+        "code":  "108",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 13"
@@ -867,6 +975,7 @@
         "id":  "treyes-109",
         "albumId":  "3reyes-2024",
         "number":  109,
+        "code":  "109",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 14"
@@ -875,6 +984,7 @@
         "id":  "treyes-110",
         "albumId":  "3reyes-2024",
         "number":  110,
+        "code":  "110",
         "section":  "Trofeos",
         "imageUrl":  null,
         "name":  "Trofeos 15"
@@ -883,6 +993,7 @@
         "id":  "treyes-111",
         "albumId":  "3reyes-2024",
         "number":  111,
+        "code":  "111",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 1"
@@ -891,6 +1002,7 @@
         "id":  "treyes-112",
         "albumId":  "3reyes-2024",
         "number":  112,
+        "code":  "112",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 2"
@@ -899,6 +1011,7 @@
         "id":  "treyes-113",
         "albumId":  "3reyes-2024",
         "number":  113,
+        "code":  "113",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 3"
@@ -907,6 +1020,7 @@
         "id":  "treyes-114",
         "albumId":  "3reyes-2024",
         "number":  114,
+        "code":  "114",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 4"
@@ -915,6 +1029,7 @@
         "id":  "treyes-115",
         "albumId":  "3reyes-2024",
         "number":  115,
+        "code":  "115",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 5"
@@ -923,6 +1038,7 @@
         "id":  "treyes-116",
         "albumId":  "3reyes-2024",
         "number":  116,
+        "code":  "116",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 6"
@@ -931,6 +1047,7 @@
         "id":  "treyes-117",
         "albumId":  "3reyes-2024",
         "number":  117,
+        "code":  "117",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 7"
@@ -939,6 +1056,7 @@
         "id":  "treyes-118",
         "albumId":  "3reyes-2024",
         "number":  118,
+        "code":  "118",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 8"
@@ -947,6 +1065,7 @@
         "id":  "treyes-119",
         "albumId":  "3reyes-2024",
         "number":  119,
+        "code":  "119",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 9"
@@ -955,6 +1074,7 @@
         "id":  "treyes-120",
         "albumId":  "3reyes-2024",
         "number":  120,
+        "code":  "120",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 10"
@@ -963,6 +1083,7 @@
         "id":  "treyes-121",
         "albumId":  "3reyes-2024",
         "number":  121,
+        "code":  "121",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 11"
@@ -971,6 +1092,7 @@
         "id":  "treyes-122",
         "albumId":  "3reyes-2024",
         "number":  122,
+        "code":  "122",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 12"
@@ -979,6 +1101,7 @@
         "id":  "treyes-123",
         "albumId":  "3reyes-2024",
         "number":  123,
+        "code":  "123",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 13"
@@ -987,6 +1110,7 @@
         "id":  "treyes-124",
         "albumId":  "3reyes-2024",
         "number":  124,
+        "code":  "124",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 14"
@@ -995,6 +1119,7 @@
         "id":  "treyes-125",
         "albumId":  "3reyes-2024",
         "number":  125,
+        "code":  "125",
         "section":  "Estadios Locales",
         "imageUrl":  null,
         "name":  "Estadios Locales 15"
@@ -1003,126 +1128,142 @@
         "id":  "treyes-126",
         "albumId":  "3reyes-2024",
         "number":  126,
-        "section":  "Figuras Históricas",
+        "code":  "126",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 1"
+        "name":  "Figuras HistÃ³ricas 1"
     },
     {
         "id":  "treyes-127",
         "albumId":  "3reyes-2024",
         "number":  127,
-        "section":  "Figuras Históricas",
+        "code":  "127",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 2"
+        "name":  "Figuras HistÃ³ricas 2"
     },
     {
         "id":  "treyes-128",
         "albumId":  "3reyes-2024",
         "number":  128,
-        "section":  "Figuras Históricas",
+        "code":  "128",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 3"
+        "name":  "Figuras HistÃ³ricas 3"
     },
     {
         "id":  "treyes-129",
         "albumId":  "3reyes-2024",
         "number":  129,
-        "section":  "Figuras Históricas",
+        "code":  "129",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 4"
+        "name":  "Figuras HistÃ³ricas 4"
     },
     {
         "id":  "treyes-130",
         "albumId":  "3reyes-2024",
         "number":  130,
-        "section":  "Figuras Históricas",
+        "code":  "130",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 5"
+        "name":  "Figuras HistÃ³ricas 5"
     },
     {
         "id":  "treyes-131",
         "albumId":  "3reyes-2024",
         "number":  131,
-        "section":  "Figuras Históricas",
+        "code":  "131",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 6"
+        "name":  "Figuras HistÃ³ricas 6"
     },
     {
         "id":  "treyes-132",
         "albumId":  "3reyes-2024",
         "number":  132,
-        "section":  "Figuras Históricas",
+        "code":  "132",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 7"
+        "name":  "Figuras HistÃ³ricas 7"
     },
     {
         "id":  "treyes-133",
         "albumId":  "3reyes-2024",
         "number":  133,
-        "section":  "Figuras Históricas",
+        "code":  "133",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 8"
+        "name":  "Figuras HistÃ³ricas 8"
     },
     {
         "id":  "treyes-134",
         "albumId":  "3reyes-2024",
         "number":  134,
-        "section":  "Figuras Históricas",
+        "code":  "134",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 9"
+        "name":  "Figuras HistÃ³ricas 9"
     },
     {
         "id":  "treyes-135",
         "albumId":  "3reyes-2024",
         "number":  135,
-        "section":  "Figuras Históricas",
+        "code":  "135",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 10"
+        "name":  "Figuras HistÃ³ricas 10"
     },
     {
         "id":  "treyes-136",
         "albumId":  "3reyes-2024",
         "number":  136,
-        "section":  "Figuras Históricas",
+        "code":  "136",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 11"
+        "name":  "Figuras HistÃ³ricas 11"
     },
     {
         "id":  "treyes-137",
         "albumId":  "3reyes-2024",
         "number":  137,
-        "section":  "Figuras Históricas",
+        "code":  "137",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 12"
+        "name":  "Figuras HistÃ³ricas 12"
     },
     {
         "id":  "treyes-138",
         "albumId":  "3reyes-2024",
         "number":  138,
-        "section":  "Figuras Históricas",
+        "code":  "138",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 13"
+        "name":  "Figuras HistÃ³ricas 13"
     },
     {
         "id":  "treyes-139",
         "albumId":  "3reyes-2024",
         "number":  139,
-        "section":  "Figuras Históricas",
+        "code":  "139",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 14"
+        "name":  "Figuras HistÃ³ricas 14"
     },
     {
         "id":  "treyes-140",
         "albumId":  "3reyes-2024",
         "number":  140,
-        "section":  "Figuras Históricas",
+        "code":  "140",
+        "section":  "Figuras HistÃ³ricas",
         "imageUrl":  null,
-        "name":  "Figuras Históricas 15"
+        "name":  "Figuras HistÃ³ricas 15"
     },
     {
         "id":  "treyes-141",
         "albumId":  "3reyes-2024",
         "number":  141,
+        "code":  "141",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 1"
@@ -1131,6 +1272,7 @@
         "id":  "treyes-142",
         "albumId":  "3reyes-2024",
         "number":  142,
+        "code":  "142",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 2"
@@ -1139,6 +1281,7 @@
         "id":  "treyes-143",
         "albumId":  "3reyes-2024",
         "number":  143,
+        "code":  "143",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 3"
@@ -1147,6 +1290,7 @@
         "id":  "treyes-144",
         "albumId":  "3reyes-2024",
         "number":  144,
+        "code":  "144",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 4"
@@ -1155,6 +1299,7 @@
         "id":  "treyes-145",
         "albumId":  "3reyes-2024",
         "number":  145,
+        "code":  "145",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 5"
@@ -1163,6 +1308,7 @@
         "id":  "treyes-146",
         "albumId":  "3reyes-2024",
         "number":  146,
+        "code":  "146",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 6"
@@ -1171,6 +1317,7 @@
         "id":  "treyes-147",
         "albumId":  "3reyes-2024",
         "number":  147,
+        "code":  "147",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 7"
@@ -1179,6 +1326,7 @@
         "id":  "treyes-148",
         "albumId":  "3reyes-2024",
         "number":  148,
+        "code":  "148",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 8"
@@ -1187,6 +1335,7 @@
         "id":  "treyes-149",
         "albumId":  "3reyes-2024",
         "number":  149,
+        "code":  "149",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 9"
@@ -1195,6 +1344,7 @@
         "id":  "treyes-150",
         "albumId":  "3reyes-2024",
         "number":  150,
+        "code":  "150",
         "section":  "Especiales",
         "imageUrl":  null,
         "name":  "Especiales 10"

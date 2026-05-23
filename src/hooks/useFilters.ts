@@ -18,7 +18,7 @@ export function useFilters(stickers: StickerWithState[]) {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
-        (s) => s.name.toLowerCase().includes(q) || String(s.number).includes(q)
+        (s) => s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q)
       );
     }
 

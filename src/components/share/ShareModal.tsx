@@ -29,7 +29,7 @@ function buildFaltantesText(publisher: string, stickers: StickerWithState[]): st
   lines.push(`📘 Álbum: ${publisher}\n`);
 
   for (const [section, items] of Object.entries(bySection)) {
-    lines.push(`📌 ${section}: ${items.map((s) => `#${s.number}`).join(', ')}`);
+    lines.push(`📌 ${section}: ${items.map((s) => `#${s.code}`).join(', ')}`);
   }
   lines.push(`\n¡Si tienes alguna, avísame! 🙌`);
   return lines.join('\n');
@@ -43,7 +43,7 @@ function buildRepetidasText(publisher: string, stickers: StickerWithState[]): st
   lines.push(`📘 Álbum: ${publisher}\n`);
 
   for (const [section, items] of Object.entries(bySection)) {
-    const nums = items.map((s) => (s.quantity ?? 1) > 1 ? `#${s.number} ×${s.quantity}` : `#${s.number}`).join(', ');
+    const nums = items.map((s) => (s.quantity ?? 1) > 1 ? `#${s.code} ×${s.quantity}` : `#${s.code}`).join(', ');
     lines.push(`🔄 ${section}: ${nums}`);
   }
   lines.push(`\n¡Las ofrezco para intercambio si te interesa! 🤝`);

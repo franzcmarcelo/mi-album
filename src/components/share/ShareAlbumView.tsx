@@ -155,7 +155,7 @@ export function StickerGrid({ stickers }: { stickers: StickerWithState[] }) {
                 const isOwned    = s.userState === 'owned';
                 const isRepeated = s.userState === 'repeated';
                 return (
-                  <div key={s.id} title={`#${s.number} ${s.name}`}
+                  <div key={s.id} title={`#${s.code} ${s.name}`}
                     style={{
                       aspectRatio: '1', borderRadius: '6px', fontWeight: 700,
                       fontSize: cfg.fontSize,
@@ -165,7 +165,7 @@ export function StickerGrid({ stickers }: { stickers: StickerWithState[] }) {
                       color: isRepeated ? '#fbbf24' : isOwned ? '#34d399' : 'var(--text-3)',
                       userSelect: 'none',
                     }}>
-                    {s.number}
+                    {s.code}
                     {isRepeated && (
                       <span style={{ position: 'absolute', bottom: 1, right: 2, fontWeight: 900, lineHeight: 1, color: '#fbbf24', fontSize: cfg.badgeFontSize }}>
                         ×{s.quantity ?? 1}

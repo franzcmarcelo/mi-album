@@ -94,7 +94,7 @@ export function AddOwnedModal({ open, onClose, onAdd, missingStickers }: AddOwne
                 <button
                   key={s.id}
                   onClick={() => toggle(s.id)}
-                  title={`#${s.number} — ${s.name}`}
+                  title={`#${s.code} — ${s.name}`}
                   style={{
                     aspectRatio: '1',
                     borderRadius: '8px',
@@ -112,7 +112,7 @@ export function AddOwnedModal({ open, onClose, onAdd, missingStickers }: AddOwne
                     fontVariantNumeric: 'tabular-nums',
                   }}
                 >
-                  {s.number}
+                  {s.code}
                 </button>
               );
             })}

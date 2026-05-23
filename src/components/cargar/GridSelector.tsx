@@ -14,7 +14,7 @@ export function GridSelector({ stickers, onToggle }: GridSelectorProps) {
         <button
           key={s.id}
           onClick={() => onToggle(s.id, s.userState)}
-          title={`#${s.number} ${s.name}`}
+          title={`#${s.code} ${s.name}`}
           className={`aspect-square rounded text-xs font-bold transition-colors ${
             s.userState === 'owned'
               ? 'bg-green-500 text-white'
@@ -23,7 +23,7 @@ export function GridSelector({ stickers, onToggle }: GridSelectorProps) {
               : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
           }`}
         >
-          {s.number}
+          {s.code}
         </button>
       ))}
     </div>
