@@ -22,6 +22,7 @@ export const FiguriteCard = React.memo(function FiguriteCard({
   const qty        = sticker.quantity ?? 1;
   const isOwned    = state !== 'missing';
   const isRepeated = state === 'repeated';
+  const isSpecial  = sticker.isSpecial === true;
   const colors     = getSectionColor(sticker.section);
   const abbrev     = abbreviateSection(sticker.section);
 
@@ -91,14 +92,26 @@ export const FiguriteCard = React.memo(function FiguriteCard({
           width: '100%', height: '100%',
           borderRadius: '8px',
           border: isOwned
-            ? '1.5px solid rgba(34,197,94,0.4)'
-            : '1.5px solid rgba(255,255,255,0.07)',
+            ? isSpecial
+              ? '1.5px solid rgba(251,191,36,0.55)'
+              : '1.5px solid rgba(34,197,94,0.4)'
+            : isSpecial
+              ? '1.5px solid rgba(251,191,36,0.3)'
+              : '1.5px solid rgba(255,255,255,0.07)',
           background: isOwned
-            ? 'rgba(16,185,129,0.09)'
-            : 'rgba(255,255,255,0.03)',
+            ? isSpecial
+              ? 'linear-gradient(160deg, rgba(16,185,129,0.1) 0%, rgba(251,191,36,0.08) 100%)'
+              : 'rgba(16,185,129,0.09)'
+            : isSpecial
+              ? 'rgba(251,191,36,0.04)'
+              : 'rgba(255,255,255,0.03)',
           boxShadow: isOwned
-            ? '0 2px 10px rgba(16,185,129,0.1)'
-            : '0 1px 4px rgba(0,0,0,0.25)',
+            ? isSpecial
+              ? '0 2px 10px rgba(16,185,129,0.1), 0 0 12px rgba(251,191,36,0.18)'
+              : '0 2px 10px rgba(16,185,129,0.1)'
+            : isSpecial
+              ? '0 1px 8px rgba(251,191,36,0.12)'
+              : '0 1px 4px rgba(0,0,0,0.25)',
           overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
           cursor: clickable ? 'pointer' : 'default',
@@ -106,6 +119,35 @@ export const FiguriteCard = React.memo(function FiguriteCard({
           transition: 'border-color 200ms, background 200ms, box-shadow 200ms',
         }}
       >
+        {/* ✦ Insignia dorada — siempre visible en figuras especiales */}
+        {isSpecial && (
+          <div style={{
+            position: 'absolute', top: 3, right: 3,
+            fontSize: size === 'lg' ? '10px' : '8px',
+            lineHeight: 1, color: '#fbbf24',
+            pointerEvents: 'none', zIndex: 3,
+            textShadow: '0 0 6px rgba(251,191,36,0.7)',
+            animation: 'special-star-pulse 2.5s ease-in-out infinite',
+          }}>✦</div>
+        )}
+
+        {/* Shimmer dorado en bucle — solo para especiales no conseguidas */}
+        {isSpecial && !isOwned && (
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 1,
+            borderRadius: '8px', overflow: 'hidden',
+            pointerEvents: 'none',
+          }}>
+            <div className="special-shimmer-anim" style={{
+              position: 'absolute',
+              top: '-30%', bottom: '-30%',
+              width: '35%',
+              background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.18) 50%, transparent)',
+              animation: 'special-shimmer 3.5s ease-in-out infinite',
+            }} />
+          </div>
+        )}
+
         {/* Diagonal shine sweep — plays once on collection */}
         {showShine && (
           <div style={{
@@ -126,7 +168,9 @@ export const FiguriteCard = React.memo(function FiguriteCard({
         {/* Section strip */}
         {showStrip && (
           <div style={{
-            background: colors.bg,
+            background: isSpecial
+              ? `linear-gradient(90deg, ${colors.bg}, rgba(251,191,36,0.55))`
+              : colors.bg,
             minHeight: stripH, flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '2px 4px',

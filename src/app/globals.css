@@ -274,3 +274,22 @@ a, button { -webkit-tap-highlight-color: transparent; }
   78%  { transform: scale(0.84) rotate(-3deg); }
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
+
+/* Shimmer dorado para figuras especiales no conseguidas */
+@keyframes special-shimmer {
+  0%   { transform: translateX(-130%) skewX(-15deg); opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { transform: translateX(320%) skewX(-15deg); opacity: 0; }
+}
+
+/* Pulso suave del ícono ✦ en figuras especiales */
+@keyframes special-star-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .special-shimmer-anim { animation: none !important; }
+  .special-star-pulse   { animation: none !important; }
+}
