@@ -8,7 +8,7 @@ import { AlbumCatalog, UserAlbumInstance } from '@/types';
 
 export const AVAILABLE_ALBUMS: AlbumCatalog[] = [
   { id: 'panini-2024', slug: 'panini-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: 'Panini', totalStickers: 145 },
-  { id: '3reyes-2024', slug: '3reyes-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: '3 Reyes', totalStickers: 150 },
+  { id: '3reyes-2024', slug: '3reyes-2024', name: 'Copa del Mundo 2026', year: 2026, publisher: '3 Reyes', totalStickers: 705 },
 ];
 
 async function fetchInstances(userId: string): Promise<UserAlbumInstance[]> {
