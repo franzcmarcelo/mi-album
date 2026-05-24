@@ -103,15 +103,136 @@ Supabase (PostgreSQL)
 
 ### Hooks — referencia rápida
 
-| Hook | Expone | Cuándo usarlo |
+| Hook | Expone | Páginas que lo usan |
 |---|---|---|
-| `useSession()` | `{ user, loading }` | Verificar sesión activa |
-| `useUserAlbums(user)` | `{ instances, addAlbum, removeAlbum, renameAlbum, getInstanceById }` | Listado y CRUD de álbumes del usuario |
-| `useAlbumData(slug)` | `{ data: Sticker[] }` | Catálogo estático del álbum (JSON local) |
-| `useInventory(instanceId, userId)` | `{ data: InventoryMap, update }` | Leer y escribir el inventario del usuario |
-| `useAlbumStats(stickers)` | `{ total, owned, repeated, missing, progress }` | Estadísticas de progreso |
-| `useFilters(stickers)` | `StickerWithState[]` | Grid de figuras con filtros, búsqueda y sección activa aplicados |
-| `useExternalAlbum(albumId)` | `{ data: { albumName, ownerName, stickers } }` | Vista pública sin sesión |
+| `useSession()` | `{ user, loading }` | todas las páginas autenticadas + `HeaderActions` + `NavMenu` |
+| `useUserAlbums(user)` | `{ instances, addAlbum, removeAlbum, renameAlbum, getInstanceById }` | `DashboardPage`, `AlbumPage` |
+| `useAlbumData(slug)` | `{ data: Sticker[] }` | `DashboardPage` (vía `AlbumCard`), `AlbumPage` |
+| `useInventory(instanceId, userId, opts?)` | `{ data: InventoryMap, update }` | `DashboardPage` (vía `AlbumCard`, lectura), `AlbumPage` (lectura + escritura) |
+| `useAlbumStats(stickers)` | `{ total, owned, repeated, missing, progress }` | `DashboardPage` (vía `AlbumCard`), `AlbumPage`, `ExternalSharePage` |
+| `useFilters(stickers)` | `StickerWithState[]` | `AlbumPage` |
+| `useExternalAlbum(albumId)` | `{ data: { albumName, ownerName, stickers } }` | `ExternalSharePage` |
+
+#### Comportamiento de caché y red
+
+| Hook | queryKey | staleTime | Notas |
+|---|---|---|---|
+| `useSession` | `['session']` | 60 s | 1 sola petición compartida. `onAuthStateChange` vive en `AuthSync` (providers.tsx), no en el hook |
+| `useUserAlbums` | `['user-albums', userId]` | default | Invalidado tras crear/archivar/renombrar |
+| `useAlbumData` | `['catalog', slug]` | Infinity | JSON local; nunca refetchea |
+| `useInventory` — prefix | `['album-prefix', instanceId]` | Infinity | `initialData` desde `slug` conocido — 0 peticiones de red |
+| `useInventory` — catalog ID | `['album-catalog-id', instanceId]` | Infinity | `initialData` desde `albumCatalogId` conocido — 0 peticiones de red |
+| `useInventory` — UUID map | `['catalog-uuids', instanceId]` | Infinity | **Lazy**: solo se fetcha en la primera escritura |
+| `useInventory` — inventario | `['inventory', instanceId, userId]` | 30 s | Optimistic updates + debounce 300 ms en `onSettled` |
+| `useExternalAlbum` | `['external-album', albumId]` | 60 s | Sin sesión requerida |
+
+#### Firma completa de `useInventory`
+
+```ts
+useInventory(
+  instanceId: string,
+  userId: string | null,
+  opts?: { slug?: string; albumCatalogId?: string }
+)
+```
+
+Pasar `slug` y `albumCatalogId` (siempre disponibles desde `UserAlbumInstance`) evita queries extra a `user_albums`.
+
+---
+
+### Caché y recarga de página
+
+TanStack Query almacena su caché **en memoria**. Eso tiene dos implicaciones importantes:
+
+| Situación | Resultado |
+|---|---|
+| **Navegación cliente** (Link / router.push) | La caché está viva → los hooks devuelven datos al instante; solo refetchean si el `staleTime` expiró |
+| **Recarga dura** (F5 / Ctrl+R / abrir URL directa) | La caché se destruye → la página ejecuta su conjunto completo de peticiones de red como si fuera la primera visita |
+
+Esto significa que los tiempos de carga que se describen abajo corresponden a la primera visita **o a cualquier recarga**. Al navegar entre páginas en la misma sesión, la mayoría de los datos ya están en caché y no generan tráfico.
+
+#### Qué carga siempre al levantar la página (cualquier ruta autenticada)
+
+`Providers` monta `AuthSync` la primera vez que el árbol React se inicializa. Esto dispara:
+
+```
+GET /auth/v1/user    ← useSession (queryKey ['session'], staleTime 60s)
+```
+
+Todas las demás queries dependen de que este valor esté disponible.
+
+---
+
+### Peticiones de red por página
+
+Mapa de qué se solicita, en qué orden y por qué hook, al cargar cada ruta por primera vez (o tras recarga).
+
+#### `/` — Dashboard
+
+```
+1. GET /auth/v1/user                          useSession (AuthSync — 1 vez global)
+2. GET user_albums?select=id,name,...         useUserAlbums.fetchInstances
+   — devuelve slug + albumCatalogId por álbum; alimenta initialData de useInventory
+
+Por cada tarjeta de álbum (en paralelo):
+3. GET user_stickers?...                      useInventory.fetchInventory (inventario para stats)
+   — prefix y albumCatalogId vienen de initialData, sin queries extra
+   — UUID map (stickers_catalog) NO se carga aquí: es lazy
+```
+
+> Con N álbumes: **2 + N peticiones**.
+
+#### `/album/[albumId]` — Álbum completo
+
+```
+1. GET /auth/v1/user                          useSession (cache hit si viene del dashboard)
+2. GET user_albums?select=id,name,...         useUserAlbums.fetchInstances (devuelve slug + albumCatalogId)
+   — useInventory espera a que instance resuelva antes de disparar sus queries
+3. import @/data/treyes.json (o panini)       useAlbumData — bundle local, sin red
+4. GET user_stickers?...                      useInventory.fetchInventory
+   — prefix y albumCatalogId vienen de initialData (slug/albumCatalogId ya conocidos)
+5. GET stickers_catalog?...                   useInventory.fetchCatalogUUIDs (lazy, solo 1ª vez)
+```
+
+> **5 peticiones** en primera visita o recarga; al navegar desde el dashboard: 1–2 (todo en caché).
+>
+> ⚠️ **Patrón anti-race-condition**: `useInventory` recibe `userId: null` mientras `instance`
+> todavía no resolvió. Esto evita que sus queries internas se disparen sin `slug` /
+> `albumCatalogId` y generen llamadas redundantes a `user_albums`. Patrón correcto:
+> ```tsx
+> const { data: inventory } = useInventory(
+>   instanceId,
+>   instance ? (user?.id ?? null) : null,  // espera a que instance resuelva
+>   { slug: instance?.slug, albumCatalogId: instance?.albumCatalogId }
+> );
+> ```
+
+#### `/share/[token]` — Panel de compartir (dueño)
+
+```
+Al recargar la página (mismas peticiones que /album/[albumId]):
+1. GET /auth/v1/user                          useSession
+2. GET user_albums?select=id,name,...         useUserAlbums.fetchInstances
+3. import @/data/treyes.json (o panini)       useAlbumData
+4. GET user_stickers?...                      useInventory.fetchInventory
+   — useInventory espera a que instance resuelva (mismo patrón anti-race-condition)
+
+Al navegar desde /album/[albumId]:
+→ Todas las queries están en caché. 0 peticiones de red.
+```
+
+> **4 peticiones** en recarga. Al navegar desde el álbum: **0 peticiones**.
+
+#### `/external-share/[albumId]` — Vista pública
+
+```
+1. GET user_albums?...                        useExternalAlbum (slug + userId del dueño)
+2. GET profiles?...                           useExternalAlbum (nombre del dueño)
+3. GET user_stickers?...                      useExternalAlbum (inventario del dueño)
+   + import JSON local                        useExternalAlbum (catálogo)
+```
+
+> **3 peticiones**. Sin sesión requerida.
 
 ### Helpers puros (`catalogHelpers.ts`)
 
@@ -147,10 +268,18 @@ Solo para preferencias de UI de sesión. **No almacenes datos de negocio aquí.*
 ```tsx
 const { user } = useSession();
 const { getInstanceById } = useUserAlbums(user);
-const instance = getInstanceById(albumId);          // { id, slug, name }
+const instance = getInstanceById(albumId);   // { id, slug, albumCatalogId, name }
 
 const { data: catalog }   = useAlbumData(instance?.slug);
-const { data: inventory, update } = useInventory(albumId, user?.id ?? null);
+
+// ⚠️ Pasar `instance ? userId : null` evita la race condition:
+// si useInventory recibe userId antes de que instance resuelva, dispara queries
+// a user_albums sin slug/albumCatalogId, generando llamadas redundantes.
+const { data: inventory, update } = useInventory(
+  albumId,
+  instance ? (user?.id ?? null) : null,
+  { slug: instance?.slug, albumCatalogId: instance?.albumCatalogId }
+);
 
 const stickers = useMemo(
   () => mergeWithInventory(catalog ?? [], inventory ?? {}),
@@ -159,6 +288,11 @@ const stickers = useMemo(
 
 const stats    = useAlbumStats(stickers);   // { total, owned, missing, … }
 const filtered = useFilters(stickers);      // aplica filtros de uiStore
+
+// Para grids grandes (600+ figuras), diferir el render con useDeferredValue
+// libera el hilo para que el header y las stats aparezcan de inmediato:
+const deferredFiltered = useDeferredValue(filtered);
+const isGridPending = deferredFiltered !== filtered;
 ```
 
 ### Página pública (sin sesión)
