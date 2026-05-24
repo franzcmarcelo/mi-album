@@ -9,7 +9,7 @@ import { ModalSheet, SectionGroup } from './AddOwnedModal';
 interface AddRepeatedModalProps {
   open: boolean;
   onClose: () => void;
-  onAdd: (selections: Array<{ stickerId: string; quantity: number }>) => void;
+  onAdd: (selections: Array<{ stickerId: string; quantity: number; state: 'repeated' | 'owned' }>) => void;
   repeatableStickers: StickerWithState[];
 }
 
@@ -55,9 +55,24 @@ export function AddRepeatedModal({ open, onClose, onAdd, repeatableStickers }: A
   }
 
   function handleConfirm() {
-    const selections = Object.entries(quantities).map(([stickerId, quantity]) => ({ stickerId, quantity }));
-    if (selections.length === 0) return;
-    onAdd(selections);
+    const changed: Array<{ stickerId: string; quantity: number; state: 'repeated' | 'owned' }> = [];
+
+    // Figuras nuevas o con cantidad modificada
+    for (const [stickerId, quantity] of Object.entries(quantities)) {
+      if (defaultQuantities[stickerId] !== quantity) {
+        changed.push({ stickerId, quantity, state: 'repeated' });
+      }
+    }
+
+    // Figuras deseleccionadas que antes eran repetidas → degradar a "owned"
+    for (const stickerId of Object.keys(defaultQuantities)) {
+      if (!quantities[stickerId]) {
+        changed.push({ stickerId, quantity: 1, state: 'owned' });
+      }
+    }
+
+    if (changed.length === 0) { onClose(); return; }
+    onAdd(changed);
     setQuantities({});
     onClose();
   }

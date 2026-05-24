@@ -214,8 +214,8 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         onClose={() => setAddRepeatedOpen(false)}
         repeatableStickers={repeatableStickers}
         onAdd={(selections) => {
-          selections.forEach(({ stickerId, quantity }) => {
-            update.mutate({ stickerId, state: 'repeated', quantity });
+          selections.forEach(({ stickerId, quantity, state }) => {
+            update.mutate({ stickerId, state, quantity });
           });
         }}
       />

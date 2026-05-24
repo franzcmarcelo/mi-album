@@ -1,24 +1,34 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { InventoryMap, StickerState } from '@/types';
 import { catalogPrefix, buildInventoryMap } from '@/lib/catalogHelpers';
 
+// Obtiene y cachea el prefijo del álbum (slug nunca cambia → staleTime: Infinity)
+async function fetchAlbumPrefix(instanceId: string): Promise<string> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from('user_albums')
+    .select('albums_catalog!inner(slug)')
+    .eq('id', instanceId)
+    .single();
+  if (!data) return '';
+  return catalogPrefix((data.albums_catalog as unknown as { slug: string }).slug);
+}
+
 // Mapea localId → UUID de stickers_catalog (necesario para escribir en user_stickers)
-async function fetchCatalogUUIDs(instanceId: string): Promise<Record<string, string>> {
+async function fetchCatalogUUIDs(instanceId: string, prefix: string): Promise<Record<string, string>> {
   const supabase = createClient();
 
   const { data: albumRow } = await supabase
     .from('user_albums')
-    .select('album_catalog_id, albums_catalog!inner(slug)')
+    .select('album_catalog_id')
     .eq('id', instanceId)
     .single();
 
   if (!albumRow) return {};
-
-  const slug = (albumRow.albums_catalog as unknown as { slug: string }).slug;
-  const prefix = catalogPrefix(slug);
 
   const { data: catalogStickers } = await supabase
     .from('stickers_catalog')
@@ -33,22 +43,10 @@ async function fetchCatalogUUIDs(instanceId: string): Promise<Record<string, str
 }
 
 // Devuelve el inventario del usuario como InventoryMap (localId → UserSticker)
-async function fetchInventory(instanceId: string): Promise<InventoryMap> {
+// El prefijo viene cacheado — esta función solo hace UNA query a user_stickers
+async function fetchInventory(instanceId: string, prefix: string): Promise<InventoryMap> {
   const supabase = createClient();
 
-  // Obtener slug para derivar el prefijo
-  const { data: albumRow } = await supabase
-    .from('user_albums')
-    .select('albums_catalog!inner(slug)')
-    .eq('id', instanceId)
-    .single();
-
-  if (!albumRow) return {};
-  const prefix = catalogPrefix(
-    (albumRow.albums_catalog as unknown as { slug: string }).slug
-  );
-
-  // Obtener figuras marcadas por el usuario
   const { data, error } = await supabase
     .from('user_stickers')
     .select('state, quantity, marked_at, stickers_catalog!inner(number)')
@@ -69,18 +67,34 @@ async function fetchInventory(instanceId: string): Promise<InventoryMap> {
 
 export function useInventory(instanceId: string, userId: string | null) {
   const qc = useQueryClient();
+  const invalidateTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  useQuery({
-    queryKey: ['catalog-uuids', instanceId],
+  // Limpia el timer al desmontar para evitar actualizaciones en componentes desmontados
+  useEffect(() => {
+    return () => clearTimeout(invalidateTimerRef.current);
+  }, []);
+
+  // Prefijo del álbum — cacheado para siempre, se obtiene una sola vez
+  const { data: prefix = '' } = useQuery({
+    queryKey: ['album-prefix', instanceId],
     enabled: !!instanceId && !!userId,
     staleTime: Infinity,
-    queryFn: () => fetchCatalogUUIDs(instanceId),
+    queryFn: () => fetchAlbumPrefix(instanceId),
   });
 
+  // Mapa UUID — cacheado para siempre, ahora no necesita re-consultar user_albums
+  useQuery({
+    queryKey: ['catalog-uuids', instanceId],
+    enabled: !!instanceId && !!userId && !!prefix,
+    staleTime: Infinity,
+    queryFn: () => fetchCatalogUUIDs(instanceId, prefix),
+  });
+
+  // Inventario del usuario — solo consulta user_stickers (el prefijo ya está cacheado)
   const query = useQuery({
     queryKey: ['inventory', instanceId, userId],
-    enabled: !!instanceId && !!userId,
-    queryFn: () => fetchInventory(instanceId),
+    enabled: !!instanceId && !!userId && !!prefix,
+    queryFn: () => fetchInventory(instanceId, prefix),
     staleTime: 30_000,
   });
 
@@ -107,8 +121,12 @@ export function useInventory(instanceId: string, userId: string | null) {
         qc.setQueryData(['inventory', instanceId, userId], context.previous);
       }
     },
+    // Debounce: N mutaciones rápidas consecutivas generan un solo refetch al terminar
     onSettled: () => {
-      qc.invalidateQueries({ queryKey: ['inventory', instanceId] });
+      clearTimeout(invalidateTimerRef.current);
+      invalidateTimerRef.current = setTimeout(() => {
+        qc.invalidateQueries({ queryKey: ['inventory', instanceId] });
+      }, 300);
     },
     mutationFn: async ({
       stickerId,
@@ -123,7 +141,7 @@ export function useInventory(instanceId: string, userId: string | null) {
 
       let uuidMap = qc.getQueryData<Record<string, string>>(['catalog-uuids', instanceId]);
       if (!uuidMap) {
-        uuidMap = await fetchCatalogUUIDs(instanceId);
+        uuidMap = await fetchCatalogUUIDs(instanceId, prefix);
         qc.setQueryData(['catalog-uuids', instanceId], uuidMap);
       }
 
