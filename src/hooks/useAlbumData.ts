@@ -1,5 +1,17 @@
 'use client';
 
+/**
+ * useAlbumData
+ * Carga el catálogo estático de figuras (JSON local) para un álbum dado.
+ *
+ * staleTime: Infinity — el catálogo nunca cambia en runtime.
+ * queryKey: ['catalog', albumSlug]
+ *
+ * Consumidores:
+ *   - app/(app)/page.tsx            (DashboardPage — vía AlbumCard, para merge con inventario)
+ *   - app/(app)/album/[albumId]/page.tsx
+ */
+
 import { useQuery } from '@tanstack/react-query';
 import { Sticker } from '@/types';
 

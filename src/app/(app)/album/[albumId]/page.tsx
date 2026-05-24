@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { use, useEffect, useState, useDeferredValue } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
@@ -33,12 +33,23 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
   const catalogMeta = instance ? AVAILABLE_ALBUMS.find((a) => a.slug === instance.slug) : null;
 
   const { data: catalog = [], isLoading: catalogLoading } = useAlbumData(instance?.slug ?? '');
-  const { data: inventory = {}, update } = useInventory(instanceId, user?.id ?? null);
+  // Pasar userId solo cuando instance ya resolvió — evita que useInventory dispare
+  // fetchAlbumPrefix y fetchAlbumCatalogId antes de tener slug y albumCatalogId disponibles.
+  const { data: inventory = {}, update } = useInventory(
+    instanceId,
+    instance ? (user?.id ?? null) : null,
+    { slug: instance?.slug, albumCatalogId: instance?.albumCatalogId }
+  );
 
   const stickers = mergeWithInventory(catalog, inventory);
   const filtered = useFilters(stickers);
   const stats = useAlbumStats(stickers);
   const sections = getSections(catalog);
+
+  // Difiere el render del grid (hasta 706 tarjetas) a una pasada de menor prioridad,
+  // liberando el thread para que el header/stats/toolbar aparezcan de inmediato.
+  const deferredFiltered = useDeferredValue(filtered);
+  const isGridPending = deferredFiltered !== filtered;
 
   useEffect(() => {
     setFilter('all');
@@ -191,10 +202,10 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
       <SectionNav sections={sections} stickers={stickers} />
 
       <FiguriteGrid
-        stickers={filtered}
+        stickers={deferredFiltered}
         currentFilter={filter}
         onUpdate={(id, state, qty) => update.mutate({ stickerId: id, state, quantity: qty })}
-        isLoading={isLoading}
+        isLoading={isLoading || isGridPending}
       />
 
       {/* Modals */}

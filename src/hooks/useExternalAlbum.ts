@@ -1,5 +1,17 @@
 'use client';
 
+/**
+ * useExternalAlbum
+ * Carga el álbum compartido públicamente (sin sesión requerida).
+ * Combina catálogo estático + inventario del dueño en un único fetch.
+ *
+ * queryKey: ['external-album', albumId]  staleTime: 60s
+ *
+ * Consumidores:
+ *   - app/external-share/[albumId]/page.tsx  (vista pública de solo lectura)
+ *   - app/external-share/[albumId]/opengraph-image.tsx  (OG image — usa fetch REST directo)
+ */
+
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { StickerWithState } from '@/types';

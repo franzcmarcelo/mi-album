@@ -1,5 +1,17 @@
 'use client';
 
+/**
+ * useUserAlbums
+ * CRUD de instancias de álbum del usuario autenticado.
+ *
+ * Expone: { instances, isLoading, addAlbum, removeAlbum, renameAlbum, getInstanceById }
+ * queryKey: ['user-albums', userId]
+ *
+ * Consumidores:
+ *   - app/(app)/page.tsx            (DashboardPage — lista + operaciones)
+ *   - app/(app)/album/[albumId]/page.tsx  (solo getInstanceById para resolver slug/nombre)
+ */
+
 import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { User } from '@supabase/supabase-js';
@@ -15,7 +27,7 @@ async function fetchInstances(userId: string): Promise<UserAlbumInstance[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('user_albums')
-    .select('id, name, status, started_at, albums_catalog!inner(slug)')
+    .select('id, name, status, started_at, album_catalog_id, albums_catalog!inner(slug)')
     .eq('user_id', userId)
     .neq('status', 'archived')
     .order('started_at', { ascending: true });
@@ -26,6 +38,7 @@ async function fetchInstances(userId: string): Promise<UserAlbumInstance[]> {
     id: row.id,
     slug: (row.albums_catalog as unknown as { slug: string }).slug,
     name: row.name,
+    albumCatalogId: row.album_catalog_id,
     createdAt: row.started_at,
   }));
 }

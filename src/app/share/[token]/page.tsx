@@ -121,7 +121,11 @@ function AlbumShareView({ instanceId }: { instanceId: string }) {
   const catalogMeta = AVAILABLE_ALBUMS.find((a) => a.slug === instance?.slug);
 
   const { data: catalog = [], isLoading: catalogLoading } = useAlbumData(instance?.slug ?? '');
-  const { data: inventory = {} } = useInventory(instanceId, user?.id ?? null);
+  const { data: inventory = {} } = useInventory(
+    instanceId,
+    instance ? (user?.id ?? null) : null,
+    { slug: instance?.slug, albumCatalogId: instance?.albumCatalogId }
+  );
 
   const stickers = mergeWithInventory(catalog, inventory);
   const { missing, repeated } = useAlbumStats(stickers);

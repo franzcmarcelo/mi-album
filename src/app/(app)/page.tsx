@@ -117,7 +117,10 @@ function AlbumCard({ instance, userId, onRemove, onRename }: {
 }) {
   const catalog = AVAILABLE_ALBUMS.find((a) => a.slug === instance.slug)!;
   const { data: stickers = [] } = useAlbumData(instance.slug);
-  const { data: inventory = {} } = useInventory(instance.id, userId);
+  const { data: inventory = {} } = useInventory(instance.id, userId, {
+    slug: instance.slug,
+    albumCatalogId: instance.albumCatalogId,
+  });
   const stats = useAlbumStats(mergeWithInventory(stickers, inventory));
 
   return (

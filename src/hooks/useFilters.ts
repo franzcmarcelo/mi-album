@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * useFilters
+ * Aplica el filtro activo (all/owned/missing/repeated), la sección activa
+ * y el texto de búsqueda del uiStore a un array de StickerWithState.
+ * Puro — no hace red ni efectos.
+ *
+ * Consumidores:
+ *   - app/(app)/album/[albumId]/page.tsx
+ */
+
 import { useMemo } from 'react';
 import { useUIStore } from '@/store/uiStore';
 import { StickerWithState } from '@/types';

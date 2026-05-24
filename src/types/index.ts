@@ -50,6 +50,7 @@ export interface UserAlbumInstance {
   id: string;
   slug: string;
   name: string;
+  albumCatalogId: string;
   createdAt: string;
 }
 
