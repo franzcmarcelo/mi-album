@@ -81,6 +81,7 @@ export function useInventory(instanceId: string, userId: string | null) {
     queryKey: ['inventory', instanceId, userId],
     enabled: !!instanceId && !!userId,
     queryFn: () => fetchInventory(instanceId),
+    staleTime: 30_000,
   });
 
   const update = useMutation({
@@ -105,6 +106,8 @@ export function useInventory(instanceId: string, userId: string | null) {
       if (context?.previous !== undefined) {
         qc.setQueryData(['inventory', instanceId, userId], context.previous);
       }
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['inventory', instanceId] });
     },
     mutationFn: async ({
@@ -126,8 +129,7 @@ export function useInventory(instanceId: string, userId: string | null) {
 
       const stickerCatalogId = uuidMap[stickerId];
       if (!stickerCatalogId) {
-        console.error('[update] UUID not found for', stickerId);
-        return;
+        throw new Error(`UUID no encontrado para la figura ${stickerId}`);
       }
 
       const supabase = createClient();
