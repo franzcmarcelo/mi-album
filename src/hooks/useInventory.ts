@@ -3,24 +3,27 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { InventoryMap, StickerState } from '@/types';
+import { catalogPrefix, buildInventoryMap } from '@/lib/catalogHelpers';
 
+// Mapea localId → UUID de stickers_catalog (necesario para escribir en user_stickers)
 async function fetchCatalogUUIDs(instanceId: string): Promise<Record<string, string>> {
   const supabase = createClient();
-  const { data: userAlbum } = await supabase
+
+  const { data: albumRow } = await supabase
     .from('user_albums')
     .select('album_catalog_id, albums_catalog!inner(slug)')
     .eq('id', instanceId)
     .single();
 
-  if (!userAlbum) return {};
+  if (!albumRow) return {};
 
-  const slug = (userAlbum.albums_catalog as unknown as { slug: string }).slug;
-  const prefix = slug.startsWith('3reyes') ? 'treyes' : 'panini';
+  const slug = (albumRow.albums_catalog as unknown as { slug: string }).slug;
+  const prefix = catalogPrefix(slug);
 
   const { data: catalogStickers } = await supabase
     .from('stickers_catalog')
     .select('id, number')
-    .eq('album_id', userAlbum.album_catalog_id);
+    .eq('album_id', albumRow.album_catalog_id);
 
   const map: Record<string, string> = {};
   for (const s of catalogStickers ?? []) {
@@ -29,31 +32,39 @@ async function fetchCatalogUUIDs(instanceId: string): Promise<Record<string, str
   return map;
 }
 
+// Devuelve el inventario del usuario como InventoryMap (localId → UserSticker)
 async function fetchInventory(instanceId: string): Promise<InventoryMap> {
   const supabase = createClient();
+
+  // Obtener slug para derivar el prefijo
+  const { data: albumRow } = await supabase
+    .from('user_albums')
+    .select('albums_catalog!inner(slug)')
+    .eq('id', instanceId)
+    .single();
+
+  if (!albumRow) return {};
+  const prefix = catalogPrefix(
+    (albumRow.albums_catalog as unknown as { slug: string }).slug
+  );
+
+  // Obtener figuras marcadas por el usuario
   const { data, error } = await supabase
     .from('user_stickers')
-    .select('sticker_catalog_id, state, quantity, marked_at, stickers_catalog!inner(number, album_id, albums_catalog!inner(slug))')
+    .select('state, quantity, marked_at, stickers_catalog!inner(number)')
     .eq('user_album_id', instanceId);
 
   if (error) throw error;
 
-  const map: InventoryMap = {};
-  for (const row of data ?? []) {
-    const sc = row.stickers_catalog as unknown as {
-      number: number;
-      albums_catalog: { slug: string };
-    };
-    const prefix = sc.albums_catalog.slug.startsWith('3reyes') ? 'treyes' : 'panini';
-    const localId = `${prefix}-${sc.number}`;
-    map[localId] = {
-      stickerId: localId,
-      state: row.state as StickerState,
+  return buildInventoryMap(
+    (data ?? []).map((row) => ({
+      number: (row.stickers_catalog as unknown as { number: number }).number,
+      state: row.state,
       quantity: row.quantity,
       markedAt: row.marked_at,
-    };
-  }
-  return map;
+    })),
+    prefix
+  );
 }
 
 export function useInventory(instanceId: string, userId: string | null) {

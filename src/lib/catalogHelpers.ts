@@ -1,4 +1,39 @@
-import { Sticker, InventoryMap, StickerWithState, FilterType } from '@/types';
+import { Sticker, InventoryMap, StickerState, StickerWithState, FilterType } from '@/types';
+
+/**
+ * Deriva el prefijo de ID local a partir del slug del álbum.
+ * Centraliza la única fuente de verdad del patrón "treyes-{n}" / "panini-{n}".
+ */
+export function catalogPrefix(slug: string): string {
+  return slug.startsWith('3reyes') ? 'treyes' : 'panini';
+}
+
+/**
+ * Construye un InventoryMap a partir de las filas devueltas por Supabase.
+ * Cada fila debe incluir el número secuencial interno de la figura.
+ * Este es el único lugar donde se construye la clave `${prefix}-${number}`.
+ */
+export function buildInventoryMap(
+  entries: Array<{
+    number: number;
+    state: string;
+    quantity?: number | null;
+    markedAt?: string | null;
+  }>,
+  prefix: string
+): InventoryMap {
+  const map: InventoryMap = {};
+  for (const entry of entries) {
+    const localId = `${prefix}-${entry.number}`;
+    map[localId] = {
+      stickerId: localId,
+      state: entry.state as StickerState,
+      quantity: entry.quantity ?? 1,
+      markedAt: entry.markedAt ?? '',
+    };
+  }
+  return map;
+}
 
 export function mergeWithInventory(
   catalog: Sticker[],

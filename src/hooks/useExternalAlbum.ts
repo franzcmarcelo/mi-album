@@ -2,8 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
-import { InventoryMap, StickerState, StickerWithState } from '@/types';
-import { mergeWithInventory } from '@/lib/catalogHelpers';
+import { StickerWithState } from '@/types';
+import { catalogPrefix, buildInventoryMap, mergeWithInventory } from '@/lib/catalogHelpers';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -21,8 +21,9 @@ async function fetchExternalAlbum(albumId: string) {
   const slug = (albumRow.albums_catalog as unknown as { slug: string }).slug;
   const albumName = (albumRow.name as string) ?? '';
   const userId = albumRow.user_id as string;
+  const prefix = catalogPrefix(slug);
 
-  // Fetch owner display name from public profiles
+  // Nombre del dueño desde perfiles públicos
   const { data: profileRow } = await supabase
     .from('profiles')
     .select('display_name')
@@ -30,6 +31,7 @@ async function fetchExternalAlbum(albumId: string) {
     .maybeSingle();
   const ownerName = profileRow?.display_name ?? '';
 
+  // Figuras marcadas por el dueño
   const { data: stickerRows, error: stickersErr } = await supabase
     .from('user_stickers')
     .select('state, quantity, stickers_catalog!inner(number)')
@@ -37,18 +39,14 @@ async function fetchExternalAlbum(albumId: string) {
 
   if (stickersErr) throw stickersErr;
 
-  const prefix = slug.startsWith('3reyes') ? 'treyes' : 'panini';
-  const inventory: InventoryMap = {};
-  for (const row of stickerRows ?? []) {
-    const sc = row.stickers_catalog as unknown as { number: number };
-    const localId = `${prefix}-${sc.number}`;
-    inventory[localId] = {
-      stickerId: localId,
-      state: row.state as StickerState,
-      quantity: row.quantity ?? 1,
-      markedAt: '',
-    };
-  }
+  const inventory = buildInventoryMap(
+    (stickerRows ?? []).map((row) => ({
+      number: (row.stickers_catalog as unknown as { number: number }).number,
+      state: row.state,
+      quantity: row.quantity,
+    })),
+    prefix
+  );
 
   const file = slug.startsWith('3reyes') ? 'treyes' : 'panini';
   const mod = await import(`@/data/${file}.json`);
