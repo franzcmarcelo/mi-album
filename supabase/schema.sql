@@ -146,8 +146,8 @@ create policy "public_read_user_stickers"
 -- =============================================================================
 
 insert into albums_catalog (slug, name, year, publisher, total_stickers) values
-  ('panini-2024', 'Mundial 2024',    2024, 'Panini',  145),
-  ('3reyes-2024', 'Liga Argentina',  2024, '3 Reyes', 150)
+  ('panini-2024', 'Mundial 2026',    2024, 'Panini',  145),
+  ('3reyes-2024', 'Mundial 2026',  2024, '3 Reyes', 150)
 on conflict (slug) do update set
   name           = excluded.name,
   year           = excluded.year,

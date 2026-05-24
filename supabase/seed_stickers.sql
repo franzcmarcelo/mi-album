@@ -165,7 +165,7 @@ begin
     (v_panini_id, 145, 'Especiales 10',     'Especiales')
   on conflict (album_id, number) do nothing;
 
-  -- ── 3 REYES LIGA ARGENTINA ───────────────────────────────────────────────
+  -- ── 3 REYES LIGA ───────────────────────────────────────────────
   insert into stickers_catalog (album_id, number, name, section) values
     (v_treyes_id,   1, 'Portada 1',             'Portada'),
     (v_treyes_id,   2, 'Portada 2',             'Portada'),
