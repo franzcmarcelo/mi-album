@@ -55,6 +55,6 @@ export interface UserAlbumInstance {
 
 export interface SharePayload {
   albumSlug: string;
-  owned: number[];
-  repeated: number[];
+  owned: string[];
+  repeated: string[];
 }

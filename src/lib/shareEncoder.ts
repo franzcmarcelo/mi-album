@@ -1,12 +1,12 @@
 import { SharePayload, StickerWithState } from '@/types';
 
 export function encodeInventory(stickers: StickerWithState[], albumSlug: string): string {
-  const owned: number[] = [];
-  const repeated: number[] = [];
+  const owned: string[] = [];
+  const repeated: string[] = [];
 
   for (const s of stickers) {
-    if (s.userState === 'owned') owned.push(s.number);
-    else if (s.userState === 'repeated') repeated.push(s.number);
+    if (s.userState === 'owned') owned.push(s.code);
+    else if (s.userState === 'repeated') repeated.push(s.code);
   }
 
   const payload: SharePayload = { albumSlug, owned, repeated };
