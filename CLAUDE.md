@@ -19,8 +19,9 @@ Aplicación web para gestionar el inventario digital de álbumes de figuritas Pa
 - `/external-share/<albumId>` — vista pública de solo lectura (sin auth), protegida con security headers y metadatos OG dinámicos
 - UI con tema oscuro, World Cup identity (logos, colores, animaciones)
 - SEO completo: robots.txt, sitemap.xml, metadatos globales, OG dinámico por álbum, JSON-LD
-- Catálogo 3 Reyes completo: **705 figuras reales** (584 numeradas + 6 letras A-F + 67 REPECHAJE E1-E67 + 48 ESCUDOS TROQUELADOS T1-T48)
+- Catálogo 3 Reyes completo: **706 figuras reales** (584 numeradas + 7 letras A-G + 67 REPECHAJE + 48 ESCUDOS TROQUELADOS); 80 figuras especiales verificadas contra el álbum físico
 - Figuras especiales (`isSpecial: true`): UI dorada diferenciada en `FiguriteCard` — borde, fondo, shimmer, insignia ✦
+- Arquitectura de datos centralizada: `catalogPrefix` + `buildInventoryMap` en `catalogHelpers`; cero accesos directos a Supabase desde componentes
 
 ## Convenciones de idioma
 
@@ -298,6 +299,184 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 ```
 
+## Arquitectura de datos — guía para nuevos componentes y páginas
+
+> **Regla fundamental**: ningún componente o página cliente toca `createClient()` directamente.
+> Toda lectura y escritura de datos pasa por los hooks descritos aquí.
+
+### Capas de datos
+
+```
+Supabase (PostgreSQL)
+    │
+    ├── Hooks de lectura/escritura (src/hooks/)
+    │       └── exponen datos ya procesados como StickerWithState[], InventoryMap, etc.
+    │
+    ├── Helpers puros (src/lib/catalogHelpers.ts)
+    │       └── funciones sin estado: mergeWithInventory, getStats, buildInventoryMap, …
+    │
+    └── Estado UI volátil (src/store/uiStore.ts — Zustand)
+            └── filtros, búsqueda, tamaño de card — NO se persiste
+```
+
+---
+
+### Hooks disponibles — qué expone cada uno
+
+| Hook | Importar desde | Expone | Cuándo usarlo |
+|---|---|---|---|
+| `useSession()` | `@/hooks/useSession` | `{ user, loading }` | Cuando necesitas saber si hay sesión activa |
+| `useUserAlbums(user)` | `@/hooks/useUserAlbums` | `{ instances, isLoading, addAlbum, removeAlbum, renameAlbum, getInstanceById }` + const `AVAILABLE_ALBUMS` | Dashboard, navbar, cualquier listado de álbumes del usuario |
+| `useAlbumData(slug)` | `@/hooks/useAlbumData` | `{ data: Sticker[], isLoading }` | Catálogo estático del álbum (JSON) |
+| `useInventory(instanceId, userId)` | `@/hooks/useInventory` | `{ data: InventoryMap, isLoading, update }` | Vista del álbum privado — leer y escribir inventario |
+| `useAlbumStats(stickers)` | `@/hooks/useAlbumStats` | `{ total, owned, repeated, missing, progress }` | Resumen numérico de progreso — cualquier UI que muestre estadísticas |
+| `useFilters(stickers)` | `@/hooks/useFilters` | `StickerWithState[]` filtrados | Grid de figuritas — aplica filtro, búsqueda y sección activa |
+| `useExternalAlbum(albumId)` | `@/hooks/useExternalAlbum` | `{ data: { slug, albumName, ownerName, stickers }, isLoading, error }` | Vista pública `/external-share` — sin sesión requerida |
+
+---
+
+### Helpers puros (`src/lib/catalogHelpers.ts`)
+
+No son hooks — se llaman como funciones normales, sin estado, sin efectos.
+
+| Función | Qué hace |
+|---|---|
+| `mergeWithInventory(catalog, inventory)` | Combina catálogo JSON + InventoryMap → `StickerWithState[]`. Es el paso central para renderizar figuras con estado. |
+| `getStats(stickers)` | Calcula `{ total, owned, repeated, missing, progress }` a partir de un array ya mergeado. |
+| `getSectionStats(stickers, section)` | Igual que `getStats` pero filtrando por sección. Úsalo en pills de sección. |
+| `getSections(stickers)` | Devuelve lista de secciones únicas. |
+| `applyFilter(stickers, filter)` | Filtra por estado ('all', 'owned', 'missing', 'repeated'). |
+| `catalogPrefix(slug)` | Devuelve `'treyes'` o `'panini'` según el slug. Nunca lo hardcodees. |
+| `buildInventoryMap(entries, prefix)` | Construye `InventoryMap` desde filas de Supabase. Solo usarlo en hooks, no en componentes. |
+
+---
+
+### Estado UI global (`src/store/uiStore.ts`)
+
+```ts
+const { filter, setFilter,
+        activeSection, setActiveSection,
+        cardSize, setCardSize,
+        searchQuery, setSearchQuery } = useUIStore();
+```
+
+- **No persiste** entre recargas (estado volátil de sesión)
+- Solo para preferencias de UI: qué filtro está activo, tamaño de card, búsqueda
+- **No almacena datos de negocio** — nunca guardes stickers, stats o inventario aquí
+
+---
+
+### Cómo construir un nuevo componente o página
+
+#### Página autenticada que muestra el álbum de un usuario
+
+```tsx
+// 1. Sesión
+const { user, loading } = useSession();
+
+// 2. Álbumes del usuario
+const { instances, getInstanceById } = useUserAlbums(user);
+const instance = getInstanceById(albumId); // → { id, slug, name }
+
+// 3. Catálogo (JSON estático)
+const { data: catalog } = useAlbumData(instance?.slug);
+
+// 4. Inventario (BD)
+const { data: inventory, update } = useInventory(albumId, user?.id ?? null);
+
+// 5. Combinar catálogo + inventario
+const stickers = useMemo(
+  () => mergeWithInventory(catalog ?? [], inventory ?? {}),
+  [catalog, inventory]
+);
+
+// 6. Stats
+const stats = useAlbumStats(stickers); // { total, owned, missing, repeated, progress }
+
+// 7. Filtrado (si hay grid de figuras)
+const filtered = useFilters(stickers); // aplica filter + búsqueda + sección activa
+```
+
+#### Página pública (sin sesión)
+
+```tsx
+const { data, isLoading, error } = useExternalAlbum(albumId);
+// data → { slug, albumName, ownerName, stickers: StickerWithState[] }
+// stickers ya tiene userState, isSpecial, etc.
+const stats = useAlbumStats(data?.stickers ?? []);
+```
+
+#### Componente que solo muestra stats (sin lógica de datos)
+
+```tsx
+// Recibe stickers por props o del contexto del padre — no hace fetch propio
+function MyStatsWidget({ stickers }: { stickers: StickerWithState[] }) {
+  const { owned, missing, progress } = useAlbumStats(stickers);
+  // …
+}
+```
+
+#### Marcar una figura
+
+```tsx
+// Siempre a través de update.mutate — nunca toques Supabase directamente
+update.mutate({ stickerId: sticker.id, state: 'owned', quantity: 1 });
+update.mutate({ stickerId: sticker.id, state: 'repeated', quantity: 3 });
+update.mutate({ stickerId: sticker.id, state: null }); // eliminar
+```
+
+---
+
+### Excepciones justificadas (no son errores de arquitectura)
+
+| Archivo | Por qué accede directo a Supabase |
+|---|---|
+| `external-share/[albumId]/layout.tsx` | Server Component — `generateMetadata()` no puede usar hooks cliente; necesita el título del álbum para el OG tag |
+| `external-share/[albumId]/opengraph-image.tsx` | Edge runtime — el cliente Supabase (basado en cookies) es incompatible con edge; usa fetch REST con la anon key |
+| `middleware.ts` | Capa de infraestructura — refresca cookies de sesión en cada request |
+| `api/auth/callback/route.ts` | Route handler de OAuth — necesario para el intercambio de código de Supabase |
+
+---
+
+### Flujo de datos por escenario
+
+**Usuario ve su álbum privado:**
+`useSession` → `useUserAlbums` → `useAlbumData` + `useInventory` → `mergeWithInventory` → `useAlbumStats` + `useFilters` → componentes de UI
+
+**Usuario marca una figura:**
+`FiguriteCard onClick` → `update.mutate()` en `useInventory` → optimistic update en cache → `upsert` en Supabase `user_stickers` → rollback si falla
+
+**Usuario comparte su álbum:**
+`/share/[instanceId]` → misma pila que arriba (lectura) + genera URL `/external-share/<instanceId>` en el cliente
+
+**Visitante ve álbum compartido:**
+`useExternalAlbum` → 3 queries anónimas (user_albums, profiles, user_stickers) → `buildInventoryMap` → `mergeWithInventory` → UI de solo lectura
+
+---
+
+### Lo que NUNCA debe hacer un componente
+
+```tsx
+// ❌ NUNCA: acceso directo a Supabase
+const supabase = createClient();
+const { data } = await supabase.from('user_stickers').select('*');
+
+// ❌ NUNCA: importar catálogo JSON directamente
+import catalog from '@/data/treyes.json';
+
+// ❌ NUNCA: calcular estadísticas manualmente
+const owned = stickers.filter(s => s.userState === 'owned').length; // usa getStats()
+
+// ❌ NUNCA: hardcodear el prefijo
+const id = `treyes-${sticker.number}`; // usa catalogPrefix(slug)
+
+// ✅ CORRECTO: todo pasa por los hooks y helpers
+const { data: catalog } = useAlbumData(slug);
+const { data: inventory, update } = useInventory(instanceId, userId);
+const stickers = mergeWithInventory(catalog ?? [], inventory ?? {});
+const stats = useAlbumStats(stickers);
+```
+
 ## Patrones de UI
 
 ### Layout del álbum (`album/[albumId]/page.tsx`)
@@ -352,22 +531,30 @@ Estructura de arriba hacia abajo:
 
 ## Catálogo 3 Reyes — estructura y convenciones
 
-El catálogo 3 Reyes tiene **705 figuras** distribuidas en:
+El catálogo 3 Reyes tiene **706 figuras** distribuidas en:
 
 | Tipo | Cantidad | `code` | `isSpecial` |
 |---|---|---|---|
-| Figuras numeradas (países) | 584 | `"1"` … `"N"` | `false` |
-| Letras de sección (A-F) | 6 | `"A"` … `"F"` | `true` |
+| Figuras numeradas (países) | 584 | `"1"` … `"N"` | mayoría `false`; 80 de ellas `true` |
+| Letras de sección (A-G) | 7 | `"A"` … `"G"` | `false` |
 | REPECHAJE | 67 | `"E1"` … `"E67"` | `false` |
-| ESCUDOS TROQUELADOS | 48 | `"T1"` … `"T48"` | `true` |
+| ESCUDOS TROQUELADOS | 48 | `"T1"` … `"T48"` | `false` |
+
+Las **80 figuras especiales** (`isSpecial: true`) son figuras numeradas específicas del álbum físico (verificadas contra el álbum real). No son las letras ni los escudos.
+
+Letras de sección y su posición secuencial:
+- A → number=33 (REPÚBLICA CHECA) · B → number=80 (BOSNIA Y HERZ)
+- C → number=196 (TURQUÍA) · D → number=266 (SUECIA)
+- E → number=428 (IRAK) · F → number=521 (R.D. CONGO) · G → number=329 (IRÁN)
 
 **Patrón `number` vs `code`:**
-- `number` (`INT`): clave de orden interno secuencial 1-705 — nunca se muestra al usuario
+- `number` (`INT`): clave de orden interno secuencial 1-706 — nunca se muestra al usuario
 - `code` (`TEXT`): identificador visible — puede ser numérico (`"33"`), letra (`"A"`), alfanumérico (`"T1"`, `"E67"`)
+- `id` local del JSON: siempre `treyes-{number}` (ej: `treyes-329` para la G de Irán)
 
-Las letras A-F se insertan dentro de la secuencia numérica de su país (ej: REPÚBLICA CHECA tiene 33-48, la letra A es el número interno 33 con `code="A"`).
+Las letras se insertan dentro de la secuencia numérica de su país; todos los stickers posteriores tienen `number = code_numérico + offset_de_letras_anteriores`.
 
-`mergeWithInventory` usa spread `...sticker` por lo que `isSpecial` se propaga automáticamente desde el JSON sin tocar `useInventory.ts`.
+`mergeWithInventory` usa spread `...sticker`, por lo que `isSpecial` se propaga automáticamente desde el JSON.
 
 ## Reglas de negocio clave
 
@@ -382,7 +569,7 @@ Las letras A-F se insertan dentro de la secuencia numérica de su país (ej: REP
 
 ### Figuras especiales (`isSpecial: true`)
 
-Las figuras especiales (letras A-F y ESCUDOS TROQUELADOS T1-T48, 54 en total) reciben un tratamiento visual diferenciado en `FiguriteCard`:
+Las figuras especiales (80 figuras numeradas concretas del álbum físico) reciben un tratamiento visual diferenciado en `FiguriteCard`:
 
 - **Borde dorado**: `rgba(251,191,36,0.55)` si conseguida, `rgba(251,191,36,0.3)` si faltante
 - **Fondo**: gradiente verde+dorado si conseguida, tinte dorado tenue si faltante
@@ -421,5 +608,6 @@ npx tsc --noEmit     # Verificar tipos sin compilar
 - **Fase 1** ✓: frontend solo, localStorage, URL compartible sin backend
 - **Fase 2** ✓: Google Auth + Supabase BD + multi-álbum + autenticación obligatoria + share público `/external-share`
 - **Fase 2.5** ✓: SEO (robots, sitemap, metadatos globales, OG dinámico), seguridad (middleware consolidado, RLS fix), responsive login, español neutro en UI
-- **Fase 2.6** ✓: Catálogo 3 Reyes completo (705 figuras reales), campo `isSpecial`, UI dorada para figuras especiales
+- **Fase 2.6** ✓: Catálogo 3 Reyes completo (706 figuras reales), campo `isSpecial`, UI dorada para figuras especiales, figura G para Irán
+- **Fase 2.7** ✓: Centralización de arquitectura de datos — `catalogPrefix`, `buildInventoryMap` en `catalogHelpers`; corrección de bugs UUID en `useInventory` y `useExternalAlbum`; documentación de flujos
 - **Fase 3** (futura): intercambios entre usuarios, notificaciones, grupos
