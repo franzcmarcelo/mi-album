@@ -19,12 +19,12 @@ async function fetchCatalogUUIDs(instanceId: string): Promise<Record<string, str
 
   const { data: catalogStickers } = await supabase
     .from('stickers_catalog')
-    .select('id, code')
+    .select('id, number')
     .eq('album_id', userAlbum.album_catalog_id);
 
   const map: Record<string, string> = {};
   for (const s of catalogStickers ?? []) {
-    map[`${prefix}-${s.code}`] = s.id;
+    map[`${prefix}-${s.number}`] = s.id;
   }
   return map;
 }
@@ -33,7 +33,7 @@ async function fetchInventory(instanceId: string): Promise<InventoryMap> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('user_stickers')
-    .select('sticker_catalog_id, state, quantity, marked_at, stickers_catalog!inner(code, album_id, albums_catalog!inner(slug))')
+    .select('sticker_catalog_id, state, quantity, marked_at, stickers_catalog!inner(number, album_id, albums_catalog!inner(slug))')
     .eq('user_album_id', instanceId);
 
   if (error) throw error;
@@ -41,11 +41,11 @@ async function fetchInventory(instanceId: string): Promise<InventoryMap> {
   const map: InventoryMap = {};
   for (const row of data ?? []) {
     const sc = row.stickers_catalog as unknown as {
-      code: string;
+      number: number;
       albums_catalog: { slug: string };
     };
     const prefix = sc.albums_catalog.slug.startsWith('3reyes') ? 'treyes' : 'panini';
-    const localId = `${prefix}-${sc.code}`;
+    const localId = `${prefix}-${sc.number}`;
     map[localId] = {
       stickerId: localId,
       state: row.state as StickerState,
