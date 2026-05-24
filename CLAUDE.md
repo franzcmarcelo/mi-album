@@ -48,8 +48,7 @@ src/
 │   │   ├── layout.tsx                    # Layout autenticado: navbar sticky, aurora blobs, logo ghost (next/image)
 │   │   ├── page.tsx                      # Dashboard: WCHero banner + grid de álbumes
 │   │   ├── HeaderActions.tsx             # Avatar de usuario + indicador de sesión en navbar
-│   │   ├── NavMenu.tsx                   # Menú hamburguesa (navegación lateral/dropdown)
-│   │   ├── LogoutButton.tsx              # Botón cerrar sesión
+│   │   ├── NavMenu.tsx                   # Menú hamburguesa (navegación lateral/dropdown, logout inline)
 │   │   └── album/[albumId]/page.tsx      # Vista de álbum: progreso, filtros, grid de figuritas
 │   ├── share/[token]/page.tsx            # Vista compartir del propietario (requiere sesión)
 │   ├── external-share/[albumId]/
@@ -69,15 +68,9 @@ src/
 │   │   └── AddRepeatedModal.tsx          # Modal para marcar figuritas como "repetidas" con cantidad
 │   ├── dashboard/
 │   │   ├── AlbumCover.tsx                # Portada de álbum (Panini: blobs; 3 Reyes: bandas diagonales)
-│   │   ├── CreateAlbumModal.tsx          # Modal para crear un nuevo álbum de la colección
-│   │   └── StatCard.tsx                  # Tarjeta de métrica genérica (no usada actualmente)
-│   ├── cargar/
-│   │   ├── BatchInput.tsx                # Ingreso de números por lote (ej: "12,45,78-90")
-│   │   ├── GridSelector.tsx              # Cuadrícula para marcar figuritas clic a clic
-│   │   └── SectionSelector.tsx           # Marcar sección completa de una vez
+│   │   └── CreateAlbumModal.tsx          # Modal para crear un nuevo álbum de la colección
 │   ├── share/
-│   │   ├── ShareAlbumView.tsx            # Componentes compartidos: AlbumStatsCard, StickerGrid, ShareFooter
-│   │   └── ShareModal.tsx                # Modal de compartir (legacy)
+│   │   └── ShareAlbumView.tsx            # Componentes compartidos: AlbumStatsCard, StickerGrid, ShareFooter
 │   └── ui/
 │       ├── Button.tsx
 │       ├── Badge.tsx
@@ -89,15 +82,13 @@ src/
 │   ├── useExternalAlbum.ts               # Fetch público de álbum para /external-share (anon client, UUID gate)
 │   ├── useAlbumData.ts                   # Carga catálogo JSON del álbum (panini/3reyes)
 │   ├── useAlbumStats.ts                  # useMemo wrapper sobre getStats(stickers)
-│   ├── useFilters.ts                     # Aplica filtros + búsqueda al listado de figuritas
-│   └── useShare.ts                       # Genera y decodifica URL de intercambio (legacy)
+│   └── useFilters.ts                     # Aplica filtros + búsqueda al listado de figuritas
 ├── store/
 │   └── uiStore.ts                        # Zustand: filter, activeSection, cardSize, searchQuery
 ├── lib/
 │   ├── supabase/
 │   │   ├── client.ts                     # createBrowserClient de @supabase/ssr
 │   │   └── server.ts                     # createServerClient para Server Components
-│   ├── shareEncoder.ts                   # Serializa inventario a base64url para URL pública
 │   ├── sectionColors.ts                  # Mapa sección → color (para pills y badges)
 │   └── catalogHelpers.ts                 # mergeWithInventory, getStats, getSections, getSectionStats
 ├── data/
