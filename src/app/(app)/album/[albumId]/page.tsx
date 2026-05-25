@@ -205,7 +205,7 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         stickers={deferredFiltered}
         currentFilter={filter}
         onUpdate={(id, state, qty) => update.mutate({ stickerId: id, state, quantity: qty })}
-        isLoading={isLoading || isGridPending}
+        isLoading={isLoading || (isGridPending && deferredFiltered.length === 0)}
       />
 
       {/* Modals */}
