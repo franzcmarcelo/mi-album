@@ -60,8 +60,7 @@ export async function middleware(request: NextRequest) {
   // ── Protected routes: redirect to /login if unauthenticated ──────────────
   const isProtected =
     pathname === '/' ||
-    pathname.startsWith('/album/') ||
-    pathname.startsWith('/share/');
+    pathname.startsWith('/album/');
 
   if (isProtected && !user) {
     const loginUrl = new URL('/login', request.url);

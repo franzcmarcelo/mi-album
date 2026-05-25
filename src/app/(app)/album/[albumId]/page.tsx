@@ -18,6 +18,7 @@ import { SearchInput } from '@/components/ui/SearchInput';
 import { AddOwnedModal } from '@/components/album/AddOwnedModal';
 import { AddRepeatedModal } from '@/components/album/AddRepeatedModal';
 import { AlbumStatsCard, StickerGrid } from '@/components/share/ShareAlbumView';
+import { ShareModal } from '@/components/album/ShareModal';
 import { useUIStore, CardSize } from '@/store/uiStore';
 
 type AlbumTab = 'vista' | 'editar';
@@ -30,6 +31,7 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
   const { getInstanceById, isLoading: albumsLoading, renameAlbum } = useUserAlbums(user);
 
   const [activeTab, setActiveTab] = useState<AlbumTab>('editar');
+  const [shareOpen, setShareOpen] = useState(false);
   const [addOwnedOpen, setAddOwnedOpen] = useState(false);
   const [addRepeatedOpen, setAddRepeatedOpen] = useState(false);
 
@@ -113,7 +115,7 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
       />
 
       <ShareBanner
-        onShare={() => router.push(`/share/${instanceId}`)}
+        onShare={() => setShareOpen(true)}
         faltantes={stats.missing}
         repetidas={stats.repeated}
       />
@@ -258,6 +260,17 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
       )}
 
       {/* Modales — siempre montados para preservar estado entre tabs */}
+      <ShareModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        instanceId={instanceId}
+        albumName={instance.name}
+        publisher={publisher}
+        stickers={stickers}
+        missing={stats.missing}
+        repeated={stats.repeated}
+      />
+
       <AddOwnedModal
         open={addOwnedOpen}
         onClose={() => setAddOwnedOpen(false)}

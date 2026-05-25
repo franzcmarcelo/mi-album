@@ -15,7 +15,7 @@ Aplicación web para gestionar el inventario digital de álbumes de figuritas Pa
 
 - **Fase 2 completa**: Google Auth + Supabase BD — autenticación obligatoria, sin localStorage
 - Multi-álbum: el usuario puede tener varios álbumes activos (Panini y/o 3 Reyes)
-- `/share/<instanceId>` — vista privada del propietario (requiere sesión); muestra enlace público a compartir
+- `/share/<instanceId>` — **eliminada**; sustituida por el modal `ShareModal` en `/album/[albumId]`
 - `/external-share/<albumId>` — vista pública de solo lectura (sin auth), protegida con security headers y metadatos OG dinámicos
 - UI con tema oscuro, World Cup identity (logos, colores, animaciones)
 - SEO completo: robots.txt, sitemap.xml, metadatos globales, OG dinámico por álbum, JSON-LD
@@ -50,7 +50,6 @@ src/
 │   │   ├── HeaderActions.tsx             # Avatar de usuario + indicador de sesión en navbar
 │   │   ├── NavMenu.tsx                   # Menú hamburguesa (navegación lateral/dropdown, logout inline)
 │   │   └── album/[albumId]/page.tsx      # Vista de álbum: progreso, filtros, grid de figuritas
-│   ├── share/[token]/page.tsx            # Vista compartir del propietario (requiere sesión)
 │   ├── external-share/[albumId]/
 │   │   ├── layout.tsx                    # Server Component: generateMetadata dinámico (título, OG, noindex)
 │   │   ├── page.tsx                      # Vista pública de solo lectura (sin auth, next/image)
@@ -114,7 +113,7 @@ Next.js ejecuta exclusivamente el archivo llamado `middleware.ts` en la raíz de
 1. **UUID gate** para `/external-share/*`: rutas con path no-UUID devuelven 404 sin consultar Supabase
 2. **Security headers** en `/external-share/*`: `X-Frame-Options: DENY`, `Content-Security-Policy`, `X-Robots-Tag: noindex, nofollow`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`
 3. **Cookie refresh de Supabase** en todas las demás rutas (patrón `getAll` / `setAll`)
-4. **Protección de rutas**: `/`, `/album/*`, `/share/*` redirigen a `/login?redirect=<path>` si no hay sesión
+4. **Protección de rutas**: `/` y `/album/*` redirigen a `/login?redirect=<path>` si no hay sesión
 5. **Redirect inverso**: `/login` redirige a `/` si ya hay sesión activa
 
 ## SEO y Open Graph
@@ -131,7 +130,7 @@ Next.js ejecuta exclusivamente el archivo llamado `middleware.ts` en la raíz de
 - Sección de 4 feature cards debajo del login card (visibles e indexables por crawlers)
 
 ### robots.ts / sitemap.ts
-- `robots.ts`: permite `/` y `/login`; bloquea `/album/` y `/share/`
+- `robots.ts`: permite `/` y `/login`; bloquea `/album/`
 - `sitemap.ts`: expone `/login` con prioridad `1.0`
 
 ### OG dinámico por álbum (`external-share/[albumId]/`)
@@ -195,14 +194,15 @@ Breakpoints cubiertos:
 - **`StickerGrid`**: grilla por secciones con control S/M/L; verde = tengo, ámbar (`#fbbf24`) = repetida con badge ×N, gris = falta
 - **`groupBySection`**: helper exportado y usado también para generar textos de WhatsApp
 
-## Ruta `/share/[token]` (solo propietario)
+## Modal `ShareModal` (componente en `components/album/ShareModal.tsx`)
 
-Requiere sesión activa (redirect a `/login` si no hay usuario). Solo acepta UUIDs.
+Reemplaza la antigua ruta `/share/[token]`. Se abre desde el `ShareBanner` de `/album/[albumId]`.
 
-- Breadcrumb: `Mi colección > Nombre álbum > Compartir`
-- Panel con `CopyCard` apuntando a `/external-share/<instanceId>`, texto faltantes y texto repetidas
-- `ownerName` proviene de `user.user_metadata.full_name` (sesión activa)
-- `CopyCard`: botón copiar con flash 2s + botón WhatsApp
+- `CopyCard` para enlace público a `/external-share/<instanceId>` + botón WhatsApp
+- `CopyCard` con texto de faltantes (solo si `missing > 0`)
+- `CopyCard` con texto de repetidas (solo si `repeated > 0`)
+- Botón copiar con flash 2s · botón WhatsApp (wa.me)
+- Usa `groupBySection` de `ShareAlbumView.tsx` para construir los textos
 
 ## Ruta `/external-share/[albumId]` (pública)
 
@@ -438,7 +438,7 @@ update.mutate({ stickerId: sticker.id, state: null }); // eliminar
 `FiguriteCard onClick` → `update.mutate()` en `useInventory` → optimistic update en cache → `upsert` en Supabase `user_stickers` → rollback si falla
 
 **Usuario comparte su álbum:**
-`/share/[instanceId]` → misma pila que arriba (lectura) + genera URL `/external-share/<instanceId>` en el cliente
+`ShareModal` (en `/album/[albumId]`) → misma pila que arriba (lectura) + genera URL `/external-share/<instanceId>` en el cliente
 
 **Visitante ve álbum compartido:**
 `useExternalAlbum` → 3 queries anónimas (user_albums, profiles, user_stickers) → `buildInventoryMap` → `mergeWithInventory` → UI de solo lectura

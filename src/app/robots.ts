@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: ['/', '/login'],
-        disallow: ['/album/', '/share/'],
+        disallow: ['/album/'],
       },
     ],
     sitemap: 'https://mi-album-phi.vercel.app/sitemap.xml',
