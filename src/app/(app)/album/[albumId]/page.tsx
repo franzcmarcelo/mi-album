@@ -17,7 +17,10 @@ import { ProgressHeader } from '@/components/album/ProgressHeader';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { AddOwnedModal } from '@/components/album/AddOwnedModal';
 import { AddRepeatedModal } from '@/components/album/AddRepeatedModal';
+import { AlbumStatsCard, StickerGrid } from '@/components/share/ShareAlbumView';
 import { useUIStore, CardSize } from '@/store/uiStore';
+
+type AlbumTab = 'vista' | 'editar';
 
 export default function AlbumPage({ params }: { params: Promise<{ albumId: string }> }) {
   const { albumId: instanceId } = use(params);
@@ -26,6 +29,7 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
   const { filter, setFilter, setActiveSection, cardSize, setCardSize } = useUIStore();
   const { getInstanceById, isLoading: albumsLoading, renameAlbum } = useUserAlbums(user);
 
+  const [activeTab, setActiveTab] = useState<AlbumTab>('editar');
   const [addOwnedOpen, setAddOwnedOpen] = useState(false);
   const [addRepeatedOpen, setAddRepeatedOpen] = useState(false);
 
@@ -62,15 +66,16 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
 
   const isLoading = sessionLoading || albumsLoading || catalogLoading;
 
-  // Get missing and owned stickers for modals
+  // Figuras para los modales
   const missingStickers = stickers.filter((s) => !s.userState);
   const repeatableStickers = stickers.filter((s) => s.userState === 'owned' || s.userState === 'repeated');
 
   if (isLoading || !instance) {
-    return (
-      <AlbumPageSkeleton notFound={!isLoading && !instance} />
-    );
+    return <AlbumPageSkeleton notFound={!isLoading && !instance} />;
   }
+
+  const publisher = catalogMeta?.publisher ?? 'Panini';
+  const catalogName = catalogMeta?.name ?? 'Copa del Mundo 2026';
 
   return (
     <div className="space-y-4">
@@ -95,6 +100,7 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         Mi colección
       </Link>
 
+      {/* Siempre visible: resumen + botón de compartir */}
       <ProgressHeader
         albumName={instance.name}
         albumType={catalogMeta ? `${catalogMeta.publisher} · ${catalogMeta.name}` : ''}
@@ -112,103 +118,146 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         repetidas={stats.repeated}
       />
 
-      <AlbumToolbar />
-
-      {/* Add button for "Tengo" filter */}
-      {filter === 'owned' && (
-        <button
-          onClick={() => setAddOwnedOpen(true)}
-          className="pressable w-full"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '10px 14px',
-            background: 'rgba(16,185,129,0.1)',
-            border: '1px solid rgba(16,185,129,0.3)',
-            borderRadius: '10px',
-            cursor: 'pointer',
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#10b981',
-          }}
-        >
-          <span style={{ fontSize: '16px' }}>+</span>
-          Agregar figuras que tengo
-        </button>
-      )}
-
-      {/* Add button for "Repetidas" filter */}
-      {filter === 'repeated' && (
-        <button
-          onClick={() => setAddRepeatedOpen(true)}
-          className="pressable w-full"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '10px 14px',
-            background: 'rgba(234,179,8,0.1)',
-            border: '1px solid rgba(234,179,8,0.3)',
-            borderRadius: '10px',
-            cursor: 'pointer',
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#eab308',
-          }}
-        >
-          <span style={{ fontSize: '16px' }}>+</span>
-          Marcar como repetidas
-        </button>
-      )}
-
-      {/* Size toggle + Search combined row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {/* Size pills */}
-        <div
-          style={{
-            display: 'flex', gap: '2px', flexShrink: 0,
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--bg-border)',
-            borderRadius: '12px',
-            padding: '4px',
-          }}
-        >
-          {(['sm', 'md', 'lg'] as CardSize[]).map((s) => {
-            const active = cardSize === s;
-            return (
-              <button
-                key={s}
-                onClick={() => setCardSize(s)}
-                className="pressable rounded-[8px] px-2.5 py-1.5 text-xs font-bold"
-                style={{
-                  background: active ? 'var(--bg-raised)' : 'transparent',
-                  color: active ? 'var(--text-1)' : 'var(--text-3)',
-                  border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
-                  cursor: 'pointer',
-                }}
-              >
-                {s === 'sm' ? 'S' : s === 'md' ? 'M' : 'L'}
-              </button>
-            );
-          })}
-        </div>
-        {/* Search */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <SearchInput />
-        </div>
+      {/* Tabs */}
+      <div
+        style={{
+          display: 'flex',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--bg-border)',
+          borderRadius: '14px',
+          padding: '4px',
+          gap: '2px',
+        }}
+      >
+        {([
+          { value: 'vista',  label: 'Vista',  icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> },
+          { value: 'editar', label: 'Editar', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> },
+        ] as { value: AlbumTab; label: string; icon: React.ReactNode }[]).map(({ value, label, icon }) => {
+          const active = activeTab === value;
+          return (
+            <button
+              key={value}
+              onClick={() => setActiveTab(value)}
+              className="pressable flex-1 rounded-[10px]"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                padding: '8px 12px',
+                background: active ? 'var(--bg-raised)' : 'transparent',
+                border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
+                color: active ? 'var(--text-1)' : 'var(--text-3)',
+                fontSize: '13px', fontWeight: active ? 700 : 500,
+                cursor: 'pointer',
+                transition: 'all 150ms',
+              }}
+            >
+              {icon}
+              {label}
+            </button>
+          );
+        })}
       </div>
 
-      <SectionNav sections={sections} stickers={stickers} />
+      {/* ── Tab: Vista (solo lectura) ─────────────────────────────────────────── */}
+      {activeTab === 'vista' && (
+        <>
+          <AlbumStatsCard
+            meta={{ ownerName: '', albumName: instance.name, publisher, catalogName }}
+            stickers={stickers}
+          />
+          <StickerGrid stickers={stickers} />
+        </>
+      )}
 
-      <FiguriteGrid
-        stickers={deferredFiltered}
-        currentFilter={filter}
-        onUpdate={(id, state, qty) => update.mutate({ stickerId: id, state, quantity: qty })}
-        isLoading={isLoading || (isGridPending && deferredFiltered.length === 0)}
-      />
+      {/* ── Tab: Editar ───────────────────────────────────────────────────────── */}
+      {activeTab === 'editar' && (
+        <>
+          <AlbumToolbar />
 
-      {/* Modals */}
+          {/* Botón rápido en filtro "Tengo" */}
+          {filter === 'owned' && (
+            <button
+              onClick={() => setAddOwnedOpen(true)}
+              className="pressable w-full"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                padding: '10px 14px',
+                background: 'rgba(16,185,129,0.1)',
+                border: '1px solid rgba(16,185,129,0.3)',
+                borderRadius: '10px',
+                cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: '#10b981',
+              }}
+            >
+              <span style={{ fontSize: '16px' }}>+</span>
+              Agregar figuras que tengo
+            </button>
+          )}
+
+          {/* Botón rápido en filtro "Repetidas" */}
+          {filter === 'repeated' && (
+            <button
+              onClick={() => setAddRepeatedOpen(true)}
+              className="pressable w-full"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                padding: '10px 14px',
+                background: 'rgba(234,179,8,0.1)',
+                border: '1px solid rgba(234,179,8,0.3)',
+                borderRadius: '10px',
+                cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: '#eab308',
+              }}
+            >
+              <span style={{ fontSize: '16px' }}>+</span>
+              Marcar como repetidas
+            </button>
+          )}
+
+          {/* Fila: tamaño de tarjeta + búsqueda */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div
+              style={{
+                display: 'flex', gap: '2px', flexShrink: 0,
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--bg-border)',
+                borderRadius: '12px',
+                padding: '4px',
+              }}
+            >
+              {(['sm', 'md', 'lg'] as CardSize[]).map((s) => {
+                const active = cardSize === s;
+                return (
+                  <button
+                    key={s}
+                    onClick={() => setCardSize(s)}
+                    className="pressable rounded-[8px] px-2.5 py-1.5 text-xs font-bold"
+                    style={{
+                      background: active ? 'var(--bg-raised)' : 'transparent',
+                      color: active ? 'var(--text-1)' : 'var(--text-3)',
+                      border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {s === 'sm' ? 'S' : s === 'md' ? 'M' : 'L'}
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <SearchInput />
+            </div>
+          </div>
+
+          <SectionNav sections={sections} stickers={stickers} />
+
+          <FiguriteGrid
+            stickers={deferredFiltered}
+            currentFilter={filter}
+            onUpdate={(id, state, qty) => update.mutate({ stickerId: id, state, quantity: qty })}
+            isLoading={isLoading || (isGridPending && deferredFiltered.length === 0)}
+          />
+        </>
+      )}
+
+      {/* Modales — siempre montados para preservar estado entre tabs */}
       <AddOwnedModal
         open={addOwnedOpen}
         onClose={() => setAddOwnedOpen(false)}
@@ -234,6 +283,8 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
   );
 }
 
+// ─── ShareBanner ──────────────────────────────────────────────────────────────
+
 function ShareBanner({ onShare, faltantes, repetidas }: {
   onShare: () => void;
   faltantes: number;
@@ -257,10 +308,8 @@ function ShareBanner({ onShare, faltantes, repetidas }: {
         overflow: 'hidden',
       }}
     >
-      {/* subtle glow top-right */}
       <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      {/* Icon */}
       <div style={{
         width: '42px', height: '42px', flexShrink: 0,
         background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
@@ -277,7 +326,6 @@ function ShareBanner({ onShare, faltantes, repetidas }: {
         </svg>
       </div>
 
-      {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-1)', letterSpacing: '-0.01em' }}>
           Compartir mi álbum
@@ -287,13 +335,14 @@ function ShareBanner({ onShare, faltantes, repetidas }: {
         </p>
       </div>
 
-      {/* Arrow */}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(165,180,252,0.7)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
         <path d="M9 18l6-6-6-6" />
       </svg>
     </button>
   );
 }
+
+// ─── AlbumPageSkeleton ────────────────────────────────────────────────────────
 
 function AlbumPageSkeleton({ notFound }: { notFound?: boolean }) {
   if (notFound) {
@@ -326,12 +375,8 @@ function AlbumPageSkeleton({ notFound }: { notFound?: boolean }) {
           <div className="skeleton" style={{ height: '4px', borderRadius: '99px', marginTop: '4px' }} />
         </div>
       </div>
-      {/* Toolbar skeleton */}
-      <div style={{ display: 'flex', gap: '8px' }}>
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="skeleton" style={{ height: '32px', width: '64px', borderRadius: '20px' }} />
-        ))}
-      </div>
+      {/* Tabs skeleton */}
+      <div className="skeleton" style={{ height: '44px', borderRadius: '14px' }} />
       {/* Grid skeleton */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
         {Array.from({ length: 20 }).map((_, i) => (
