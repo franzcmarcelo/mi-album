@@ -14,10 +14,9 @@ import { FiguriteGrid } from '@/components/album/FiguriteGrid';
 import { AlbumToolbar } from '@/components/album/AlbumToolbar';
 import { SectionNav } from '@/components/album/SectionNav';
 import { ProgressHeader } from '@/components/album/ProgressHeader';
-import { SearchInput } from '@/components/ui/SearchInput';
 import { AddOwnedModal } from '@/components/album/AddOwnedModal';
 import { AddRepeatedModal } from '@/components/album/AddRepeatedModal';
-import { AlbumStatsCard, StickerGrid } from '@/components/share/ShareAlbumView';
+import { StickerGrid, StickerGridControls, CardSize as GridCardSize } from '@/components/share/ShareAlbumView';
 import { ShareModal } from '@/components/album/ShareModal';
 import { useUIStore, CardSize } from '@/store/uiStore';
 
@@ -27,11 +26,12 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
   const { albumId: instanceId } = use(params);
   const router = useRouter();
   const { user, loading: sessionLoading } = useSession();
-  const { filter, setFilter, setActiveSection, cardSize, setCardSize } = useUIStore();
+  const { filter, setFilter, setActiveSection, cardSize, setCardSize, albumShareOpen, setAlbumShareOpen, setAlbumPageActive } = useUIStore();
   const { getInstanceById, isLoading: albumsLoading, renameAlbum } = useUserAlbums(user);
 
-  const [activeTab, setActiveTab] = useState<AlbumTab>('editar');
-  const [shareOpen, setShareOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<AlbumTab>('vista');
+  const [resumeSize, setResumeSize] = useState<GridCardSize>('md');
+  const [resumeFilter, setResumeFilter] = useState<'all' | 'missing' | 'repeated'>('all');
   const [addOwnedOpen, setAddOwnedOpen] = useState(false);
   const [addRepeatedOpen, setAddRepeatedOpen] = useState(false);
 
@@ -61,6 +61,15 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
     setFilter('all');
     setActiveSection(null);
   }, [instanceId, setFilter, setActiveSection]);
+
+  // Señaliza al header que estamos en una página de álbum; se limpia al desmontar.
+  useEffect(() => {
+    setAlbumPageActive(true);
+    return () => {
+      setAlbumPageActive(false);
+      setAlbumShareOpen(false);
+    };
+  }, [setAlbumPageActive, setAlbumShareOpen]);
 
   useEffect(() => {
     if (!sessionLoading && !user) router.replace('/login');
@@ -102,7 +111,7 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         Mi colección
       </Link>
 
-      {/* Siempre visible: resumen + botón de compartir */}
+      {/* Siempre visible: resumen de progreso */}
       <ProgressHeader
         albumName={instance.name}
         albumType={catalogMeta ? `${catalogMeta.publisher} · ${catalogMeta.name}` : ''}
@@ -112,12 +121,6 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         total={stats.total}
         progress={stats.progress}
         onRename={(name) => renameAlbum(instanceId, name)}
-      />
-
-      <ShareBanner
-        onShare={() => setShareOpen(true)}
-        faltantes={stats.missing}
-        repetidas={stats.repeated}
       />
 
       {/* Tabs */}
@@ -132,7 +135,7 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         }}
       >
         {([
-          { value: 'vista',  label: 'Vista',  icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> },
+          { value: 'vista',  label: 'Resumen',  icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> },
           { value: 'editar', label: 'Editar', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> },
         ] as { value: AlbumTab; label: string; icon: React.ReactNode }[]).map(({ value, label, icon }) => {
           const active = activeTab === value;
@@ -159,14 +162,28 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         })}
       </div>
 
-      {/* ── Tab: Vista (solo lectura) ─────────────────────────────────────────── */}
+      {/* ── Tab: Resumen (solo lectura) ──────────────────────────────────────── */}
       {activeTab === 'vista' && (
         <>
-          <AlbumStatsCard
-            meta={{ ownerName: '', albumName: instance.name, publisher, catalogName }}
-            stickers={stickers}
+          <ResumeFilterBar
+            filter={resumeFilter}
+            onChange={setResumeFilter}
+            size={resumeSize}
+            onSizeChange={setResumeSize}
           />
-          <StickerGrid stickers={stickers} />
+          <StickerGrid
+            stickers={
+              resumeFilter === 'missing'  ? stickers.filter((s) => !s.userState) :
+              resumeFilter === 'repeated' ? stickers.filter((s) => s.userState === 'repeated') :
+              stickers
+            }
+            size={resumeSize}
+            onSizeChange={setResumeSize}
+            hideControls
+            hideNames
+            hideProgress={resumeFilter !== 'all'}
+            summaryFilter={resumeFilter}
+          />
         </>
       )}
 
@@ -213,7 +230,7 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
             </button>
           )}
 
-          {/* Fila: tamaño de tarjeta + búsqueda */}
+          {/* Fila: tamaño de tarjeta + navegación por sección */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div
               style={{
@@ -244,11 +261,9 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
               })}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <SearchInput />
+              <SectionNav sections={sections} stickers={stickers} />
             </div>
           </div>
-
-          <SectionNav sections={sections} stickers={stickers} />
 
           <FiguriteGrid
             stickers={deferredFiltered}
@@ -259,10 +274,17 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
         </>
       )}
 
+      {/* Banner de compartir — al final del contenido de tabs */}
+      <ShareBanner
+        onShare={() => setAlbumShareOpen(true)}
+        faltantes={stats.missing}
+        repetidas={stats.repeated}
+      />
+
       {/* Modales — siempre montados para preservar estado entre tabs */}
       <ShareModal
-        open={shareOpen}
-        onClose={() => setShareOpen(false)}
+        open={albumShareOpen}
+        onClose={() => setAlbumShareOpen(false)}
         instanceId={instanceId}
         albumName={instance.name}
         publisher={publisher}
@@ -292,6 +314,105 @@ export default function AlbumPage({ params }: { params: Promise<{ albumId: strin
           });
         }}
       />
+    </div>
+  );
+}
+
+// ─── ResumeFilterBar ─────────────────────────────────────────────────────────
+
+type ResumeFilter = 'all' | 'missing' | 'repeated';
+
+const RESUME_FILTERS: { value: ResumeFilter; label: string; icon: React.ReactNode; color: string; activeBg: string }[] = [
+  {
+    value: 'all',
+    label: 'Todas',
+    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M3 8l5-5m8 0l5 5M3 16l5 5m8 0l5-5M3 12h18" /></svg>,
+    color: 'rgba(100,116,139,1)',
+    activeBg: 'rgba(100,116,139,0.15)',
+  },
+  {
+    value: 'missing',
+    label: 'Faltan',
+    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>,
+    color: '#f97316',
+    activeBg: 'rgba(249,115,22,0.15)',
+  },
+  {
+    value: 'repeated',
+    label: 'Repetidas',
+    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M17 2l4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="M7 22l-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /></svg>,
+    color: '#eab308',
+    activeBg: 'rgba(234,179,8,0.15)',
+  },
+];
+
+function ResumeFilterBar({ filter, onChange, size, onSizeChange }: {
+  filter: ResumeFilter;
+  onChange: (f: ResumeFilter) => void;
+  size: GridCardSize;
+  onSizeChange: (s: GridCardSize) => void;
+}) {
+  return (
+    <div style={{ display: 'flex', gap: '6px', alignItems: 'stretch' }}>
+      {/* S/M/L — mismo alto que la barra de filtro */}
+      <div style={{
+        display: 'flex', gap: '2px', flexShrink: 0,
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--bg-border)',
+        borderRadius: '14px',
+        padding: '5px',
+      }}>
+        {(['sm', 'md', 'lg'] as GridCardSize[]).map((s) => {
+          const active = size === s;
+          return (
+            <button
+              key={s}
+              onClick={() => onSizeChange(s)}
+              className="pressable rounded-[9px] px-2.5 text-xs font-bold"
+              style={{
+                background: active ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                color: active ? 'var(--text-1)' : 'var(--text-3)',
+                border: active ? '1px solid var(--bg-border-hi)' : '1px solid transparent',
+                cursor: 'pointer',
+              }}
+            >
+              {s === 'sm' ? 'S' : s === 'md' ? 'M' : 'L'}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Filtros */}
+      <div style={{
+        flex: 1, display: 'flex',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--bg-border)',
+        borderRadius: '14px',
+        padding: '5px',
+        gap: '2px',
+      }}>
+        {RESUME_FILTERS.map((f) => {
+          const active = filter === f.value;
+          return (
+            <button
+              key={f.value}
+              onClick={() => onChange(f.value)}
+              className="pressable flex-1 flex items-center justify-center gap-1.5 rounded-[9px] py-1.5 text-xs font-semibold transition-all duration-200"
+              style={{
+                background: active ? f.activeBg : 'rgba(255,255,255,0.04)',
+                color: f.color,
+                opacity: active ? 1 : 0.7,
+                border: active ? `1px solid ${f.color}` : '1px solid transparent',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{f.icon}</span>
+              <span>{f.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

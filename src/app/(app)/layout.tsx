@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { NavMenu } from './NavMenu';
 import { HeaderActions } from './HeaderActions';
+import { ScrollToTop } from '@/components/ui/ScrollToTop';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -115,6 +116,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       {/* Spacer so wave doesn't stick to content */}
       <div style={{ height: '32px' }} />
+
+      <ScrollToTop />
     </div>
   );
 }

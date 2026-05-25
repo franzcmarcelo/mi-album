@@ -16,12 +16,12 @@ export const metadata: Metadata = {
   description:
     'Gestiona tu colección de figuras Panini y 3 Reyes del Mundial 2026. Controla lo que tienes, lo que te falta y tus repetidas. Comparte tu progreso con amigos.',
   keywords: [
-    'álbum figuritas',
+    'álbum Figuras',
     'Panini 2026',
     'Mundial 2026',
-    'figuritas Copa del Mundo',
+    'Figuras Copa del Mundo',
     'stickers FIFA World Cup',
-    '3 Reyes figuritas',
+    '3 Reyes Figuras',
   ],
   authors: [{ name: 'Mi Álbum' }],
   openGraph: {

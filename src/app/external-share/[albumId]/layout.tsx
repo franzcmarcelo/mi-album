@@ -41,8 +41,8 @@ export async function generateMetadata({
 
     const title = `${albumName} — ${publisher} Copa del Mundo 2026`;
     const description = ownerName
-      ? `El álbum de ${ownerName}: "${albumName}" (${publisher} · Copa del Mundo 2026). Vista de solo lectura.`
-      : `Álbum "${albumName}" de ${publisher} · Copa del Mundo 2026. Vista de solo lectura.`;
+      ? `El álbum de ${ownerName}: "${albumName}" (${publisher} · Copa del Mundo 2026).`
+      : `Álbum "${albumName}" de ${publisher} · Copa del Mundo 2026.`;
     const ogImage = `${BASE_URL}/external-share/${albumId}/opengraph-image`;
 
     return {

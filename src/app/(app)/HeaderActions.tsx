@@ -2,13 +2,49 @@
 
 import Link from 'next/link';
 import { useSession } from '@/hooks/useSession';
+import { useUIStore } from '@/store/uiStore';
 
 export function HeaderActions() {
   const { user, loading } = useSession();
+  const albumPageActive = useUIStore((s) => s.albumPageActive);
+  const setAlbumShareOpen = useUIStore((s) => s.setAlbumShareOpen);
 
-  if (loading || user) {
-    return null;
+  // Botón de compartir — visible solo cuando el usuario está en una página de álbum
+  if (albumPageActive) {
+    return (
+      <button
+        onClick={() => setAlbumShareOpen(true)}
+        className="pressable"
+        aria-label="Compartir álbum"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '7px 12px',
+          borderRadius: '10px',
+          background: 'rgba(99,102,241,0.15)',
+          border: '1px solid rgba(99,102,241,0.35)',
+          color: '#818cf8',
+          cursor: 'pointer',
+          fontSize: '13px',
+          fontWeight: 700,
+          transition: 'all 150ms',
+        }}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+        </svg>
+        Compartir
+      </button>
+    );
   }
+
+  // Botón de login — visible solo cuando el usuario no está autenticado
+  if (loading || user) return null;
 
   return (
     <Link

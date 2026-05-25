@@ -4,6 +4,7 @@ import React from 'react';
 import { StickerWithState, StickerState } from '@/types';
 import { useUIStore } from '@/store/uiStore';
 import { getSectionColor } from '@/lib/sectionColors';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { FiguriteCard } from './FiguriteCard';
 
 interface FiguriteGridProps {
@@ -88,30 +89,16 @@ export function FiguriteGrid({ stickers, onUpdate, isLoading, currentFilter = 'a
         const colors = getSectionColor(section);
         return (
           <React.Fragment key={section}>
-            {/* Section header — spans all columns */}
-            <div style={{
-              gridColumn: '1 / -1',
-              display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '6px 2px 2px',
-            }}>
-              <div style={{
-                width: '8px', height: '8px', borderRadius: '50%',
-                background: colors.bg, flexShrink: 0,
-              }} />
-              <span style={{
-                fontSize: '10px', fontWeight: 800,
-                letterSpacing: '0.12em', textTransform: 'uppercase',
-                color: 'var(--text-3)',
-              }}>
-                {section}
-              </span>
-              <span style={{
-                fontSize: '9px', fontWeight: 600,
-                color: 'var(--text-3)', opacity: 0.5,
-              }}>
-                {sectionStickers.length}
-              </span>
-              <div style={{ flex: 1, height: '1px', background: 'var(--bg-border)' }} />
+            {/* Encabezado de sección unificado */}
+            <div style={{ gridColumn: '1 / -1', padding: '6px 2px 4px' }}>
+              <SectionHeader
+                section={section}
+                color={colors.bg}
+                collected={sectionStickers.filter((s) => s.userState === 'owned' || s.userState === 'repeated').length}
+                total={sectionStickers.length}
+                showProgress={currentFilter === 'all'}
+                showCount={true}
+              />
             </div>
 
             {/* Cards for this section */}
