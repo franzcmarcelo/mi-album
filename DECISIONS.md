@@ -34,9 +34,9 @@
 | Ruta | Descripción |
 |------|-------------|
 | `/` | Dashboard — lista de álbumes del usuario |
-| `/album/[albumId]` | Detalle de álbum — grid de figuritas, filtros, share |
+| `/album/[albumId]` | Detalle de álbum — tabs Vista/Editar, grid de Figuras, filtros, ShareModal |
 | `/login` | Login con Google |
-| `/share/[token]` | Vista pública de inventario (sin auth) |
+| `/external-share/[albumId]` | Vista pública de solo lectura (sin auth); reemplaza la antigua `/share/[token]` |
 
 Las rutas `/cargar` y `/repetidas` fueron eliminadas: la carga se hace directamente desde el grid del álbum y la info de repetidas/faltantes vive en el modal de compartir. El `BottomNav` fue eliminado junto con `/repetidas` (con una sola ruta principal no aportaba valor).
 
@@ -45,6 +45,7 @@ Las rutas `/cargar` y `/repetidas` fueron eliminadas: la carga se hace directame
 - **Fase 1** ✅ — Frontend solo, localStorage, flip-card 3D, URL compartible por WhatsApp
 - **Fase 2** ✅ — Google OAuth, Supabase DB, migración automática, múltiples álbumes por usuario
 - **Fase 2.5** ✅ — UI overhaul: NavMenu hamburger, AlbumToolbar unificada, ShareModal con 3 secciones, skeleton loaders, limpieza de rutas
+- **Fase 2.8** ✅ — Tabs Vista/Editar, resumen por filtro en StickerGrid, SectionHeader unificado, exportación PNG con CompactExport + html-to-image
 - **Fase 3** ⏳ — Intercambios entre usuarios (ver sección 13)
 
 ---
@@ -266,7 +267,7 @@ El modal de compartir del detalle de álbum expone 3 secciones independientes, c
 | ❌ Mis faltantes | Texto con números por sección + firma "Álbum: Panini" | Abre wa.me con el texto |
 | 🔄 Mis repetidas | Texto con números por sección + firma "Álbum: Panini" | Abre wa.me con el texto |
 
-Las secciones de faltantes/repetidas solo se muestran si hay figuritas en ese estado. El texto está en español LATAM estándar (sin voseo argentino).
+Las secciones de faltantes/repetidas solo se muestran si hay Figuras en ese estado. El texto está en español LATAM estándar (sin voseo argentino).
 
 ---
 

@@ -1,6 +1,6 @@
 # Mi Álbum — Copa del Mundo 2026
 
-Aplicación web para gestionar el inventario digital de los álbumes de figuritas **Panini** y **3 Reyes** del Mundial 2026. Permite marcar figuras como conseguidas o repetidas, ver el progreso y compartir el álbum públicamente.
+Aplicación web para gestionar el inventario digital de los álbumes de Figuras **Panini** y **3 Reyes** del Mundial 2026. Permite marcar figuras como conseguidas o repetidas, ver el progreso y compartir el álbum públicamente.
 
 ---
 

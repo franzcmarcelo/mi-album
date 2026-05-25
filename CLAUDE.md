@@ -1,6 +1,6 @@
 # Álbum Digital Panini / 3 Reyes
 
-Aplicación web para gestionar el inventario digital de álbumes de figuritas Panini y 3 Reyes del Mundial 2026.
+Aplicación web para gestionar el inventario digital de álbumes de Figuras Panini y 3 Reyes del Mundial 2026.
 
 ## Stack
 
@@ -27,7 +27,7 @@ Aplicación web para gestionar el inventario digital de álbumes de figuritas Pa
 
 - Todo el texto de la UI y los comentarios de código se escriben en **español neutro (estándar)**
 - No usar voseo ni expresiones rioplatenses: usar "tú", imperativo estándar ("revisa", "indica"), sin regionalismos
-- En la UI: "figura/s" (no "sticker/s" ni "figurita/s"); en keywords SEO se puede mantener "figuritas" para cobertura de búsqueda
+- En la UI: "figura/s" (no "sticker/s" ni "figurita/s"); en keywords SEO se puede mantener "Figuras" para cobertura de búsqueda
 
 ## Estructura de carpetas
 
@@ -49,7 +49,7 @@ src/
 │   │   ├── page.tsx                      # Dashboard: WCHero banner + grid de álbumes
 │   │   ├── HeaderActions.tsx             # Avatar de usuario + indicador de sesión en navbar
 │   │   ├── NavMenu.tsx                   # Menú hamburguesa (navegación lateral/dropdown, logout inline)
-│   │   └── album/[albumId]/page.tsx      # Vista de álbum: progreso, filtros, grid de figuritas
+│   │   └── album/[albumId]/page.tsx      # Vista de álbum: progreso, filtros, grid de Figuras
 │   ├── external-share/[albumId]/
 │   │   ├── layout.tsx                    # Server Component: generateMetadata dinámico (título, OG, noindex)
 │   │   ├── page.tsx                      # Vista pública de solo lectura (sin auth, next/image)
@@ -59,31 +59,33 @@ src/
 ├── components/
 │   ├── album/
 │   │   ├── FiguriteCard.tsx              # Tarjeta de figurita con animaciones (bounce, shine, stamp, UI dorada para especiales)
-│   │   ├── FiguriteGrid.tsx              # Cuadrícula de figuritas (virtualizada para 600+ items)
+│   │   ├── FiguriteGrid.tsx              # Cuadrícula de Figuras (virtualizada para 600+ items)
 │   │   ├── SectionNav.tsx                # Nav horizontal de secciones; pills con checkbox toggle
 │   │   ├── AlbumToolbar.tsx              # Solo filtros (Todas/Tengo/Faltan/Repetidas)
 │   │   ├── ProgressHeader.tsx            # Header: barra top segmentada, % grande, tres pills
-│   │   ├── AddOwnedModal.tsx             # Modal para marcar figuritas como "tengo" en lote (exporta ModalSheet, SectionGroup)
-│   │   └── AddRepeatedModal.tsx          # Modal para marcar figuritas como "repetidas" con cantidad
+│   │   ├── AddOwnedModal.tsx             # Modal para marcar Figuras como "tengo" en lote (exporta ModalSheet, SectionGroup)
+│   │   └── AddRepeatedModal.tsx          # Modal para marcar Figuras como "repetidas" con cantidad
 │   ├── dashboard/
 │   │   ├── AlbumCover.tsx                # Portada de álbum (Panini: blobs; 3 Reyes: bandas diagonales)
 │   │   └── CreateAlbumModal.tsx          # Modal para crear un nuevo álbum de la colección
 │   ├── share/
-│   │   └── ShareAlbumView.tsx            # Componentes compartidos: AlbumStatsCard, StickerGrid, ShareFooter
+│   │   └── ShareAlbumView.tsx            # AlbumStatsCard, StickerGrid (resumen + descarga PNG), CompactExport, ShareFooter
 │   └── ui/
 │       ├── Button.tsx
 │       ├── Badge.tsx
-│       └── SearchInput.tsx               # Buscador de figuritas por número o nombre
+│       ├── ScrollToTop.tsx               # Botón flotante para volver al inicio de la página
+│       ├── SectionHeader.tsx             # Encabezado de sección unificado: punto · nombre · barra/raya · conteo
+│       └── SearchInput.tsx               # Buscador de Figuras por número o nombre
 ├── hooks/
 │   ├── useSession.ts                     # Sesión Supabase (user, loading)
 │   ├── useUserAlbums.ts                  # CRUD de álbumes del usuario + AVAILABLE_ALBUMS
-│   ├── useInventory.ts                   # CRUD de figuritas del inventario contra Supabase
+│   ├── useInventory.ts                   # CRUD de Figuras del inventario contra Supabase
 │   ├── useExternalAlbum.ts               # Fetch público de álbum para /external-share (anon client, UUID gate)
 │   ├── useAlbumData.ts                   # Carga catálogo JSON del álbum (panini/3reyes)
 │   ├── useAlbumStats.ts                  # useMemo wrapper sobre getStats(stickers)
-│   └── useFilters.ts                     # Aplica filtros + búsqueda al listado de figuritas
+│   └── useFilters.ts                     # Aplica filtros + búsqueda al listado de Figuras
 ├── store/
-│   └── uiStore.ts                        # Zustand: filter, activeSection, cardSize, searchQuery
+│   └── uiStore.ts                        # Zustand: filter, activeSection, cardSize, searchQuery, albumPageActive, albumShareOpen
 ├── lib/
 │   ├── supabase/
 │   │   ├── client.ts                     # createBrowserClient de @supabase/ssr
@@ -121,7 +123,7 @@ Next.js ejecuta exclusivamente el archivo llamado `middleware.ts` en la raíz de
 ### Metadatos globales (`app/layout.tsx`)
 - `metadataBase`: apunta al dominio de producción para que las URLs relativas de OG sean absolutas
 - Title template: `%s | Mi Álbum`
-- Keywords incluyen "figuritas" para mayor cobertura de búsqueda aunque la UI use "figuras"
+- Keywords incluyen "Figuras" para mayor cobertura de búsqueda aunque la UI use "figuras"
 - `og:image`, Twitter card, canonical
 
 ### Página de login (`app/(auth)/login/page.tsx`)
@@ -191,8 +193,25 @@ Breakpoints cubiertos:
 `AlbumStatsCard`, `StickerGrid` y `ShareFooter` son usados por ambas rutas de compartir.
 
 - **`AlbumStatsCard`**: muestra publisher + catalogName + nombre del dueño (`ownerName`), nombre del álbum, %, barra de progreso y chips Tengo/Repetidas/Faltan/Total
-- **`StickerGrid`**: grilla por secciones con control S/M/L; verde = tengo, ámbar (`#fbbf24`) = repetida con badge ×N, gris = falta
-- **`groupBySection`**: helper exportado y usado también para generar textos de WhatsApp
+- **`StickerGrid`**: grilla por secciones con control S/M/L; acepta `summaryFilter` ('all' | 'missing' | 'repeated') para mostrar un bloque de resumen en la parte superior (stats + barra de progreso + botón de descarga); usa `SectionHeader` unificado
+  - Verde = tengo, ámbar (`#fbbf24`) = repetida con badge ×N, gris = falta
+- **`StickerGridControls`**: botones S/M/L exportado para usar fuera del card
+- **`CompactExport`**: componente renderizado off-screen para exportar el resumen como imagen PNG via `html-to-image`; cuadrícula plana con etiquetas de sección inline (span 5 cols, texto horizontal) y celdas de figura coloreadas; URL de promo hardcodeada a `mi-album-phi.vercel.app`
+- **`DownloadButton`**: ícono de descarga de 30px que dispara `handleDownload`; usa `flushSync` + `createRoot` + `setTimeout(80ms)` para garantizar render síncrono antes de la captura
+- **`groupBySection`**: helper exportado que devuelve `Record<string, StickerWithState[]>`; usado también para generar textos de WhatsApp
+
+### `SectionHeader` (`src/components/ui/SectionHeader.tsx`)
+
+Encabezado de sección unificado, usado en `FiguriteGrid` y `StickerGrid`.
+
+```
+• NOMBRE ────────────────── [X/Y]
+```
+
+- `showProgress=true` → la raya es una barra de progreso animada (filtro "Todas")
+- `showProgress=false` → la raya es un divisor de 1px (filtros Faltan/Repetidas)
+- `showCount=true` → muestra `X/Y` en vista "Todas" o solo el total en otras vistas
+- `isComplete` solo se activa cuando `showProgress=true` (verde + ✓)
 
 ## Modal `ShareModal` (componente en `components/album/ShareModal.tsx`)
 
@@ -213,7 +232,7 @@ Accesible sin sesión. El `albumId` es el UUID de `user_albums` en Supabase.
 - `useExternalAlbum`: fetch con cliente anon; trae `albumName`, `ownerName` (vía tabla `profiles`), `slug`, `stickers`
 - UUID validation con regex antes de hacer la query (`enabled: isValidUUID`, `retry: false`)
 - `InvalidLink` para UUIDs no encontrados o rutas inválidas
-- Sin mutaciones, sin `onClick` en figuritas, `userSelect: 'none'`
+- Sin mutaciones, sin `onClick` en Figuras, `userSelect: 'none'`
 
 ## Esquema de base de datos (Supabase / PostgreSQL)
 
@@ -321,7 +340,7 @@ Supabase (PostgreSQL)
 | `useAlbumData(slug)` | `@/hooks/useAlbumData` | `{ data: Sticker[], isLoading }` | Catálogo estático del álbum (JSON) |
 | `useInventory(instanceId, userId)` | `@/hooks/useInventory` | `{ data: InventoryMap, isLoading, update }` | Vista del álbum privado — leer y escribir inventario |
 | `useAlbumStats(stickers)` | `@/hooks/useAlbumStats` | `{ total, owned, repeated, missing, progress }` | Resumen numérico de progreso — cualquier UI que muestre estadísticas |
-| `useFilters(stickers)` | `@/hooks/useFilters` | `StickerWithState[]` filtrados | Grid de figuritas — aplica filtro, búsqueda y sección activa |
+| `useFilters(stickers)` | `@/hooks/useFilters` | `StickerWithState[]` filtrados | Grid de Figuras — aplica filtro, búsqueda y sección activa |
 | `useExternalAlbum(albumId)` | `@/hooks/useExternalAlbum` | `{ data: { slug, albumName, ownerName, stickers }, isLoading, error }` | Vista pública `/external-share` — sin sesión requerida |
 
 ---
@@ -601,4 +620,5 @@ npx tsc --noEmit     # Verificar tipos sin compilar
 - **Fase 2.5** ✓: SEO (robots, sitemap, metadatos globales, OG dinámico), seguridad (middleware consolidado, RLS fix), responsive login, español neutro en UI
 - **Fase 2.6** ✓: Catálogo 3 Reyes completo (706 figuras reales), campo `isSpecial`, UI dorada para figuras especiales, figura G para Irán
 - **Fase 2.7** ✓: Centralización de arquitectura de datos — `catalogPrefix`, `buildInventoryMap` en `catalogHelpers`; corrección de bugs UUID en `useInventory` y `useExternalAlbum`; documentación de flujos
+- **Fase 2.8** ✓: UI de resumen enriquecida — tabs Vista/Editar en la página de álbum, bloque de resumen con stats en `StickerGrid` según filtro activo (`summaryFilter`), `SectionHeader` unificado para vistas de editar y compartir, exportación de resumen como imagen PNG (`CompactExport` + `html-to-image`), filtros renombrados a Todas/Faltan/Repetidas
 - **Fase 3** (futura): intercambios entre usuarios, notificaciones, grupos
